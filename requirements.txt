@@ -1,0 +1,13 @@
+diffusers
+transformers
+scipy
+ftfy
+fire
+wandb
+safetensors
+opencv-python
+torchvision
+mediapipe
+fire 
+accelerate
+einops
