@@ -203,8 +203,8 @@ def struct_output(args):
     else: os.mkdir(dataset_)
     
     # Now create folder for experiments
-    if(args.lora_or_krona==1): exp = f"krona_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.alpha_text}_{args.alpha_unet}"
-    elif(args.lora_or_krona==0): exp = f"lora_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.alpha_text}_{args.alpha_unet}"
+    if(args.lora_or_krona==1): exp = f"krona_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.max_train_steps}"
+    elif(args.lora_or_krona==0): exp = f"lora_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.max_train_steps}"
     else: raise AttributeError("must be wither 0 or 1")
     exp_ = os.path.join(dataset_, exp)
     if(os.path.exists(exp_)): pass
@@ -519,6 +519,8 @@ def parse_args(input_args=None):
         args = parser.parse_args()
         
     args.instance_prompt = instance_prompt(os.path.basename(args.instance_data_dir))
+    if args.with_prior_preservation:
+        args.class_prompt = 'a '+ args.instance_prompt.split(',')[1]
     args.output_dir = struct_output(args) # structure the output folder 
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
@@ -1090,6 +1092,9 @@ def main(args):
     save_path = args.output_dir
     generator(args)
     clipi, clipt = evaluator(args)
+
+    print(clipi)
+    print(clipt)
     
     # save all the info in the form of *.json file
     exp_info = {"Dataset_Name": os.path.basename(args.instance_data_dir), "Adaptor": args.lora_or_krona,
@@ -1098,7 +1103,7 @@ def main(args):
                 "learning_rate_text": args.learning_rate_text, "alpha_text": args.alpha_text, 
                 "alpha_unet": args.alpha_unet, "output_path":args.output_dir}
     exp_name = f'{save_path}/log_{args.lora_or_krona}_{args.lora_rank}_{args.num_train_epochs}_{len(train_dataset)}_\
-        {args.learning_rate}_{args.learning_rate_text}_{args.alpha_text}_{args.alpha_unet}.json'
+        {args.learning_rate}_{args.learning_rate_text}.json'
     
     with open(exp_name, 'w') as f:
         f.write(json.dumps(exp_info, indent=4))

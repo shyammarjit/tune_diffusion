@@ -8,6 +8,7 @@ def instance_prompt(dataset):
         'bear_plushie': 'bear_plushie,stuffed animal',
         'berry_bowl': 'berry_bowl,bowl',
         'can': 'can,can',
+        'car2':'car2,car',
         'candle': 'candle,candle',
         'cat': 'cat,cat',
         'cat2': 'cat2,cat',
@@ -24,7 +25,7 @@ def instance_prompt(dataset):
         'fancy_boot': 'fancy_boot,boot',
         'grey_sloth_plushie': 'grey_sloth_plushie,stuffed animal',
         'monster_toy': 'monster_toy,toy',
-        'pink_sunglasses': 'pink_sunglasses,glasses',
+        'pink_sunglasses': 'pink_sunglasses,sunglasses',
         'poop_emoji': 'poop_emoji,toy',
         'rc_car': 'rc_car,toy',
         'red_cartoon': 'red_cartoon,cartoon',
@@ -47,7 +48,122 @@ def get_promts(dataset):
     non_living_dataset= ['backpack','backpack_dog','bear_plushie','berry_bowl','can','candle' ,'clock' ,'colorful_sneaker','duck_toy','fancy_boot','grey_sloth_plushie','monster_toy','pink_sunglasses','poop_emoji','rc_car','red_cartoon','robot_toy','shiny_sneaker','teapot','vase','wolf_plushie']
     unique_token = os.path.basename(dataset)
     class_token = instance_prompt(unique_token)
+    add_ones=[]
+    if unique_token=="teapot":
+        add_ones=[
+            "A {V} teapot floating in milk",
+            "A transparent {V} teapot with milk inside",
+            "A {V} teapot pouring tea",
+            "A {V} teapot floating in the sea",
+            "A bear pouring from a {V} teapot"
+        ]
+        add_ones = [sentence.format(V=unique_token) for sentence in add_ones]
+
+    elif unique_token=="clock":
+        add_ones = [
+            'a {0} clock with a cave in the background'.format(unique_token),
+            'A {0} clock on top of blue fabric'.format(unique_token),
+            'A {0} clock held by a hand, with a forest in the background'.format(unique_token)
+        ]
+
+    elif unique_token=="dog6":
+        add_ones = [
+            'a {0} dog in the Acropolis'.format(unique_token),
+            'a {0} dog in a doghouse'.format(unique_token),
+            'a {0} dog in a bucket'.format(unique_token),
+            'a {0} dog getting a haircut'.format(unique_token),
+            'a depressed {0} dog'.format(unique_token),
+            'a sleeping {0} dog'.format(unique_token),
+            'a sad {0} dog'.format(unique_token),
+            'a joyous {0} dog'.format(unique_token),
+            'a barking {0} dog'.format(unique_token),
+            'a crying {0} dog'.format(unique_token),
+            'a frowning {0} dog'.format(unique_token),
+            'a screaming {0} dog'.format(unique_token)
+        ]
+
+    elif unique_token == "vase":
+        add_ones = [
+            'a {0} vase in the Acropolis'.format(unique_token),
+            'A {0} vase in the ocean'.format(unique_token),
+            'A {0} vase with a colorful flower bouquet'.format(unique_token),
+            'Milk poured into a {0} vase'.format(unique_token),
+            'A {0} vase buried in the sands'.format(unique_token),
+            'Two {0} vases on a table'.format(unique_token)
+        ]
+        
+    elif unique_token == "cat":
+        add_ones = [
+            'a {0} cat seen from the top'.format(unique_token),
+            'a {0} cat seen from the bottom'.format(unique_token),
+            'a {0} cat seen from the side'.format(unique_token),
+            'a {0} cat seen from the back'.format(unique_token)
+        ]
+
+    elif unique_token == "dog2":
+        add_ones = [
+            'a {0} dog wearing a witch outfit'.format(unique_token),
+            'a {0} dog wearing Angel Wings'.format(unique_token),
+            'a {0} dog wearing a Superman Outfit'.format(unique_token),
+            'a {0} dog wearing an Ironman Outfit'.format(unique_token),
+            'a {0} dog wearing a Nurse Outfit'.format(unique_token),
+            'A cross of a {0} dog and a bear'.format(unique_token),
+            'A cross of a {0} dog and a panda'.format(unique_token),
+            'A cross of a {0} dog and a koala'.format(unique_token),
+            'A cross of a {0} dog and a lion'.format(unique_token),
+            'A cross of a {0} dog and a hippo'.format(unique_token)
+        ]
+
     
+    elif unique_token == "backpack":
+        add_ones = [
+            'A {0} backpack in the Grand Canyon'.format(unique_token),
+            'A wet {0} backpack in water'.format(unique_token),
+            'A {0} backpack in Boston'.format(unique_token),
+            'A {0} backpack with the night sky'.format(unique_token)
+        ]
+
+    elif unique_token == "pink_sunglasses":
+        add_ones = [
+            'A {0} sunglasses in the jungle'.format(unique_token),
+            'A {0} sunglasses worn by a bear'.format(unique_token),
+            'A {0} sunglasses at Mt. Fuji'.format(unique_token),
+            'A {0} sunglasses with the Eiffel Tower in the background'.format(unique_token)
+        ]
+
+    elif unique_token == "dog":
+        add_ones = [
+            'A {0} dog in the Versailles Hall of Mirrors'.format(unique_token),
+            'A {0} dog in the gardens of Versailles'.format(unique_token),
+            'A {0} dog in Coachella'.format(unique_token),
+            'A {0} dog in Mount Fuji'.format(unique_token),
+            'A {0} dog with the Eiffel Tower in the background'.format(unique_token)
+        ]
+
+
+    elif unique_token == "dog5":
+        add_ones = [
+            'a {0} dog image in the form of Vincent Van Gogh painting'.format(unique_token),
+            'a {0} dog image in the form of Michelangelo painting'.format(unique_token),
+            'a {0} dog image in the form of Rembrandt painting'.format(unique_token),
+            'a {0} dog image in the form of Leonardo da Vinci painting'.format(unique_token),
+            'a {0} dog image in the form of Pierre-Auguste Renoir painting'.format(unique_token),
+            'a {0} dog image in the form of Johannes Vermeer painting'.format(unique_token)
+        ]
+
+    
+    elif unique_token == "car2":
+        add_ones = [
+            'A red {0} car'.format(unique_token),
+            'A purple {0} car'.format(unique_token),
+            'A pink {0} car'.format(unique_token),
+            'A blue {0} car'.format(unique_token),
+            'A yellow {0} car'.format(unique_token)
+        ]
+    
+    else:
+        add_ones = []
+
     if unique_token in non_living_dataset :
         object_prompt_list = ['a {0} {1} in the jungle'.format(unique_token, class_token),
             'a {0} {1} in the snow'.format(unique_token, class_token),
@@ -75,6 +191,8 @@ def get_promts(dataset):
             'a wet {0} {1}'.format(unique_token, class_token),
             'a cube shaped {0} {1}'.format(unique_token, class_token)
         ]
+        if len(add_ones) > 0:
+            return add_ones + object_prompt_list
         return object_prompt_list
 
     if(unique_token in livig_dataset):
@@ -104,6 +222,8 @@ def get_promts(dataset):
             'a wet {0} {1}'.format(unique_token, class_token),
             'a cube shaped {0} {1}'.format(unique_token, class_token)
         ]
+        if len(add_ones) > 0:
+            return add_ones + live_prompt_list
         return live_prompt_list
     
     if(unique_token == "face"):
