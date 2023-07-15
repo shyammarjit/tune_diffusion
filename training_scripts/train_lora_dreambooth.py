@@ -203,8 +203,8 @@ def struct_output(args):
     else: os.mkdir(dataset_)
     
     # Now create folder for experiments
-    if(args.lora_or_krona==1): exp = f"krona_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.max_train_steps}"
-    elif(args.lora_or_krona==0): exp = f"lora_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.max_train_steps}"
+    if(args.lora_or_krona==1): exp = f"krona_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.max_train_steps}_{args.with_prior_preservation}"
+    elif(args.lora_or_krona==0): exp = f"lora_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.max_train_steps}_{args.with_prior_preservation}"
     else: raise AttributeError("must be wither 0 or 1")
     exp_ = os.path.join(dataset_, exp)
     if(os.path.exists(exp_)): pass
@@ -1101,9 +1101,9 @@ def main(args):
                 "lora_rank": args.lora_rank, "clipi": clipi, "clipt": clipt, "num_train_epochs": args.num_train_epochs, 
                 "no_of_images": len(train_dataset), "learning_rate": args.learning_rate, 
                 "learning_rate_text": args.learning_rate_text, "alpha_text": args.alpha_text, 
-                "alpha_unet": args.alpha_unet, "output_path":args.output_dir}
+                "alpha_unet": args.alpha_unet, "output_path": args.output_dir, "with_prior_preservation": args.with_prior_preservation}
     exp_name = f'{save_path}/log_{args.lora_or_krona}_{args.lora_rank}_{args.num_train_epochs}_{len(train_dataset)}_\
-        {args.learning_rate}_{args.learning_rate_text}.json'
+        {args.learning_rate}_{args.learning_rate_text}_{args.with_prior_preservation}.json'
     
     with open(exp_name, 'w') as f:
         f.write(json.dumps(exp_info, indent=4))
