@@ -35,7 +35,7 @@ for dataset in "${subjects[@]}"; do
                         --lr_scheduler="constant" \
                         --lr_warmup_steps=0 \
                         --max_train_steps="$s" \
-                        --lora_or_krona=1 \
+                        --lora_or_krona=0 \
                         --lora_rank="$rank" \
                         --with_prior_preservation \
                         --prior_loss_weight=1.0 \
