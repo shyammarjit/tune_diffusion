@@ -101,6 +101,10 @@ def generator(args):
         from lora_diffusion import tune_lora_scale, patch_pipe
         wandb.init(project='krona-exp',name=f"lora_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.alpha_text}_{args.alpha_unet}")
 
+    elif(args.lora_or_krona==2):
+        from compacter_diffusion import tune_lora_scale, patch_pipe
+        wandb.init(project='krona-exp',name=f"compacter_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.alpha_text}_{args.alpha_unet}")
+
     else:
         raise AttributeError(f"wrong ataptor type {args.adaptor}")
     

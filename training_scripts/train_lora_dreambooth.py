@@ -205,6 +205,8 @@ def struct_output(args):
     # Now create folder for experiments
     if(args.lora_or_krona==1): exp = f"krona_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.max_train_steps}_{args.with_prior_preservation}"
     elif(args.lora_or_krona==0): exp = f"lora_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.max_train_steps}_{args.with_prior_preservation}"
+    elif(args.lora_or_krona==2): exp = f"compacter_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.max_train_steps}_{args.with_prior_preservation}"
+
     else: raise AttributeError("must be wither 0 or 1")
     exp_ = os.path.join(dataset_, exp)
     if(os.path.exists(exp_)): pass
@@ -1138,7 +1140,16 @@ if __name__ == "__main__":
             save_safeloras
         )
         from lora_diffusion.xformers_utils import set_use_memory_efficient_attention_xformers
-   
+    elif(args.lora_or_krona==2):
+        from compacter_diffusion import (extract_lora_ups_down,
+            inject_trainable_lora,
+            inject_trainable_lora_extended,
+            safetensors_available,
+            save_lora_weight,
+            save_safeloras
+        )
+        from compacter_diffusion.xformers_utils import set_use_memory_efficient_attention_xformers
+    
     else:
         raise ValueError(f"lora krona argument either 0 or 1, but given {args.lora_or_krona}")
     main(args)

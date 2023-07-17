@@ -5,11 +5,11 @@ lora_rank=("8" "4")
 LEARNING_RATE=("1e-4" "2e-5")
 LEARNING_RATE_TEXT=("5e-5" "7e-4")
 
-export OUTPUT_DIR="/home/smarjit/outputs"
+export OUTPUT_DIR="/home/btech/ayush.singh/tune_krona_outputs"
 export MODEL_NAME="stabilityai/stable-diffusion-2-1-base"
 
 for dataset in "${subjects[@]}"; do
-    export INSTANCE_DIR="/home/smarjit/dataset/${dataset}"
+    export INSTANCE_DIR="/home/btech/ayush.singh/dataset/${dataset}"
     
     for rank in "${lora_rank[@]}"; do
         for lr in "${LEARNING_RATE[@]}"; do

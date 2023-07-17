@@ -79,11 +79,11 @@
 # patch_pipe(
 #     pipe,
 #     # "./",
-#     # "/home/smarjit/tune_diffusion/training_scripts/example_loras/lora_illust.safetensors",
+#     # "/home/btech/ayush.singh/tune_diffusion/training_scripts/example_loras/lora_illust.safetensors",
     
-#     "/home/smarjit/tune_diffusion/training_scripts/output_lora/lora_weight.safetensors", # lora.py -> LORA
+#     "/home/btech/ayush.singh/tune_diffusion/training_scripts/output_lora/lora_weight.safetensors", # lora.py -> LORA
     
-#     # "/home/smarjit/tune_diffusion/training_scripts/output_krona_4/lora_weight.safetensors", # krona 
+#     # "/home/btech/ayush.singh/tune_diffusion/training_scripts/output_krona_4/lora_weight.safetensors", # krona 
     
 #     patch_text=True,
 #     patch_ti=True,
@@ -225,8 +225,8 @@ from lora_diffusion import tune_lora_scale, patch_pipe
 
 patch_pipe(
     pipe,
-    "/home/smarjit/tune_diffusion/training_scripts/output_krona_2/lora_weight.safetensors",  # Specify the path to your LORA weights file
-    # "/home/smarjit/tune_diffusion/training_scripts/output_lora/lora_weight.safetensors",  # Specify the path to your LORA weights file
+    "/home/btech/ayush.singh/tune_diffusion/training_scripts/output_krona_2/lora_weight.safetensors",  # Specify the path to your LORA weights file
+    # "/home/btech/ayush.singh/tune_diffusion/training_scripts/output_lora/lora_weight.safetensors",  # Specify the path to your LORA weights file
     
     patch_text=True,
     patch_ti=True,
@@ -240,9 +240,9 @@ torch.manual_seed(0)
 
 for i, prompt in enumerate(prompts):
     image = pipe(prompt, num_inference_steps=50, guidance_scale=7).images[0]
-    image.save(f"/home/smarjit/tune_diffusion/training_scripts/krona_images_2/image_{i+1}.jpg")  # Save the generated image with a unique name
-    # image.save(f"/home/smarjit/tune_diffusion/training_scripts/lora_images/image_{i+1}.jpg")  # Save the generated image with a unique name
-    # image.save(f"/home/smarjit/tune_diffusion/training_scripts/orignal_images/image_{i+1}.jpg")  # Save the generated image with a unique name
+    image.save(f"/home/btech/ayush.singh/tune_diffusion/training_scripts/krona_images_2/image_{i+1}.jpg")  # Save the generated image with a unique name
+    # image.save(f"/home/btech/ayush.singh/tune_diffusion/training_scripts/lora_images/image_{i+1}.jpg")  # Save the generated image with a unique name
+    # image.save(f"/home/btech/ayush.singh/tune_diffusion/training_scripts/orignal_images/image_{i+1}.jpg")  # Save the generated image with a unique name
 
 print("Image generation completed!")
 
