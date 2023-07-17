@@ -15,10 +15,10 @@ import torch.nn as nn
 from typing import Union, Optional
 import torch.nn.functional as F
 
-from .hypercomplex .inits import glorot_uniform, glorot_normal  #phm_init
-from .hypercomplex.kronecker import kronecker_product, kronecker_product_einsum_batched
+from .inits import glorot_uniform, glorot_normal  #phm_init
+from .kronecker import kronecker_product, kronecker_product_einsum_batched
 from .adapter_utils import Activations
-from .hypercomplex.layers import PHMLinear
+from .layers import PHMLinear
 
 try:
     from safetensors.torch import safe_open

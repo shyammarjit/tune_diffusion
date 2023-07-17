@@ -578,3 +578,6 @@ cat,1,8,0.8408203125,0.2914155105064655,4,250,2e-06,0.0005,1.0,1.0,/home/btech/a
 dog6,1,8,0.74755859375,0.2995869404560811,4,250,1e-06,5e-05,1.0,1.0,/home/btech/ayush.singh/tune_krona_outputs/dog6/krona_8_1e-06_5e-05_1000_True/images,True
 dog2,1,8,0.7578125,0.2892403738839286,4,250,2e-06,0.0005,1.0,1.0,/home/btech/ayush.singh/tune_krona_outputs/dog2/krona_8_2e-06_0.0005_800_True/images,True
 teapot,1,8,0.78076171875,0.3413167317708333,2,250,1e-06,2e-05,1.0,1.0,/home/btech/ayush.singh/tune_krona_outputs/teapot/krona_8_1e-06_2e-05_400_True/images,True
+dog6,1,8,0.72802734375,0.2986433699324324,80,5,1e-06,2e-05,1.0,1.0,/home/btech/ayush.singh/tune_krona_outputs/dog6/krona_8_1e-06_2e-05_400_False/images,False
+clock,1,8,0.76171875,0.3069022042410714,4,250,1e-06,2e-05,1.0,1.0,/home/btech/ayush.singh/tune_krona_outputs/clock/krona_8_1e-06_2e-05_800_True/images,True
+backpack,1,8,0.826171875,0.3195716594827586,4,250,2e-06,0.0005,1.0,1.0,/home/btech/ayush.singh/tune_krona_outputs/backpack/krona_8_2e-06_0.0005_1000_True/images,True
