@@ -30,13 +30,3 @@ python generator.py
 ```
 
 
-<br>
-
------------------------------------------------
-
-# TO DO : Changes to integrate krona and promts and metrics
-### Make changes in LoRa and than first try to generate images 
-### Add lora_or_Krona parser
-### add promts and metrics in the parsers and generator
-
-
