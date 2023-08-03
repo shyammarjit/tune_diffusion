@@ -1,16 +1,33 @@
 # Installation Steps
-### 1. Conda env Create   - conda create -n name_of_env
-### 2. Install acclerator - pip install accelerator
-### 3. Install diffuser  -
-* a. For normal usage     : pip install git+https://github.com/huggingface/diffusers
-* b. For clone : git clone https://github.com/huggingface/diffusers.git 
-* c. For editable :  pip install -e ".[torch]" in diffusers folder
+## Conda env Create
+```
+conda create -n name_of_env
+```
+## Install acclerator
+```
+pip install accelerator
+```
+## Install diffuser
+```
+pip install git+https://github.com/huggingface/diffusers
+git clone https://github.com/huggingface/diffusers.git
+cd diffusers
+pip install -e ".[torch]"
+```
 
-### 4. Install requirements - 
-* pip install -r requirements.txt  + clip install 
-* pip install -r requirements_sdxl.txt
-### 5. Train dreambooth_sdxl using script file    : bash run_lora_sdxl.sh
-### 6. Generate images from the finetuned weights : python generator.py
+## Install requirements 
+```
+pip install -r requirements.txt  + clip install 
+pip install -r requirements_sdxl.txt
+```
+## Train dreambooth_sdxl using script file
+```
+bash run_lora_sdxl.sh
+```
+## Generate images from the finetuned weights 
+```
+python generator.py
+```
 
 
 <br>
