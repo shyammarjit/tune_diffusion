@@ -1,44 +1,43 @@
 import os
-
 def instance_prompt(dataset):
     
     subject_class_dict = {
-        'backpack': 'backpack,backpack',
-        'backpack_dog': 'backpack_dog,backpack',
-        'bear_plushie': 'bear_plushie,stuffed animal',
-        'berry_bowl': 'berry_bowl,bowl',
-        'can': 'can,can',
-        'car2':'car2,car',
-        'candle': 'candle,candle',
-        'cat': 'cat,cat',
-        'cat2': 'cat2,cat',
-        'clock': 'clock,clock',
-        'colorful_sneaker': 'colorful_sneaker,sneaker',
-        'dog': 'dog,dog',
-        'dog2': 'dog2,dog',
-        'dog3': 'dog3,dog',
-        'dog5': 'dog5,dog',
-        'dog6': 'dog6,dog',
-        'dog7': 'dog7,dog',
-        'dog8': 'dog8,dog',
-        'duck_toy': 'duck_toy,toy',
-        'fancy_boot': 'fancy_boot,boot',
-        'grey_sloth_plushie': 'grey_sloth_plushie,stuffed animal',
-        'monster_toy': 'monster_toy,toy',
-        'pink_sunglasses': 'pink_sunglasses,sunglasses',
-        'poop_emoji': 'poop_emoji,toy',
-        'rc_car': 'rc_car,toy',
-        'red_cartoon': 'red_cartoon,cartoon',
-        'robot_toy': 'robot_toy,toy',
-        'shiny_sneaker': 'shiny_sneaker,sneaker',
-        'teapot': 'teapot,teapot',
-        'vase': 'vase,vase',
-        'wolf_plushie': 'wolf_plushie,stuffed animal',
-        'face' : 'face',
-        'akemi':'takada,akemi',
-        'supersaiyan':'super,saiyan',
-        'pokemon':'pokemon',
-        'kiriko':'kiriko'
+        'backpack': 'sksbackpack,backpack',
+        'backpack_dog': 'sksbackpack_dog,backpack',
+        'bear_plushie': 'sksbear_plushie,stuffed animal',
+        'berry_bowl': 'sksberry_bowl,bowl',
+        'can': 'skscan,can',
+        'car2':'skscar2,car',
+        'candle': 'skscandle,candle',
+        'cat': 'skscat,cat',
+        'cat2': 'skscat2,cat',
+        'clock': 'sksclock,clock',
+        'colorful_sneaker': 'skscolorful_sneaker,sneaker',
+        'dog': 'sksdog,dog',
+        'dog2': 'sksdog2,dog',
+        'dog3': 'sksdog3,dog',
+        'dog5': 'sksdog5,dog',
+        'dog6': 'sksdog6,dog',
+        'dog7': 'sksdog7,dog',
+        'dog8': 'sksdog8,dog',
+        'duck_toy': 'sksduck_toy,toy',
+        'fancy_boot': 'sksfancy_boot,boot',
+        'grey_sloth_plushie': 'sksgrey_sloth_plushie,stuffed animal',
+        'monster_toy': 'sksmonster_toy,toy',
+        'pink_sunglasses': 'skspink_sunglasses,sunglasses',
+        'poop_emoji': 'skspoop_emoji,toy',
+        'rc_car': 'sksrc_car,toy',
+        'red_cartoon': 'sksred_cartoon,cartoon',
+        'robot_toy': 'sksrobot_toy,toy',
+        'shiny_sneaker': 'sksshiny_sneaker,sneaker',
+        'teapot': 'sksteapot,teapot',
+        'vase': 'sksvase,vase',
+        'wolf_plushie': 'skswolf_plushie,stuffed animal',
+        'face' : 'sksface',
+        'takadaakemi':'skstakada,akemi',
+        'supersaiyan':'skssupersaiyan,saiyan',
+        'pokemon':'skspokemon',
+        'kiriko':'skskiriko'
     }
     return subject_class_dict[dataset]
  
@@ -293,80 +292,77 @@ def get_promts(dataset):
         ]
     
     if(unique_token == "supersaiyan"):
-        supersaiyan_prompts =["Super Saiyan with spiky golden hair, glowing blue eyes, and a fierce expression.", #1
-            "Female Super Saiyan with flowing golden hair, wearing unique battle armor, surrounded by energy blasts.", #2
-            "Super Saiyan with silver hair and electric blue aura, calmly floating in mid-air.", #3
-            "Young Super Saiyan in training, wearing weighted outfit, practicing martial arts in a serene mountain setting.", #4
-            "Super Saiyan fusion between two characters, combining their physical features and unique traits, emanating a powerful aura.", #5
-            "Super Saiyan with emerald green hair, vibrant purple eyes, surrounded by swirling energy and cracks of lightning.", #6
-            "Super Saiyan surrounded by a halo of energy, creating shockwaves with every punch, in a destroyed cityscape.", #7
-            "Super Saiyan with wild, untamed red hair, wearing torn battle gi, charging a massive energy blast.", #8
-            "Super Saiyan with ice-blue hair and icy aura, depicted in a frozen tundra with floating ice shards.", #9
-            "Super Saiyan in an advanced transformation, with multiple energy auras emanating from their body, in a cosmic landscape.", #10
-            "Super Saiyan with golden hair that transitions into fiery red at the tips, engaged in a fierce battle, surrounded by rubble.", #11
-            "Super Saiyan with a dark, brooding appearance, jet-black hair, glowing red eyes, wielding a dark energy sword.", #12
-            "Super Saiyan with flowing silver hair and peaceful expression, meditating in a serene garden.", #13
-            "Super Saiyan with long, flowing hair changing colors from blue to purple in a gradient, charging a powerful energy beam.", #14
-            "Super Saiyan with golden hair that has a sparkling, starry effect, flying through the night sky, leaving trails of stardust.", #15
-            "Super Saiyan with fiery orange hair, intense gaze, surrounded by a tornado-like energy vortex.", #16
-            "Super Saiyan with jet-black hair, glowing silver eyes, training in a dark, otherworldly dimension.", #17
-            "Super Saiyan with vibrant, neon-colored hair, playful expression, riding on a hoverboard made of energy.", #18
-            "Super Saiyan in a berserker state, with wild, untamed hair, furious expression, unleashing devastating attacks.", #19
-            "Super Saiyan with transparent, crystalline hair that refracts light, surrounded by shards of energy crystals.", #20
-            "Super Saiyan with bioluminescent hair that glows in various shades of green, standing amidst a lush, vibrant forest.", #21
-            "Super Saiyan with ethereal, translucent hair resembling flowing water, surrounded by a misty, aquatic aura.", #22
-            "Super Saiyan with celestial-themed hair resembling swirling galaxies, floating in space, surrounded by nebulae and stars.", #23
-            "Super Saiyan with metallic silver hair, cybernetic augmentation on one arm, charging up an energy cannon.", #24
-            "Super Saiyan with fiery crimson hair, phoenix-like aura, soaring through the sky, leaving a trail of flames.", #25
-            "Super Saiyan with dual-colored hair split down the middle into contrasting shades, engaging in a high-speed aerial battle.", #26
-            "Super Saiyan with a wild, mane-like hairstyle made of golden lightning, unleashing a devastating lightning attack.", #27
-            "Super Saiyan with translucent, crystalline armor reflecting and refracting light, surrounded by an aura of energy constructs.", #28
-            "Super Saiyan with jet-black hair emitting a radiant, violet glow, standing atop a mountain peak, with a storm brewing in the background.", #29
-            "Super Saiyan with iridescent hair shifting in color depending on the angle, meditating under a waterfall.", #30
-            "Super Saiyan with bioluminescent tattoos glowing on their skin, summoning an enormous energy dragon.", #31
-            "Super Saiyan with transparent, crystalline wings shimmering with a rainbow of colors, flying through a serene, cloud-filled sky.", #32
-            "Super Saiyan with a partially transformed appearance, showcasing a mix of their normal form and Super Saiyan traits, training in a gravity chamber.", #33
-            "Super Saiyan with radiant, golden hair and angelic wings, healing a wounded ally with their energy.", #34
-            "Super Saiyan with a fiery aura engulfing their entire body, surrounded by crumbling rocks and lava.", #35
-            "Super Saiyan with a majestic, ethereal presence, emanating a soft, golden glow, wielding a staff made of pure energy.", #36
-            "Super Saiyan with crystalline armor and a helmet concealing their face, charging up a powerful energy sphere.", #37
-            "Super Saiyan with bioluminescent markings on their skin pulsing with energy, in deep focus, channeling their inner strength.", #38
-            "Super Saiyan with a shimmering, ethereal tail made of pure energy, engaged in a hand-to-hand combat stance.", #39
-            "Super Saiyan with multi-colored, flowing hair shifting hues dynamically, surrounded by a whirlwind of energy blades.", #40
-            "Super Saiyan with a sleek, streamlined appearance, wearing an advanced battle suit, charging up an energy beam from their palms.", #41
-            "Super Saiyan with fiery crimson hair, wearing a legendary golden armor, clashing swords with a formidable opponent.", #42
-            "Super Saiyan with luminescent, silver hair, standing atop a mountain peak, arms crossed, overlooking a vast landscape.", #43
-            "Super Saiyan with electrified, cobalt-blue hair, crackling with lightning, in mid-air, preparing to deliver a devastating punch.", #44
-            "Super Saiyan with a flowing mane of emerald green hair, surrounded by a cyclone of energy, unleashing a powerful ki blast.", #45
-            "Super Saiyan with radiant, golden hair and emerald-green eyes, emanating a calm and focused aura, meditating on a mountaintop.", #46
-            "Super Saiyan with flowing, pearl-white hair and a serene expression, standing on a serene beach, waves crashing behind them.", #47
-            "Super Saiyan with fiery, magma-red hair and magma-like energy aura, clenching their fists, ready for an intense battle.", #48
-            "Super Saiyan with violet-colored hair, wearing an elegant, flowing robe, surrounded by a serene garden filled with blooming flowers.", #49
-            "Super Saiyan with luminescent, golden hair, transcendent expression, and a halo of energy, radiating a divine power.", #50
+        supersaiyan_prompts =["a photo of skssupersaiyan with spiky golden hair, glowing blue eyes, and a fierce expression.", #1
+            "a photo of skssupersaiyan fusion between two characters, combining their physical features and unique traits, emanating a powerful aura.", #5
+            "a photo of skssupersaiyan with emerald green hair, vibrant purple eyes, surrounded by swirling energy and cracks of lightning.", #6
+            "a photo of skssupersaiyan surrounded by a halo of energy, creating shockwaves with every punch, in a destroyed cityscape.", #7
+            "a photo of skssupersaiyan with wild, untamed red hair, wearing torn battle gi, charging a massive energy blast.", #8
+            "a photo of skssupersaiyan with ice-blue hair and icy aura, depicted in a frozen tundra with floating ice shards.", #9
+            "a photo of skssupersaiyan in an advanced transformation, with multiple energy auras emanating from their body, in a cosmic landscape.", #10
+            "a photo of skssupersaiyan with golden hair that transitions into fiery red at the tips, engaged in a fierce battle, surrounded by rubble.", #11
+            "a photo of skssupersaiyan with a dark, brooding appearance, jet-black hair, glowing red eyes, wielding a dark energy sword.", #12
+            "a photo of skssupersaiyan with flowing silver hair and peaceful expression, meditating in a serene garden.", #13
+            "a photo of skssupersaiyan with long, flowing hair changing colors from blue to purple in a gradient, charging a powerful energy beam.", #14
+            "a photo of skssupersaiyan with golden hair that has a sparkling, starry effect, flying through the night sky, leaving trails of stardust.", #15
+            "a photo of skssupersaiyan with fiery orange hair, intense gaze, surrounded by a tornado-like energy vortex.", #16
+            "a photo of skssupersaiyan with jet-black hair, glowing silver eyes, training in a dark, otherworldly dimension.", #17
+            "a photo of skssupersaiyan with vibrant, neon-colored hair, playful expression, riding on a hoverboard made of energy.", #18
+            "a photo of skssupersaiyan in a berserker state, with wild, untamed hair, furious expression, unleashing devastating attacks.", #19
+            "a photo of skssupersaiyan with transparent, crystalline hair that refracts light, surrounded by shards of energy crystals.", #20
+            "a photo of skssupersaiyan with bioluminescent hair that glows in various shades of green, standing amidst a lush, vibrant forest.", #21
+            "a photo of skssupersaiyan with ethereal, translucent hair resembling flowing water, surrounded by a misty, aquatic aura.", #22
+            "a photo of skssupersaiyan with celestial-themed hair resembling swirling galaxies, floating in space, surrounded by nebulae and stars.", #23
+            "a photo of skssupersaiyan with metallic silver hair, cybernetic augmentation on one arm, charging up an energy cannon.", #24
+            "a photo of skssupersaiyan with fiery crimson hair, phoenix-like aura, soaring through the sky, leaving a trail of flames.", #25
+            "a photo of skssupersaiyan with dual-colored hair split down the middle into contrasting shades, engaging in a high-speed aerial battle.", #26
+            "a photo of skssupersaiyan with a wild, mane-like hairstyle made of golden lightning, unleashing a devastating lightning attack.", #27
+            "a photo of skssupersaiyan with translucent, crystalline armor reflecting and refracting light, surrounded by an aura of energy constructs.", #28
+            "a photo of skssupersaiyan with jet-black hair emitting a radiant, violet glow, standing atop a mountain peak, with a storm brewing in the background.", #29
+            "a photo of skssupersaiyan with iridescent hair shifting in color depending on the angle, meditating under a waterfall.", #30
+            "a photo of skssupersaiyan with bioluminescent tattoos glowing on their skin, summoning an enormous energy dragon.", #31
+            "a photo of skssupersaiyan with transparent, crystalline wings shimmering with a rainbow of colors, flying through a serene, cloud-filled sky.", #32
+            "a photo of skssupersaiyan with a partially transformed appearance, showcasing a mix of their normal form and Super Saiyan traits, training in a gravity chamber.", #33
+            "a photo of skssupersaiyan with radiant, golden hair and angelic wings, healing a wounded ally with their energy.", #34
+            "a photo of skssupersaiyan with a fiery aura engulfing their entire body, surrounded by crumbling rocks and lava.", #35
+            "a photo of skssupersaiyan with a majestic, ethereal presence, emanating a soft, golden glow, wielding a staff made of pure energy.", #36
+            "a photo of skssupersaiyan with crystalline armor and a helmet concealing their face, charging up a powerful energy sphere.", #37
+            "a photo of skssupersaiyan with bioluminescent markings on their skin pulsing with energy, in deep focus, channeling their inner strength.", #38
+            "a photo of skssupersaiyan with a shimmering, ethereal tail made of pure energy, engaged in a hand-to-hand combat stance.", #39
+            "a photo of skssupersaiyan with multi-colored, flowing hair shifting hues dynamically, surrounded by a whirlwind of energy blades.", #40
+            "a photo of skssupersaiyan with a sleek, streamlined appearance, wearing an advanced battle suit, charging up an energy beam from their palms.", #41
+            "a photo of skssupersaiyan with fiery crimson hair, wearing a legendary golden armor, clashing swords with a formidable opponent.", #42
+            "a photo of skssupersaiyan with luminescent, silver hair, standing atop a mountain peak, arms crossed, overlooking a vast landscape.", #43
+            "a photo of skssupersaiyan with electrified, cobalt-blue hair, crackling with lightning, in mid-air, preparing to deliver a devastating punch.", #44
+            "a photo of skssupersaiyan with a flowing mane of emerald green hair, surrounded by a cyclone of energy, unleashing a powerful ki blast.", #45
+            "a photo of skssupersaiyan with radiant, golden hair and emerald-green eyes, emanating a calm and focused aura, meditating on a mountaintop.", #46
+            "a photo of skssupersaiyan with flowing, pearl-white hair and a serene expression, standing on a serene beach, waves crashing behind them.", #47
+            "a photo of skssupersaiyan with fiery, magma-red hair and magma-like energy aura, clenching their fists, ready for an intense battle.", #48
+            "a photo of skssupersaiyan with violet-colored hair, wearing an elegant, flowing robe, surrounded by a serene garden filled with blooming flowers.", #49
+            "a photo of skssupersaiyan with luminescent, golden hair, transcendent expression, and a halo of energy, radiating a divine power.", #50
         ]
         return supersaiyan_prompts
     
-    if(unique_token == "akemi"):
-        prompts = ["takada akemi, creamy mami, morisawa yuu, nega (creamy mami), posi (creamy mami), 1girl, ahoge, blue background, blue eyes, cat, choker, copyright name, dress, elbow gloves, flower, frills, gloves, hair flower, hair ornament, microphone, purple hair, short hair, smile, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, creamy mami, morisawa yuu, 2girls, dress one wearing white other blue, hug, idol, magical girl, multiple girls, wings, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, lucy (cyberpunk), 1girl, against railing, arm rest, bangs, bare shoulders, belt, black belt, black leotard, black pants, blurry, bob cut, breasts, building, cityscape, clothing cutout, cropped jacket, cyberpunk, depth of field, from side, gradient eyes, grey eyes, grey hair, holding, jacket, leotard, lips, long sleeves, looking afar, looking ahead, mechanical parts, medium breasts, multicolored eyes, multicolored hair, night, night sky, off shoulder, open clothes, open jacket, outdoors, pants, parted lips, railing, red eyeliner, science fiction, short hair with long locks, short shorts, shorts, sidelocks, sky, smoke, smoking, solo, standing, teeth, thigh cutout, upper teeth only, white jacket, white shorts, cyberpunk (series), cyberpunk edgerunners, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, pyra (xenoblade), 1girl, armor, bangs, black gloves, breasts, red eyes, closed mouth, earrings, eyelashes, fingerless gloves, floating hair, framed breasts, gem, gloves, hair ornament, headpiece, jewelry, large breasts, leaning back, leotard, neon trim, official art, pose, red hair, red shorts, saitou masatsugu, short hair, short shorts, short sleeves, shorts, sidelocks, skin tight, solo, standing, swept bangs, thighhighs, tiara, space background, turtleneck, underbust, vambraces, xenoblade chronicles (series), (xenoblade chronicles 2), 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, (komi shouko), 1girl, bangs, blazer, blue jacket, blush, bow, bowtie, breasts, closed mouth, collared shirt, cowboy shot, expressionless, outdoors, highres, jacket, (komi-san wa komyushou desu), long hair, looking at viewer, medium breasts, purple eyes, purple hair, red bow, red bowtie school uniform, shirt, striped, striped bow, striped bowtie, striped skirt, swept bangs, white shirt, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, creamy mami, morisawa yuu, nega (creamy mami), posi (creamy mami), 1girl, ahoge, blue background, blue eyes, cat, choker, copyright name,light purple-pink dress, elbow gloves, flower, frills, gloves, hair flower, hair ornament, microphone, purple hair, short hair, smile, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, princess zelda, 1girl, bangs, blonde hair, breasts, bridal gauntlets, closed mouth, expressionless, from side, green eyes, highres, jewelry, long hair, long sleeves, nintendo, outdoors, pointy ears, ring, small breasts, solo, standing, the legend of zelda, tree, triforce print, upper body, blue shirt 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, yorha no. 2 type b, 1girl, black dress, black hairband, breasts, cleavage, black dress, hair over one eye, hairband, lips, long sleeves, looking at viewer, medium breasts, mole, mole under mouth, puffy long sleeves, puffy sleeves, short hair, signature, solo, white hair, blue eyes, outdoors, grass, trees, ruins, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, eula (genshin impact), 1980s (style), 1girl, solo, mature female, mature, curvy, 1girl, solo, thighhighs, gloves, hairband, breasts, cape, bangs, thighs, leotard, necktie, light blue hair, blue hair, outdoors, long sleeves, looking at viewer, medium breasts, black gloves, blue necktie, hair ornament, black, black hairband, yellow eyes, closed mouth, blue cape, medium hair, arms above head, painting (medium), retro artstyle, traditional media, watercolor (medium)",
-            "takada akemi, mythra (xenoblade), 1girl, armor, bangs, bare shoulders, blonde hair, breasts, cleavage, closed mouth, dress, earrings, elbow gloves, eyelashes, floating hair, gem, gloves, hair ornament, hairband, headpiece, jewelry, large breasts, leaning back, long hair, neon trim, official art, pose, saitou masatsugu, sidelocks, skin tight, smile, solo, standing, swept bangs, tiara, space background, very long hair, white dress, xenoblade chronicles (series), (xenoblade chronicles 2), 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, creamy mami, morisawa yuu, 2girls, dress, hug, idol, magical girl, multiple girls, wings, black background like space 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, ((1boy)), bangs, black footwear, blue eyes, casual, dated, denim, headphones, hood, hood down, hoodie, jeans, long sleeves, looking at viewer, pants, red hair, short hair, sitting, solo, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, white top black bottom dress, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair,side parted hair, hair behind ear, upper body, stylish black dress, indoors, bar, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair, side parted hair, hair behind ear, upper body, stylish black dress, indoors, bar 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair, side parted hair, hair behind ear, upper body, white sky blue stylish dress, indoors, bar, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "takada akemi, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair, side parted hair, hair behind ear, upper body, stylish purple-violet dress, indoors, bar, 1980s (style), painting (medium), retro artstyle, watercolor (medium), holding wine glass",
-            "takada akemi, painting (medium), retro artstyle, traditional media, watercolor (medium), 1980s (style), A beautiful woman, raw portrait, best quality, without makeup, lighting, highly detailed, outdoor, sleeveless white lace, freckle",
-            "takada akemi, painting (medium), retro artstyle, traditional media, watercolor (medium), 1980s (style), A beautiful girl, idol, pure face, best quality, raw portrait, highly detailed, skinny, supple and pale skin, sunlight, sleeveless, bow, tidy street",
-            "takada akemi, traditional media, 1980s (style), A beautiful woman, fantasy, nature, japan traditional dress, perfect face, masterpiece, best quality, lighting, highly detailed, body, balcony, sexy, trending on artstation",
-            "takada akemi, traditional media, 1980s (style), 1girl, masterpiece, best quality, fantasy uniform, crop top, kawaii, crystal gradient eyes, highly detailed, sunlight, indoors, colorful, white pink dress"
+    if(unique_token == "takadaakemi"):
+        prompts = ["image of skstakadaakemi, creamy mami, morisawa yuu, nega (creamy mami), posi (creamy mami), 1girl, ahoge, blue background, blue eyes, cat, choker, copyright name, dress, elbow gloves, flower, frills, gloves, hair flower, hair ornament, microphone, purple hair, short hair, smile, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, creamy mami, morisawa yuu, 2girls, dress one wearing white other blue, hug, idol, magical girl, multiple girls, wings, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, lucy (cyberpunk), 1girl, against railing, arm rest, bangs, bare shoulders, belt, black belt, black leotard, black pants, blurry, bob cut, breasts, building, cityscape, clothing cutout, cropped jacket, cyberpunk, depth of field, from side, gradient eyes, grey eyes, grey hair, holding, jacket, leotard, lips, long sleeves, looking afar, looking ahead, mechanical parts, medium breasts, multicolored eyes, multicolored hair, night, night sky, off shoulder, open clothes, open jacket, outdoors, pants, parted lips, railing, red eyeliner, science fiction, short hair with long locks, short shorts, shorts, sidelocks, sky, smoke, smoking, solo, standing, teeth, thigh cutout, upper teeth only, white jacket, white shorts, cyberpunk (series), cyberpunk edgerunners, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, pyra (xenoblade), 1girl, armor, bangs, black gloves, breasts, red eyes, closed mouth, earrings, eyelashes, fingerless gloves, floating hair, framed breasts, gem, gloves, hair ornament, headpiece, jewelry, large breasts, leaning back, leotard, neon trim, official art, pose, red hair, red shorts, saitou masatsugu, short hair, short shorts, short sleeves, shorts, sidelocks, skin tight, solo, standing, swept bangs, thighhighs, tiara, space background, turtleneck, underbust, vambraces, xenoblade chronicles (series), (xenoblade chronicles 2), 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, (komi shouko), 1girl, bangs, blazer, blue jacket, blush, bow, bowtie, breasts, closed mouth, collared shirt, cowboy shot, expressionless, outdoors, highres, jacket, (komi-san wa komyushou desu), long hair, looking at viewer, medium breasts, purple eyes, purple hair, red bow, red bowtie school uniform, shirt, striped, striped bow, striped bowtie, striped skirt, swept bangs, white shirt, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, creamy mami, morisawa yuu, nega (creamy mami), posi (creamy mami), 1girl, ahoge, blue background, blue eyes, cat, choker, copyright name,light purple-pink dress, elbow gloves, flower, frills, gloves, hair flower, hair ornament, microphone, purple hair, short hair, smile, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, princess zelda, 1girl, bangs, blonde hair, breasts, bridal gauntlets, closed mouth, expressionless, from side, green eyes, highres, jewelry, long hair, long sleeves, nintendo, outdoors, pointy ears, ring, small breasts, solo, standing, the legend of zelda, tree, triforce print, upper body, blue shirt 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, yorha no. 2 type b, 1girl, black dress, black hairband, breasts, cleavage, black dress, hair over one eye, hairband, lips, long sleeves, looking at viewer, medium breasts, mole, mole under mouth, puffy long sleeves, puffy sleeves, short hair, signature, solo, white hair, blue eyes, outdoors, grass, trees, ruins, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, eula (genshin impact), 1980s (style), 1girl, solo, mature female, mature, curvy, 1girl, solo, thighhighs, gloves, hairband, breasts, cape, bangs, thighs, leotard, necktie, light blue hair, blue hair, outdoors, long sleeves, looking at viewer, medium breasts, black gloves, blue necktie, hair ornament, black, black hairband, yellow eyes, closed mouth, blue cape, medium hair, arms above head, painting (medium), retro artstyle, traditional media, watercolor (medium)",
+            "image of skstakadaakemi, mythra (xenoblade), 1girl, armor, bangs, bare shoulders, blonde hair, breasts, cleavage, closed mouth, dress, earrings, elbow gloves, eyelashes, floating hair, gem, gloves, hair ornament, hairband, headpiece, jewelry, large breasts, leaning back, long hair, neon trim, official art, pose, saitou masatsugu, sidelocks, skin tight, smile, solo, standing, swept bangs, tiara, space background, very long hair, white dress, xenoblade chronicles (series), (xenoblade chronicles 2), 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, creamy mami, morisawa yuu, 2girls, dress, hug, idol, magical girl, multiple girls, wings, black background like space 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, ((1boy)), bangs, black footwear, blue eyes, casual, dated, denim, headphones, hood, hood down, hoodie, jeans, long sleeves, looking at viewer, pants, red hair, short hair, sitting, solo, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, white top black bottom dress, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair,side parted hair, hair behind ear, upper body, stylish black dress, indoors, bar, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair, side parted hair, hair behind ear, upper body, stylish black dress, indoors, bar 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair, side parted hair, hair behind ear, upper body, white sky blue stylish dress, indoors, bar, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair, side parted hair, hair behind ear, upper body, stylish purple-violet dress, indoors, bar, 1980s (style), painting (medium), retro artstyle, watercolor (medium), holding wine glass",
+            "image of skstakadaakemi, painting (medium), retro artstyle, traditional media, watercolor (medium), 1980s (style), A beautiful woman, raw portrait, best quality, without makeup, lighting, highly detailed, outdoor, sleeveless white lace, freckle",
+            "image of skstakadaakemi, painting (medium), retro artstyle, traditional media, watercolor (medium), 1980s (style), A beautiful girl, idol, pure face, best quality, raw portrait, highly detailed, skinny, supple and pale skin, sunlight, sleeveless, bow, tidy street",
+            "image of skstakadaakemi, traditional media, 1980s (style), A beautiful woman, fantasy, nature, japan traditional dress, perfect face, masterpiece, best quality, lighting, highly detailed, body, balcony, sexy, trending on artstation",
+            "image of skstakadaakemi, traditional media, 1980s (style), 1girl, masterpiece, best quality, fantasy uniform, crop top, kawaii, crystal gradient eyes, highly detailed, sunlight, indoors, colorful, white pink dress"
         ]
         return prompts
     

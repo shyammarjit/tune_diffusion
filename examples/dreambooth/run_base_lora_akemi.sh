@@ -1,0 +1,52 @@
+subjects=("takadaakemi")
+lora_rank=("8" "4" "2" "16")
+LEARNING_RATE=("1e-4" "5e-6" "5e-5" "1e-5" "5e-4")
+steps=("500" "1000" "1500" "2000")
+
+export MODEL_NAME="stabilityai/stable-diffusion-2-1"
+export OUTPUT_DIR="/home/btech/ayush.singh/outputs_base"
+
+for dataset in "${subjects[@]}"; do
+    export INSTANCE_DIR="/home/btech/ayush.singh/dataset/${dataset}"
+    for rank in "${lora_rank[@]}"; do
+        for lr in "${LEARNING_RATE[@]}"; do
+            for s in "${steps[@]}"; do
+                accelerate launch train_dreambooth_lora.py \
+                    --pretrained_model_name_or_path=$MODEL_NAME \
+                    --instance_data_dir=$INSTANCE_DIR \
+                    --output_dir=$OUTPUT_DIR \
+                    --mixed_precision="fp16" \
+                    --instance_prompt="a photo of sks$dataset" \
+                    --resolution=1024 \
+                    --train_batch_size=1 \
+                    --gradient_accumulation_steps=4 \
+                    --learning_rate=$lr \
+                    --lr_scheduler="constant" \
+                    --lr_warmup_steps=0 \
+                    --max_train_steps=$s \
+                    --adapter_type="lora" \
+                    --lora_rank=$rank \
+                    --seed="0" \
+                    --diffusion_model="base"
+
+                python3 generator.py \
+                    --pretrained_model_name_or_path=$MODEL_NAME \
+                    --instance_data_dir=$INSTANCE_DIR \
+                    --output_dir=$OUTPUT_DIR \
+                    --mixed_precision="fp16" \
+                    --instance_prompt="a photo of aks$dataset" \
+                    --resolution=1024 \
+                    --train_batch_size=1 \
+                    --gradient_accumulation_steps=4 \
+                    --learning_rate=$lr \
+                    --lr_scheduler="constant" \
+                    --lr_warmup_steps=0 \
+                    --max_train_steps=$s \
+                    --adapter_type="lora" \
+                    --lora_rank=$rank \
+                    --seed="0" \
+                    --diffusion_model="base"
+            done
+        done
+    done
+done
