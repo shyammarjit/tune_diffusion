@@ -162,18 +162,20 @@ def struct_output(args):
                     |- *.png
     """
     print("output folder formatting done.")
+
     # Check whether output folder exists or not. If not then create
     if(os.path.exists(args.output_dir)): pass
     else: os.mkdir(args.output_dir)
-    
+
     # Now create another folder by the name of the dataset
     dataset_name = os.path.basename(args.instance_data_dir)
     dataset_ = os.path.join(args.output_dir, dataset_name)
     if(os.path.exists(dataset_)): pass
     else: os.mkdir(dataset_)
-    
+
     # Now create folder for experiments
     if(args.adapter_type=="krona"): exp = f"krona_{args.diffusion_model}_{args.lora_rank}_{args.learning_rate}_{args.max_train_steps}_{args.with_prior_preservation}"
+    elif(args.adapter_type=="kadapt"): exp = f"kadapt_{args.diffusion_model}_{args.lora_rank}_{args.learning_rate}_{args.max_train_steps}_{args.with_prior_preservation}"
     elif(args.adapter_type=="lora"): exp = f"lora_{args.diffusion_model}_{args.lora_rank}_{args.learning_rate}_{args.max_train_steps}_{args.with_prior_preservation}"
     else: raise AttributeError("Wrong adapter format.")
     exp_ = os.path.join(dataset_, exp)
@@ -499,7 +501,7 @@ def parse_args(input_args=None):
         type=str,
         default="lora",
         help="Adapter type.",
-        choices=["lora", "krona", "kadaptation_phm", "kadaptation_lphm", "compactor_phm", "compactor_lphm",\
+        choices=["lora", "krona", 'kadapt', "kadaptation_phm", "kadaptation_lphm", "compactor_phm", "compactor_lphm",\
         "adapter", "glora", "bitfit", "pa", "repadapter"],
     )
     parser.add_argument(
@@ -1186,6 +1188,33 @@ def main(args):
     else: num_params_text = 0
     print(f"Total learnable parameters: {num_params_unet + num_params_text}\n") # number of parameters
 
+    # Initializing phm rules (A matrices)
+    if args.adapter_type == 'kadapt':
+        import torch.nn as nn
+        phm_dim = 16
+        phm_rule_q_left = nn.Parameter(torch.FloatTensor(phm_dim, phm_dim, 1).to(accelerator.device),
+                              requires_grad=True)
+        phm_rule_q_right = nn.Parameter(torch.FloatTensor(phm_dim, 1, phm_dim).to(accelerator.device),
+                        requires_grad=True)
+        phm_rule_q_left.data.uniform_(-0.01, 0.01)
+        phm_rule_q_right.data.uniform_(-0.01, 0.01)
+        phm_rule_v_left = nn.Parameter(torch.FloatTensor(phm_dim, phm_dim, 1).to(accelerator.device),
+                        requires_grad=True)
+        phm_rule_v_right = nn.Parameter(torch.FloatTensor(phm_dim, 1, phm_dim).to(accelerator.device),
+                        requires_grad=True)
+        phm_rule_v_left.data.uniform_(-0.01, 0.01)
+        phm_rule_v_right.data.uniform_(-0.01, 0.01)
+
+        phm_rule_ = dict()
+        phm_rule_['phm_q_left'] = phm_rule_q_left
+        phm_rule_['phm_q_right'] = phm_rule_q_right
+        phm_rule_['phm_v_left'] = phm_rule_v_left
+        phm_rule_['phm_v_right'] = phm_rule_v_right
+        phm_rule = dict()
+        phm_rule['phm_rule'] = phm_rule_
+    
+    else: phm_rule=None
+
     for epoch in range(first_epoch, args.num_train_epochs):
         unet.train()
         if args.train_text_encoder:
@@ -1196,7 +1225,7 @@ def main(args):
                 if step % args.gradient_accumulation_steps == 0:
                     progress_bar.update(1)
                 continue
-
+            
             with accelerator.accumulate(unet):
                 pixel_values = batch["pixel_values"].to(dtype=weight_dtype)
 
@@ -1206,14 +1235,17 @@ def main(args):
                     model_input = model_input * vae.config.scaling_factor
                 else:
                     model_input = pixel_values
-
+    
                 # Sample noise that we'll add to the latents
                 noise = torch.randn_like(model_input)
+          
                 bsz, channels, height, width = model_input.shape
+
                 # Sample a random timestep for each image
                 timesteps = torch.randint(
                     0, noise_scheduler.config.num_train_timesteps, (bsz,), device=model_input.device
                 )
+ 
                 timesteps = timesteps.long()
 
                 # Add noise to the model input according to the noise magnitude at each timestep
@@ -1238,11 +1270,11 @@ def main(args):
                     class_labels = timesteps
                 else:
                     class_labels = None
-
-                # Predict the noise residual
+                
                 model_pred = unet(
-                    noisy_model_input, timesteps, encoder_hidden_states, class_labels=class_labels
+                    noisy_model_input, timesteps, encoder_hidden_states, class_labels=class_labels, cross_attention_kwargs=phm_rule
                 ).sample
+            
 
                 # if model predicts variance, throw away the prediction. we will only train on the
                 # simplified training objective. This means that all schedulers using the fine tuned
@@ -1273,7 +1305,8 @@ def main(args):
                     loss = loss + args.prior_loss_weight * prior_loss
                 else:
                     loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
-
+                
+                #print('\n\nloss\n\n', loss)
                 accelerator.backward(loss)
                 if accelerator.sync_gradients:
                     params_to_clip = (
@@ -1324,6 +1357,7 @@ def main(args):
             if global_step >= args.max_train_steps:
                 break
 
+        # exit()
         if accelerator.is_main_process:
             if args.validation_prompt is not None and epoch % args.validation_epochs == 0:
                 logger.info(
@@ -1417,6 +1451,8 @@ def main(args):
             unet_lora_layers=unet_lora_layers,
             text_encoder_lora_layers=text_encoder_lora_layers,
         )
+        if args.adapter_type == 'kadapt':
+            torch.save(phm_rule, f'{args.output_dir}/phm_rule.pt')
 
         # Final inference
         # Load previous pipeline

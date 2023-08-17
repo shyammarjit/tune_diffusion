@@ -160,6 +160,7 @@ def struct_output(args):
     # Now create folder for experiments
     if(args.adapter_type=="krona"): exp = f"krona_{args.diffusion_model}_{args.lora_rank}_{args.learning_rate}_{args.max_train_steps}_{args.with_prior_preservation}"
     elif(args.adapter_type=="lora"): exp = f"lora_{args.diffusion_model}_{args.lora_rank}_{args.learning_rate}_{args.max_train_steps}_{args.with_prior_preservation}"
+    elif(args.adapter_type=="kadapt"): exp = f"kadapt_{args.diffusion_model}_{args.lora_rank}_{args.learning_rate}_{args.max_train_steps}_{args.with_prior_preservation}"
     else: raise AttributeError("Wrong adapter format.")
     exp_ = os.path.join(dataset_, exp)
     if(os.path.exists(exp_)): pass
@@ -463,7 +464,7 @@ def parse_args(input_args=None):
         type=str,
         default="lora",
         help="Adapter type.",
-        choices=["lora", "krona", "kadaptation_phm", "kadaptation_lphm", "compactor_phm", "compactor_lphm",\
+        choices=["lora", "krona", "kadapt", "compactor_phm", "compactor_lphm",\
         "adapter", "glora", "bitfit", "pa", "repadapter"],
     )
 
@@ -874,9 +875,9 @@ def main(args):
             LoRAAttnProcessor2_0 if hasattr(F, "scaled_dot_product_attention") else LoRAAttnProcessor
         )
         module = lora_attn_processor_class(hidden_size=hidden_size, 
-        cross_attention_dim=cross_attention_dim, 
-        rank=args.lora_rank,
-        adapter_type=args.adapter_type,
+            cross_attention_dim=cross_attention_dim, 
+            rank=args.lora_rank,
+            adapter_type=args.adapter_type,
         )
         unet_lora_attn_procs[name] = module
         unet_lora_parameters.extend(module.parameters())
@@ -901,6 +902,8 @@ def main(args):
             unet_lora_layers=unet_lora_layers_to_save,
             text_encoder_lora_layers=None,
         )
+        if args.adapter_type == 'kadapt':
+            torch.save(phm_rule, f'{args.output_dir}/phm_rule.pt')
 
     def load_model_hook(models, input_dir):
         unet_ = None
@@ -1103,6 +1106,51 @@ def main(args):
     num_params = sum(p.numel() for p in unet.parameters() if p.requires_grad)
     print(f"Total learnable parameters: {num_params}\n") # number of parameters
 
+
+
+
+    # Initializing phm rules (A matrices)
+    if args.adapter_type == 'kadapt':
+        import torch.nn as nn
+        phm_dim = 32
+        # phm_rule_q_left = nn.Parameter(torch.FloatTensor(phm_dim, phm_dim, 1).to(accelerator.device),
+        #                       requires_grad=True)
+        # phm_rule_q_right = nn.Parameter(torch.FloatTensor(phm_dim, 1, phm_dim).to(accelerator.device),
+        #                 requires_grad=True)
+        # phm_rule_q_left.data.uniform_(-0.01, 0.01)
+        # phm_rule_q_right.data.uniform_(-0.01, 0.01)
+        # phm_rule_v_left = nn.Parameter(torch.FloatTensor(phm_dim, phm_dim, 1).to(accelerator.device),
+        #                 requires_grad=True)
+        # phm_rule_v_right = nn.Parameter(torch.FloatTensor(phm_dim, 1, phm_dim).to(accelerator.device),
+        #                 requires_grad=True)
+        # phm_rule_v_left.data.uniform_(-0.01, 0.01)
+        # phm_rule_v_right.data.uniform_(-0.01, 0.01)
+        phm_rule_q_left = nn.Parameter(torch.FloatTensor(phm_dim, phm_dim, 1).to(accelerator.device),
+                              requires_grad=True)
+        phm_rule_q_right = nn.Parameter(torch.FloatTensor(phm_dim, 1, phm_dim).to(accelerator.device),
+                        requires_grad=True)
+        phm_rule_q_left.data.uniform_(-0.01, 0.01)
+        phm_rule_q_right.data.uniform_(-0.01, 0.01)
+        phm_rule_v_left = nn.Parameter(torch.FloatTensor(phm_dim, phm_dim, 1).to(accelerator.device),
+                        requires_grad=True)
+        phm_rule_v_right = nn.Parameter(torch.FloatTensor(phm_dim, 1, phm_dim).to(accelerator.device),
+                        requires_grad=True)
+        phm_rule_v_left.data.uniform_(-0.01, 0.01)
+        phm_rule_v_right.data.uniform_(-0.01, 0.01)
+
+
+        phm_rule_ = dict()
+        phm_rule_['phm_q_left'] = phm_rule_q_left
+        phm_rule_['phm_q_right'] = phm_rule_q_right
+        phm_rule_['phm_v_left'] = phm_rule_v_left
+        phm_rule_['phm_v_right'] = phm_rule_v_right
+        phm_rule = dict()
+        phm_rule['phm_rule'] = phm_rule_
+    
+    else: phm_rule=None
+
+
+    # main training loop
     for epoch in range(first_epoch, args.num_train_epochs):
         unet.train()
         for step, batch in enumerate(train_dataloader):
@@ -1134,9 +1182,14 @@ def main(args):
                 noisy_model_input = noise_scheduler.add_noise(model_input, noise, timesteps)
 
                 # Predict the noise residual
+                # print(phm_rule['phm_rule']['phm_q_left'][0].grad)
+                # print(phm_rule.grad)
                 model_pred = unet(
-                    noisy_model_input, timesteps, batch["input_ids"], added_cond_kwargs=batch["unet_added_conditions"]
+                    noisy_model_input, timesteps, batch["input_ids"], added_cond_kwargs=batch["unet_added_conditions"],
+                    cross_attention_kwargs=phm_rule
                 ).sample
+                
+                
 
                 # Get the target for loss depending on the prediction type
                 if noise_scheduler.config.prediction_type == "epsilon":
@@ -1277,6 +1330,8 @@ def main(args):
             unet_lora_layers=unet_lora_layers,
             text_encoder_lora_layers=None,
         )
+        if args.adapter_type == 'kadapt':
+            torch.save(phm_rule, f'{args.output_dir}/phm_rule.pt')
 
         # Final inference
         # Load previous pipeline

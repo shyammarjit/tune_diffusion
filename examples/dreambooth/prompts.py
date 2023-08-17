@@ -79,7 +79,7 @@ def get_promts(dataset):
             'a barking {0} dog'.format(unique_token),
             'a crying {0} dog'.format(unique_token),
             'a frowning {0} dog'.format(unique_token),
-            'a screaming {0} dog'.format(unique_token)
+            'a screaming {0} dog'.format(unique_token),
         ]
 
     elif unique_token == "vase":
@@ -94,10 +94,12 @@ def get_promts(dataset):
         
     elif unique_token == "cat":
         add_ones = [
-            'a {0} cat seen from the top'.format(unique_token),
-            'a {0} cat seen from the bottom'.format(unique_token),
-            'a {0} cat seen from the side'.format(unique_token),
-            'a {0} cat seen from the back'.format(unique_token)
+            # 'a {0} cat seen from the top'.format(unique_token),
+            # 'a {0} cat seen from the bottom'.format(unique_token),
+            # 'a {0} cat seen from the side'.format(unique_token),
+            # 'a {0} cat seen from the back'.format(unique_token),
+            'a {0} cat is acting in a play wearing a costume'.format(unique_token),
+            'a {0} cat is playing with a ball in the water'.format(unique_token),
         ]
 
     elif unique_token == "dog2":
@@ -192,7 +194,7 @@ def get_promts(dataset):
             'a cube shaped {0} {1}'.format(unique_token, class_token)
         ]
         if len(add_ones) > 0:
-            return add_ones + object_prompt_list
+            return add_ones # + object_prompt_list
         return object_prompt_list
 
     if(unique_token in livig_dataset):
@@ -223,7 +225,7 @@ def get_promts(dataset):
             'a cube shaped {0} {1}'.format(unique_token, class_token)
         ]
         if len(add_ones) > 0:
-            return add_ones + live_prompt_list
+            return add_ones # + live_prompt_list
         return live_prompt_list
     
     if(unique_token == "face"):

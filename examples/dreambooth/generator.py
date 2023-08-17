@@ -4,6 +4,7 @@ import torch, os, clip, glob, json
 from PIL import Image
 from prompts import get_promts
 from tqdm import trange
+from diffusers import loaders
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as T
 import torch.nn.functional as F
@@ -98,17 +99,20 @@ def generator(args, prompts):
         refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-refiner-0.9", torch_dtype=torch.float16, use_safetensors=True, variant="fp16"
         )
-        refiner.to("cuda"); generator = torch.Generator("cuda").manual_seed(0)
+        refiner.to("cuda"); generator = torch.Generator("cuda").manual_seed(args.seed)
     
     elif(args.diffusion_model == "base"):
-        model_id = "stabilityai/stable-diffusion-2-1-base"
+        model_id = "CompVis/stable-diffusion-v1-4"
         pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
         pipe = pipe.to("cuda")
         pipe.load_lora_weights(args.output_dir, adapter_type=args.adapter_type)
     else:
         raise AttributeError("only supported base and sdxl model")
-
     
+    # Load phm_rule from saved pt file.
+    if args.adapter_type == 'kadapt':
+        phm_rule = torch.load(f'{args.output_dir}/phm_rule.pt')
+    else: phm_rule = None
 
     # create the image folder
     image_dir = os.path.join(args.output_dir, 'images') 
@@ -117,10 +121,10 @@ def generator(args, prompts):
     
     for i in trange(len(prompts), desc = "generating images"):
         if(args.diffusion_model == "sdxl"):
-            image = pipe(prompt=prompts[i], output_type="latent", generator=generator).images[0]
+            image = pipe(prompt=prompts[i], output_type="latent", generator=generator, cross_attention_kwargs=phm_rule).images[0]
             image = refiner(prompt=prompts[i], image=image[None, :], generator=generator).images[0]
         else: # without sdxl run
-            image = pipe(prompts[i], num_inference_steps=50, guidance_scale=7).images[0]
+            image = pipe(prompts[i], num_inference_steps=50, guidance_scale=7, cross_attention_kwargs=phm_rule).images[0]
         
         image_save_path = os.path.join(image_dir, "image_{}.jpg".format(i+1))
         # wandb.log({'Final Images': wandb.Image(image)})
@@ -177,25 +181,27 @@ def save_metrics(args, clipi, clipt):
     df.to_csv('data.csv', index=False)
 
     # delete the save files
-    if(args.diffusion_model=="sdxl"):
-        os.remove(os.path.join(args.output_dir, "pytorch_lora_weights.bin")) # delet lora weights
-        if(os.path.isdir(os.path.join(args.output_dir, 'logs'))):
-            shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
-        if(os.path.isdir(os.path.join(args.output_dir, 'checkpoint-500'))):
-            shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
-        if(os.path.isdir(os.path.join(args.output_dir, 'checkpoint-1000'))):
-            shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
+    remove_weights = False
+    if(remove_weights):
+        if(args.diffusion_model=="sdxl"):
+            os.remove(os.path.join(args.output_dir, "pytorch_lora_weights.bin")) # delet lora weights
+            if(os.path.isdir(os.path.join(args.output_dir, 'logs'))):
+                shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
+            if(os.path.isdir(os.path.join(args.output_dir, 'checkpoint-500'))):
+                shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
+            if(os.path.isdir(os.path.join(args.output_dir, 'checkpoint-1000'))):
+                shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
     
-    elif(args.diffusion_model=="base"):
-        os.remove(os.path.join(args.output_dir, "pytorch_lora_weights.bin")) # delet lora weights
-        if(os.path.isdir(os.path.join(args.output_dir, 'logs'))):
-            shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
-        if(os.path.isdir(os.path.join(args.output_dir, 'checkpoint-500'))):
-            shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
-        if(os.path.isdir(os.path.join(args.output_dir, 'checkpoint-1000'))):
-            shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
-    else:
-        raise AttributeError("Wrong input for diffusion model.")
+        elif(args.diffusion_model=="base"):
+            os.remove(os.path.join(args.output_dir, "pytorch_lora_weights.bin")) # delet lora weights
+            if(os.path.isdir(os.path.join(args.output_dir, 'logs'))):
+                shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
+            if(os.path.isdir(os.path.join(args.output_dir, 'checkpoint-500'))):
+                shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
+            if(os.path.isdir(os.path.join(args.output_dir, 'checkpoint-1000'))):
+                shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
+        else:
+            raise AttributeError("Wrong input for diffusion model.")
 
 
 
