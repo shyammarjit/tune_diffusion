@@ -21,7 +21,8 @@ from torch import nn
 class LoRALinearLayer(nn.Module):
     def __init__(self, in_features, out_features, rank=4, network_alpha=None, device=None, dtype=None):
         super().__init__()
-        print("kamal"); exit()
+        # print(kamal)
+        # exit()
 
         self.down = nn.Linear(in_features, rank, bias=False, device=device, dtype=dtype)
         self.up = nn.Linear(rank, out_features, bias=False, device=device, dtype=dtype)
@@ -108,19 +109,23 @@ class LoRACompatibleLinear(nn.Linear):
 
     def __init__(self, *args, lora_layer: Optional[LoRALinearLayer] = None, adapter_low_rank=None, **kwargs):
         super().__init__(*args, **kwargs)
-        print('shyam', args, kwargs)
+        # print('shyam', args, kwargs)
+        # print(kamal)
         self.lora_layer = lora_layer
-        if(lora_layer is not None):
-            # shyam
-            self.lora_layer = lora_layer(args[0], args[1])
+        self.args = args
+        self.kwargs = kwargs
+    
+    def get_config(self):
+        return self.args, self.kwargs
 
-    def set_lora_layer(self, lora_layer: Optional[LoRAConv2dLayer]):
+    def set_lora_layer(self, lora_layer: Optional[LoRALinearLayer]):
         self.lora_layer = lora_layer
 
     def forward(self, x):
+        print("shyam"); exit()
         if self.lora_layer is None:
             return super().forward(x)
         else:
-            print(x.shape)
-            print(super().forward(x).shape); exit()
+            # print(x.shape)
+            # print(super().forward(x).shape); exit()
             return super().forward(x) + self.lora_layer(x)

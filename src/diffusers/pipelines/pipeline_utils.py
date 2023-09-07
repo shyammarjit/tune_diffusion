@@ -380,9 +380,9 @@ def load_sub_model(
     variant: str,
     low_cpu_mem_usage: bool,
     cached_folder: Union[str, os.PathLike],
-    adapter_type: Optional[str] = None,
-    adapter_low_rank: Optional[bool] = None,
-    tune_mlp: Optional[bool] = None,
+    # adapter_type: Optional[str] = None,
+    # adapter_low_rank: Optional[bool] = None,
+    # tune_mlp: Optional[bool] = None,
 ):
     """Helper method to load the module `name` from `library_name` and `class_name`"""
     # retrieve class candidates
@@ -466,10 +466,10 @@ def load_sub_model(
             loading_kwargs["low_cpu_mem_usage"] = False
 
     # Add additional arguments 
-    if adapter_type is not None: 
-        loading_kwargs["adapter_type"] = adapter_type
-        loading_kwargs["adapter_low_rank"] = adapter_low_rank
-        loading_kwargs["tune_mlp"] = tune_mlp
+    # if adapter_type is not None: 
+    #     loading_kwargs["adapter_type"] = adapter_type
+    #     loading_kwargs["adapter_low_rank"] = adapter_low_rank
+    #     loading_kwargs["tune_mlp"] = tune_mlp
 
     # check if the module is in a subdirectory
     if os.path.isdir(os.path.join(cached_folder, name)):
@@ -1145,9 +1145,9 @@ class DiffusionPipeline(ConfigMixin, PushToHubMixin):
                         variant=variant,
                         low_cpu_mem_usage=low_cpu_mem_usage,
                         cached_folder=cached_folder,
-                        adapter_type=kwargs['adapter_type'],
-                        adapter_low_rank=kwargs['adapter_low_rank'],
-                        tune_mlp=kwargs['tune_mlp'],
+                        # adapter_type=kwargs['adapter_type'],
+                        # adapter_low_rank=kwargs['adapter_low_rank'],
+                        # tune_mlp=kwargs['tune_mlp'],
                     )
                 logger.info(
                     f"Loaded {name} as {class_name} from `{name}` subfolder of {pretrained_model_name_or_path}."

@@ -56,6 +56,7 @@ from diffusers.optimization import get_scheduler
 from diffusers.utils import check_min_version, is_wandb_available
 from diffusers.utils.import_utils import is_xformers_available
 from prompts import instance_prompt
+from diffusers.models.lora import LoRALinearLayer
 
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
@@ -511,6 +512,11 @@ def parse_args(input_args=None):
         action="store_true",
         help="Whether we are finetuning MLP layers as well.",
     )
+    parser.add_argument("--lora_mlp_rank",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition",
+    )
 
     if input_args is not None: args = parser.parse_args(input_args)
     else: args = parser.parse_args()
@@ -826,11 +832,11 @@ def main(args):
     # exit()
     unet = UNet2DConditionModel.from_pretrained(
         args.pretrained_model_name_or_path, subfolder="unet", revision=args.revision, 
-        adapter_type = args.adapter_type,
-        adapter_low_rank = args.adapter_low_rank,
-        tune_mlp=args.tune_mlp,
+        # adapter_type = args.adapter_type,
+        # adapter_low_rank = args.adapter_low_rank,
+        # tune_mlp=args.tune_mlp,
     )
-    exit()
+    # exit()
 
     # We only train the additional adapter LoRA layers
     vae.requires_grad_(False)
@@ -878,6 +884,7 @@ def main(args):
     # Set correct lora layers
     unet_lora_attn_procs = {}
     unet_lora_parameters = []
+    # if(args.tune_mlp): ffn_layers = []
     for name, attn_processor in unet.attn_processors.items():
         cross_attention_dim = None if name.endswith("attn1.processor") else unet.config.cross_attention_dim
         if name.startswith("mid_block"):
@@ -896,14 +903,26 @@ def main(args):
         # To DO: May need to modify the rank of K, Q, V and Out (Future Experiments)
         module = lora_attn_processor_class(
             hidden_size=hidden_size, cross_attention_dim=cross_attention_dim, 
-            rank=args.lora_rank,
-            adapter_type=args.adapter_type,
-            attn_update_unet=args.attn_update_unet,
+            rank=args.lora_rank, # k rank
+            adapter_type=args.adapter_type, # added 
+            attn_update_unet=args.attn_update_unet, # added 
+            # q_rank=q_rank, # added 
+            # v_rank=v_rank, # added 
+            # out_rank=out_rank, # added 
         )
         unet_lora_attn_procs[name] = module
         unet_lora_parameters.extend(module.parameters())
-
+        # if(args.tune_mlp): ffn_layers.append(name)
+        
     unet.set_attn_processor(unet_lora_attn_procs)
+    if(args.tune_mlp): 
+        unet_lora_extended_parameters = unet.set_ffn_processors(adapter_type=args.adapter_type,
+            lora_mlp_rank=args.lora_mlp_rank,
+        )
+        unet_lora_parameters.extend(unet_lora_extended_parameters)
+    # print(len(unet_lora_parameters))
+    # print(unet_lora_parameters[0].shape)
+    # exit()
 
     # The text encoder comes from 🤗 transformers, so we cannot directly modify it.
     # So, instead, we monkey-patch the forward calls of its attention-blocks.
@@ -1437,9 +1456,9 @@ def main(args):
         )
         pipeline = StableDiffusionXLPipeline.from_pretrained(
             args.pretrained_model_name_or_path, vae=vae, revision=args.revision, torch_dtype=weight_dtype,
-            adapter_type = args.adapter_type,
-            adapter_low_rank = args.adapter_low_rank,
-            tune_mlp=args.tune_mlp,
+            # adapter_type = args.adapter_type,
+            # adapter_low_rank = args.adapter_low_rank,
+            # tune_mlp=args.tune_mlp,
         )
 
         # We train on the simplified learning objective. If we were previously predicting a variance, we need the scheduler to ignore it

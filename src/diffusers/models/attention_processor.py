@@ -307,8 +307,9 @@ class Attention(nn.Module):
     def set_processor(self, processor: "AttnProcessor"):
         # if current processor is in `self._modules` and if passed `processor` is not, we need to
         # pop `processor` from `self._modules`
+        # print("shyam ====> set_processor")
         if (
-            hasattr(self, "processor")
+            hasattr(self, " ")
             and isinstance(self.processor, torch.nn.Module)
             and not isinstance(processor, torch.nn.Module)
         ):
@@ -532,7 +533,7 @@ class LoRAAttnProcessor(nn.Module):
 
         self.hidden_size = hidden_size
         self.cross_attention_dim = cross_attention_dim
-        self.rank = rank
+        self.rank = rank # default is k rank
 
         q_rank = kwargs.pop("q_rank", None)
         q_hidden_size = kwargs.pop("q_hidden_size", None)
@@ -550,6 +551,7 @@ class LoRAAttnProcessor(nn.Module):
         out_hidden_size = out_hidden_size if out_hidden_size is not None else hidden_size
 
         self.attn_update_unet = list(attn_update_unet)
+        
         if(adapter_type == "lora"):
             if("q" in attn_update_unet):
                 self.to_q_lora = LoRALinearLayer(q_hidden_size, q_hidden_size, q_rank, network_alpha)
@@ -561,26 +563,10 @@ class LoRAAttnProcessor(nn.Module):
                 self.to_out_lora = LoRALinearLayer(out_hidden_size, out_hidden_size, out_rank, network_alpha)
 
         elif(adapter_type == "krona"):
-            if("q" in attn_update_unet):
-                self.to_q_lora = KronALinearLayer(q_hidden_size, q_hidden_size, q_rank, network_alpha)
-            if("k" in attn_update_unet):
-                self.to_k_lora = KronALinearLayer(cross_attention_dim or hidden_size, hidden_size, rank, network_alpha)
-            if("v" in attn_update_unet):
-                self.to_v_lora = KronALinearLayer(cross_attention_dim or v_hidden_size, v_hidden_size, v_rank, network_alpha)
-            if("o" in attn_update_unet):
-                self.to_out_lora = KronALinearLayer(out_hidden_size, out_hidden_size, out_rank, network_alpha)
+            raise ValueError("Currently not supported.")
         
-        elif(adapter_type == "slice_lora"):
-            if("q" in attn_update_unet):
-                self.to_q_lora = SliceLoRALinearLayer(q_hidden_size, q_hidden_size, q_rank, network_alpha)
-            if("k" in attn_update_unet):
-                self.to_k_lora = SliceLoRALinearLayer(cross_attention_dim or hidden_size, hidden_size, rank, network_alpha)
-            if("v" in attn_update_unet):
-                self.to_v_lora = SliceLoRALinearLayer(cross_attention_dim or v_hidden_size, v_hidden_size, v_rank, network_alpha)
-            if("o" in attn_update_unet):
-                self.to_out_lora = SliceLoRALinearLayer(out_hidden_size, out_hidden_size, out_rank, network_alpha)
         else:
-            raise ValueError("Only lora, slice_lora and krona supported.")
+            raise ValueError("Only lora and krona supported.")
 
     def __call__(
         self, attn: Attention, hidden_states, encoder_hidden_states=None, attention_mask=None, scale=1.0, temb=None
@@ -1024,6 +1010,7 @@ class XFormersAttnProcessor:
 
     def __init__(self, attention_op: Optional[Callable] = None):
         self.attention_op = attention_op
+        # print(kamal); exit()
 
     def __call__(
         self,
@@ -1326,7 +1313,7 @@ class LoRAAttnProcessor2_0(nn.Module):
 
         self.hidden_size = hidden_size
         self.cross_attention_dim = cross_attention_dim
-        self.rank = rank
+        self.rank = rank # deafult is k rank
 
         q_rank = kwargs.pop("q_rank", None)
         q_hidden_size = kwargs.pop("q_hidden_size", None)
@@ -1344,6 +1331,7 @@ class LoRAAttnProcessor2_0(nn.Module):
         out_hidden_size = out_hidden_size if out_hidden_size is not None else hidden_size
 
         self.attn_update_unet = list(attn_update_unet)
+        
         if(adapter_type == "lora"):
             if("q" in attn_update_unet):
                 self.to_q_lora = LoRALinearLayer(q_hidden_size, q_hidden_size, q_rank, network_alpha)
@@ -1355,26 +1343,9 @@ class LoRAAttnProcessor2_0(nn.Module):
                 self.to_out_lora = LoRALinearLayer(out_hidden_size, out_hidden_size, out_rank, network_alpha)
             
         elif(adapter_type == "krona"):
-            if("q" in attn_update_unet):
-                self.to_q_lora = KronALinearLayer(q_hidden_size, q_hidden_size, q_rank, network_alpha)
-            if("k" in attn_update_unet):
-                self.to_k_lora = KronALinearLayer(cross_attention_dim or hidden_size, hidden_size, rank, network_alpha)
-            if("v" in attn_update_unet):
-                self.to_v_lora = KronALinearLayer(cross_attention_dim or v_hidden_size, v_hidden_size, v_rank, network_alpha)
-            if("o" in attn_update_unet):
-                self.to_out_lora = KronALinearLayer(out_hidden_size, out_hidden_size, out_rank, network_alpha)
-
-        elif(adapter_type=="slice_lora"):
-            if("q" in attn_update_unet):
-                self.to_q_lora = SliceLoRALinearLayer(q_hidden_size, q_hidden_size, q_rank, network_alpha)
-            if("k" in attn_update_unet):
-                self.to_k_lora = SliceLoRALinearLayer(cross_attention_dim or hidden_size, hidden_size, rank, network_alpha)
-            if("v" in attn_update_unet):
-                self.to_v_lora = SliceLoRALinearLayer(cross_attention_dim or v_hidden_size, v_hidden_size, v_rank, network_alpha)
-            if("o" in attn_update_unet):
-                self.to_out_lora = SliceLoRALinearLayer(out_hidden_size, out_hidden_size, out_rank, network_alpha)
+            raise ValueError("Currently not supported")
         else:
-            raise ValueError("Only lora, slice LoRA, and krona supported.")
+            raise ValueError("Only lora & krona supported.")
     
     def __call__(self, attn: Attention, hidden_states, encoder_hidden_states=None, attention_mask=None, scale=1.0):
         residual = hidden_states

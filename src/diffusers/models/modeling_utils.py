@@ -352,9 +352,9 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
 
     @classmethod
     def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], 
-            adapter_type=None,
-            adapter_low_rank=None,
-            tune_mlp=None,
+            # adapter_type=None,
+            # adapter_low_rank=None,
+            # tune_mlp=None,
             **kwargs,
         ):
         r"""
@@ -615,9 +615,9 @@ class ModelMixin(torch.nn.Module, PushToHubMixin):
                 # Instantiate model with empty weights
                 with accelerate.init_empty_weights():
                     
-                    unused_kwargs['adapter_type'] = adapter_type # added
-                    unused_kwargs['adapter_low_rank'] = adapter_low_rank # added
-                    unused_kwargs['tune_mlp'] = tune_mlp # added
+                    # unused_kwargs['adapter_type'] = adapter_type # added
+                    # unused_kwargs['adapter_low_rank'] = adapter_low_rank # added
+                    # unused_kwargs['tune_mlp'] = tune_mlp # added
                     # print(unused_kwargs); exit()
 
                     model = cls.from_config(config, **unused_kwargs)

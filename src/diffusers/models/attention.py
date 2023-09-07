@@ -100,12 +100,12 @@ class BasicTransformerBlock(nn.Module):
         norm_type: str = "layer_norm",
         final_dropout: bool = False,
         attention_type: str = "default",
-        adapter_type: Optional[str] = None,
-        adapter_low_rank: Optional[bool] = None,
-        tune_mlp: Optional[bool] = None,
+        # adapter_type: Optional[str] = None,
+        # adapter_low_rank: Optional[bool] = None,
+        # tune_mlp: Optional[bool] = None,
     ):
         super().__init__()
-        print(adapter_type, adapter_low_rank, tune_mlp)
+        # print(adapter_type, adapter_low_rank, tune_mlp)
         # if(adapter_type=="lora"):
         #     print(kamla)
         # if(adapter_type==None):
@@ -130,6 +130,7 @@ class BasicTransformerBlock(nn.Module):
             self.norm1 = AdaLayerNormZero(dim, num_embeds_ada_norm)
         else:
             self.norm1 = nn.LayerNorm(dim, elementwise_affine=norm_elementwise_affine)
+        # print("attention model")
         self.attn1 = Attention(
             query_dim=dim,
             heads=num_attention_heads,
@@ -139,6 +140,7 @@ class BasicTransformerBlock(nn.Module):
             cross_attention_dim=cross_attention_dim if only_cross_attention else None,
             upcast_attention=upcast_attention,
         )
+        # exit()
 
         # 2. Cross-Attn
         if cross_attention_dim is not None or double_self_attention:
@@ -166,9 +168,9 @@ class BasicTransformerBlock(nn.Module):
         # 3. Feed-forward
         self.norm3 = nn.LayerNorm(dim, elementwise_affine=norm_elementwise_affine)
         self.ff = FeedForward(dim, dropout=dropout, activation_fn=activation_fn, final_dropout=final_dropout,
-            adapter_type=adapter_type,
-            adapter_low_rank=adapter_low_rank,
-            tune_mlp=tune_mlp,
+            # adapter_type=adapter_type,
+            # adapter_low_rank=adapter_low_rank,
+            # tune_mlp=tune_mlp,
         )
 
         # 4. Fuser
@@ -216,6 +218,7 @@ class BasicTransformerBlock(nn.Module):
             attention_mask=attention_mask,
             **cross_attention_kwargs,
         )
+        # exit()
         if self.use_ada_layer_norm_zero:
             attn_output = gate_msa.unsqueeze(1) * attn_output
         hidden_states = attn_output + hidden_states
@@ -289,9 +292,9 @@ class FeedForward(nn.Module):
         dropout: float = 0.0,
         activation_fn: str = "geglu",
         final_dropout: bool = False,
-        adapter_type = None,
-        adapter_low_rank = None,
-        tune_mlp=None
+        # adapter_type = None,
+        # adapter_low_rank = None,
+        # tune_mlp=None
     ):
         super().__init__()
         inner_dim = int(dim * mult)
@@ -312,18 +315,18 @@ class FeedForward(nn.Module):
         # project dropout
         self.net.append(nn.Dropout(dropout))
         # project out
-        if(tune_mlp):
-            if(adapter_type=="lora"):
-                self.net.append(LoRACompatibleLinear(inner_dim, dim_out))#, lora_layer=LoRALinearLayer))
-                # self.net.append(LoRACompatibleLinear(inner_dim, dim_out, lora_layer=LoRALinearLayer, adapter_low_rank=adapter_low_rank))
-            elif(adapter_type=="slice_lora"):
-                self.net.append(SliceLoRACompatibleLinear(inner_dim, dim_out, lora_layer=SliceLoRALinearLayer, adapter_low_rank=adapter_low_rank))
-            elif(adapter_type=="krona"):
-                self.net.append(KronACompatibleLinear(inner_dim, dim_out, lora_layer=KronALinearLayer, adapter_low_rank=adapter_low_rank))
-            else:
-                raise ValueError("Only LoRA, slice_LoRA, and KronA are supported.")
-        else:
-            self.net.append(LoRACompatibleLinear(inner_dim, dim_out))
+        # if(tune_mlp):
+        #     if(adapter_type=="lora"):
+        #         self.net.append(LoRACompatibleLinear(inner_dim, dim_out))#, lora_layer=LoRALinearLayer))
+        #         # self.net.append(LoRACompatibleLinear(inner_dim, dim_out, lora_layer=LoRALinearLayer, adapter_low_rank=adapter_low_rank))
+        #     elif(adapter_type=="slice_lora"):
+        #         self.net.append(SliceLoRACompatibleLinear(inner_dim, dim_out, lora_layer=SliceLoRALinearLayer, adapter_low_rank=adapter_low_rank))
+        #     elif(adapter_type=="krona"):
+        #         self.net.append(KronACompatibleLinear(inner_dim, dim_out, lora_layer=KronALinearLayer, adapter_low_rank=adapter_low_rank))
+        #     else:
+        #         raise ValueError("Only LoRA, slice_LoRA, and KronA are supported.")
+        
+        self.net.append(LoRACompatibleLinear(inner_dim, dim_out))
 
 
         # FF as used in Vision Transformer, MLP-Mixer, etc. have a final dropout

@@ -55,9 +55,9 @@ def get_down_block(
     cross_attention_norm=None,
     attention_head_dim=None,
     downsample_type=None,
-    adapter_type=None,
-    adapter_low_rank=None,
-    tune_mlp=None,
+    # adapter_type=None,
+    # adapter_low_rank=None,
+    # tune_mlp=None,
 ):
     # If attn head dim is not defined, we default it to the number of heads
     if attention_head_dim is None:
@@ -134,9 +134,9 @@ def get_down_block(
             upcast_attention=upcast_attention,
             resnet_time_scale_shift=resnet_time_scale_shift,
             attention_type=attention_type,
-            adapter_type=adapter_type, # added
-            adapter_low_rank=adapter_low_rank, # added
-            tune_mlp=tune_mlp, # added
+            # adapter_type=adapter_type, # added
+            # adapter_low_rank=adapter_low_rank, # added
+            # tune_mlp=tune_mlp, # added
         )
     elif down_block_type == "SimpleCrossAttnDownBlock2D":
         if cross_attention_dim is None:
@@ -258,9 +258,9 @@ def get_up_block(
     cross_attention_norm=None,
     attention_head_dim=None,
     upsample_type=None,
-    adapter_type=None, # added
-    adapter_low_rank=None, # added
-    tune_mlp=None, # added
+    # adapter_type=None, # added
+    # adapter_low_rank=None, # added
+    # tune_mlp=None, # added
 ):
     # If attn head dim is not defined, we default it to the number of heads
     if attention_head_dim is None:
@@ -320,9 +320,9 @@ def get_up_block(
             upcast_attention=upcast_attention,
             resnet_time_scale_shift=resnet_time_scale_shift,
             attention_type=attention_type,
-            adapter_type=adapter_type, # added
-            adapter_low_rank=adapter_low_rank, # added
-            tune_mlp=tune_mlp, # added
+            # adapter_type=adapter_type, # added
+            # adapter_low_rank=adapter_low_rank, # added
+            # tune_mlp=tune_mlp, # added
         )
     elif up_block_type == "SimpleCrossAttnUpBlock2D":
         if cross_attention_dim is None:
@@ -573,9 +573,9 @@ class UNetMidBlock2DCrossAttn(nn.Module):
         use_linear_projection=False,
         upcast_attention=False,
         attention_type="default",
-        adapter_type=None, # added
-        adapter_low_rank=None, # added
-        tune_mlp=None, # added
+        # adapter_type=None, # added
+        # adapter_low_rank=None, # added
+        # tune_mlp=None, # added
     ):
         super().__init__()
 
@@ -613,9 +613,9 @@ class UNetMidBlock2DCrossAttn(nn.Module):
                         use_linear_projection=use_linear_projection,
                         upcast_attention=upcast_attention,
                         attention_type=attention_type,
-                        adapter_type=adapter_type, # added
-                        adapter_low_rank=adapter_low_rank, # added
-                        tune_mlp=tune_mlp, # added
+                        # adapter_type=adapter_type, # added
+                        # adapter_low_rank=adapter_low_rank, # added
+                        # tune_mlp=tune_mlp, # added
                     )
                 )
             else:
@@ -959,9 +959,9 @@ class CrossAttnDownBlock2D(nn.Module):
         only_cross_attention=False,
         upcast_attention=False,
         attention_type="default",
-        adapter_type=None, # added
-        adapter_low_rank=None, # added
-        tune_mlp=None, # added
+        # adapter_type=None, # added
+        # adapter_low_rank=None, # added
+        # tune_mlp=None, # added
     ):
         super().__init__()
         resnets = []
@@ -999,9 +999,9 @@ class CrossAttnDownBlock2D(nn.Module):
                         only_cross_attention=only_cross_attention,
                         upcast_attention=upcast_attention,
                         attention_type=attention_type,
-                        adapter_type=adapter_type, # added
-                        adapter_low_rank=adapter_low_rank, # added
-                        tune_mlp=tune_mlp, # added
+                        # adapter_type=adapter_type, # added
+                        # adapter_low_rank=adapter_low_rank, # added
+                        # tune_mlp=tune_mlp, # added
                     )
                 )
             else:
@@ -2101,9 +2101,9 @@ class CrossAttnUpBlock2D(nn.Module):
         only_cross_attention=False,
         upcast_attention=False,
         attention_type="default",
-        adapter_type=None, # added
-        adapter_low_rank=None, # added
-        tune_mlp=None, # added
+        # adapter_type=None, # added
+        # adapter_low_rank=None, # added
+        # tune_mlp=None, # added
     ):
         super().__init__()
         resnets = []
@@ -2143,9 +2143,9 @@ class CrossAttnUpBlock2D(nn.Module):
                         only_cross_attention=only_cross_attention,
                         upcast_attention=upcast_attention,
                         attention_type=attention_type,
-                        adapter_type=adapter_type, # added
-                        adapter_low_rank=adapter_low_rank, # added
-                        tune_mlp=tune_mlp, # added
+                        # adapter_type=adapter_type, # added
+                        # adapter_low_rank=adapter_low_rank, # added
+                        # tune_mlp=tune_mlp, # added
                     )
                 )
             else:

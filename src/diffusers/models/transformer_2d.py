@@ -92,9 +92,9 @@ class Transformer2DModel(ModelMixin, ConfigMixin):
         norm_type: str = "layer_norm",
         norm_elementwise_affine: bool = True,
         attention_type: str = "default",
-        adapter_type: str = "lora",
-        adapter_low_rank: bool = False,
-        tune_mlp: bool = False,
+        # adapter_type: str = "lora", # added
+        # adapter_low_rank: bool = False, # added
+        # tune_mlp: bool = False, # added
     ):
         super().__init__()
         self.use_linear_projection = use_linear_projection
@@ -190,9 +190,9 @@ class Transformer2DModel(ModelMixin, ConfigMixin):
                     norm_type=norm_type,
                     norm_elementwise_affine=norm_elementwise_affine,
                     attention_type=attention_type,
-                    adapter_type=adapter_type, # added
-                    adapter_low_rank=adapter_low_rank, # added
-                    tune_mlp=tune_mlp, # added
+                    # adapter_type=adapter_type, # added
+                    # adapter_low_rank=adapter_low_rank, # added
+                    # tune_mlp=tune_mlp, # added
                 )
                 for d in range(num_layers)
             ]

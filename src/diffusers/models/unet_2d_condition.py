@@ -204,9 +204,9 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
         mid_block_only_cross_attention: Optional[bool] = None,
         cross_attention_norm: Optional[str] = None,
         addition_embed_type_num_heads=64,
-        adapter_type: Optional[str] = None, # added
-        adapter_low_rank: Optional[bool] = None, # added
-        tune_mlp: Optional[bool] = None, # added
+        # adapter_type: Optional[str] = None, # added
+        # adapter_low_rank: Optional[bool] = None, # added
+        # tune_mlp: Optional[bool] = None, # added
     ):
         super().__init__()
 
@@ -456,9 +456,9 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                 resnet_out_scale_factor=resnet_out_scale_factor,
                 cross_attention_norm=cross_attention_norm,
                 attention_head_dim=attention_head_dim[i] if attention_head_dim[i] is not None else output_channel,
-                adapter_type=adapter_type, # added
-                adapter_low_rank=adapter_low_rank, # added
-                tune_mlp=tune_mlp, # added
+                # adapter_type=adapter_type, # added
+                # adapter_low_rank=adapter_low_rank, # added
+                # tune_mlp=tune_mlp, # added
             )
             self.down_blocks.append(down_block)
 
@@ -479,9 +479,9 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                 use_linear_projection=use_linear_projection,
                 upcast_attention=upcast_attention,
                 attention_type=attention_type,
-                adapter_type=adapter_type, # added
-                adapter_low_rank=adapter_low_rank, # added
-                tune_mlp=tune_mlp, # added
+                # adapter_type=adapter_type, # added
+                # adapter_low_rank=adapter_low_rank, # added
+                # tune_mlp=tune_mlp, # added
             )
         elif mid_block_type == "UNetMidBlock2DSimpleCrossAttn":
             self.mid_block = UNetMidBlock2DSimpleCrossAttn(
@@ -553,9 +553,9 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                 resnet_out_scale_factor=resnet_out_scale_factor,
                 cross_attention_norm=cross_attention_norm,
                 attention_head_dim=attention_head_dim[i] if attention_head_dim[i] is not None else output_channel,
-                adapter_type=adapter_type, # added
-                adapter_low_rank=adapter_low_rank, # added
-                tune_mlp=tune_mlp, # added
+                # adapter_type=adapter_type, # added
+                # adapter_low_rank=adapter_low_rank, # added
+                # tune_mlp=tune_mlp, # added
             )
             self.up_blocks.append(up_block)
             prev_output_channel = output_channel
@@ -592,11 +592,16 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
             `dict` of attention processors: A dictionary containing all attention processors used in the model with
             indexed by its weight name.
         """
+        # This property function is gettting call when we do unet.attn_processors # added
+        
         # set recursively
         processors = {}
 
         def fn_recursive_add_processors(name: str, module: torch.nn.Module, processors: Dict[str, AttentionProcessor]):
             if hasattr(module, "set_processor"):
+                # print(name, module)
+                # print(module.processor)
+                # exit()
                 processors[f"{name}.processor"] = module.processor
 
             for sub_name, child in module.named_children():
@@ -606,8 +611,53 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
 
         for name, module in self.named_children():
             fn_recursive_add_processors(name, module, processors)
-
         return processors
+
+    
+    def set_ffn_processors(self, adapter_type, lora_mlp_rank):
+        r"""
+        Returns:
+            `dict` of ffn processors: A dictionary containing all attention processors used in the model with
+            indexed by its weight name.
+        """
+        # This property function is gettting call when we do unet.attn_processors # added
+        # set recursively
+        extended_parameters = []
+
+        def fn_recursive_add_processors(name: str, module: torch.nn.Module, 
+            extended_parameters, 
+            adapter_type,
+            lora_mlp_rank,
+        ):
+            if hasattr(module, "set_lora_layer"):
+                # This has access to all comportable linear layers added in the codebase
+                # to access only ffn layers split the name by . then see if there is ff or not
+                
+                if "ff" in name.split("."):
+                    if(adapter_type=="lora"):
+                        from .lora import LoRALinearLayer
+                        args, _ = module.get_config()
+                        module.set_lora_layer(lora_layer=LoRALinearLayer(args[0], args[1], rank = lora_mlp_rank))
+                    else: raise ValueError("only lora and krona are supported.")
+                    
+                    # print(module); exit()
+                    # print(name, module.parameters())
+                    # print(name)
+                    for param in module.parameters():
+                        if(param.requires_grad == True):
+                            # print(param.shape)
+                            extended_parameters.append(param)
+                    # exit()
+
+            for sub_name, child in module.named_children():
+                fn_recursive_add_processors(f"{name}.{sub_name}", child, extended_parameters, adapter_type, lora_mlp_rank)
+
+            return extended_parameters
+
+        for name, module in self.named_children():
+            fn_recursive_add_processors(name, module, extended_parameters, adapter_type, lora_mlp_rank)
+            
+        return extended_parameters
 
     def set_attn_processor(self, processor: Union[AttentionProcessor, Dict[str, AttentionProcessor]]):
         r"""
@@ -622,6 +672,7 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                 processor. This is strongly recommended when setting trainable attention processors.
 
         """
+        # print("shyam is back"); exit()
         count = len(self.attn_processors.keys())
 
         if isinstance(processor, dict) and len(processor) != count:
@@ -641,6 +692,7 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                 fn_recursive_attn_processor(f"{name}.{sub_name}", child, processor)
 
         for name, module in self.named_children():
+            # print(name, module)
             fn_recursive_attn_processor(name, module, processor)
 
     def set_default_attn_processor(self):
