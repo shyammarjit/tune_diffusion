@@ -1486,7 +1486,11 @@ class LoraLoaderMixin:
         text_encoder,
         lora_scale=1,
         network_alphas=None,
-        rank=4,
+        rank_k=4, # added 
+        rank_q=4, # added
+        rank_v=4, # added 
+        rank_o=4, # added
+        rank_mlp=4, # added
         dtype=None,
         patch_mlp=False,
         adapter_type=None,

@@ -35,18 +35,15 @@ accelerate launch train_dreambooth_lora_sdxl.py \
     --lr_warmup_steps=0 \
     --max_train_steps=$steps \
     --adapter_type="lora" \
+    --unet_lora_rank=$rank \
+    --
     --seed="0" \
     --diffusion_model="sdxl" \
     --use_8bit_adam \
     --gradient_checkpointing \
     --attn_update_unet=$attn_update_unet \
     --enable_xformers_memory_efficient_attention \
-    --unet_lora_rank_k=$unet_lora_rank_k \
-    --unet_lora_rank_q=$unet_lora_rank_q \
-    --unet_lora_rank_v=$unet_lora_rank_v \
-    --unet_lora_rank_out=$unet_lora_rank_o \
-    --unet_lora_rank_mlp=$unet_lora_rank_mlp \
-    --unet_tune_mlp \
+    # --tune_mlp \
     # --lora_mlp_rank=$rank \
     # --attn_update_text=$attn_update_text \
     # --train_text_encoder \

@@ -1302,9 +1302,13 @@ class LoRAAttnProcessor2_0(nn.Module):
             Equivalent to `alpha` but it's usage is specific to Kohya (A1111) style LoRAs.
     """
 
-    def __init__(self, hidden_size, cross_attention_dim=None, rank=4, network_alpha=None, 
+    def __init__(self, hidden_size, cross_attention_dim=None, network_alpha=None, 
             adapter_type = None,
             attn_update_unet = None,
+            k_rank=None,
+            q_rank=None,
+            v_rank=None,
+            out_rank=None,
             **kwargs,
         ):
         super().__init__()
@@ -1313,21 +1317,14 @@ class LoRAAttnProcessor2_0(nn.Module):
 
         self.hidden_size = hidden_size
         self.cross_attention_dim = cross_attention_dim
-        self.rank = rank # deafult is k rank
 
-        q_rank = kwargs.pop("q_rank", None)
         q_hidden_size = kwargs.pop("q_hidden_size", None)
-        q_rank = q_rank if q_rank is not None else rank
         q_hidden_size = q_hidden_size if q_hidden_size is not None else hidden_size
 
-        v_rank = kwargs.pop("v_rank", None)
         v_hidden_size = kwargs.pop("v_hidden_size", None)
-        v_rank = v_rank if v_rank is not None else rank
         v_hidden_size = v_hidden_size if v_hidden_size is not None else hidden_size
 
-        out_rank = kwargs.pop("out_rank", None)
         out_hidden_size = kwargs.pop("out_hidden_size", None)
-        out_rank = out_rank if out_rank is not None else rank
         out_hidden_size = out_hidden_size if out_hidden_size is not None else hidden_size
 
         self.attn_update_unet = list(attn_update_unet)
@@ -1336,7 +1333,7 @@ class LoRAAttnProcessor2_0(nn.Module):
             if("q" in attn_update_unet):
                 self.to_q_lora = LoRALinearLayer(q_hidden_size, q_hidden_size, q_rank, network_alpha)
             if("k" in attn_update_unet):
-                self.to_k_lora = LoRALinearLayer(cross_attention_dim or hidden_size, hidden_size, rank, network_alpha)
+                self.to_k_lora = LoRALinearLayer(cross_attention_dim or hidden_size, hidden_size, k_rank, network_alpha)
             if("v" in attn_update_unet):
                 self.to_v_lora = LoRALinearLayer(cross_attention_dim or v_hidden_size, v_hidden_size, v_rank, network_alpha)
             if("o" in attn_update_unet):

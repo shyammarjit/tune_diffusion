@@ -90,7 +90,8 @@ inference: true
     model_card = f"""
 # LoRA DreamBooth - {repo_id}
 
-These are LoRA adaption weights for {base_model}. The weights were trained on {prompt} using [DreamBooth](https://dreambooth.github.io/). You can find some example images in the following. \n
+These are LoRA adaption weights for {base_model}. The weights were trained on {prompt} using [DreamBooth](https://dreambooth.github.io/).
+You can find some example images in the following. \n
 {img_str}
 
 LoRA for the text encoder was enabled: {train_text_encoder}.
@@ -156,11 +157,27 @@ def struct_output(args):
     else: os.mkdir(dataset_)
     
     # Now create folder for experiments
-    args.adapter_low_rank = args.adapter_low_rank
-    if(args.adapter_type=="slice_lora"): exp = f"slice_lora_{args.attn_update_unet}_{args.adapter_low_rank}_{args.attn_update_text}_{args.diffusion_model}_{args.lora_rank}_{args.learning_rate}_{args.max_train_steps}_{args.with_prior_preservation}"
-    elif(args.adapter_type=="lora"): exp = f"lora_{args.attn_update_unet}_{args.adapter_low_rank}_{args.attn_update_text}_{args.diffusion_model}_{args.lora_rank}_{args.learning_rate}_{args.max_train_steps}_{args.with_prior_preservation}"
-    elif(args.adapter_type=="krona"): exp = f"krona_{args.attn_update_unet}_{args.adapter_low_rank}_{args.attn_update_text}_{args.diffusion_model}_{args.lora_rank}_{args.learning_rate}_{args.max_train_steps}_{args.with_prior_preservation}"
+    attn_config = ''
+    if "k" in args.attn_update_unet: attn_config = attn_config + "k" + str(args.unet_lora_rank_k)
+    if "q" in args.attn_update_unet: attn_config = attn_config + "q" + str(args.unet_lora_rank_q)
+    if "v" in args.attn_update_unet: attn_config = attn_config + "v" + str(args.unet_lora_rank_v)
+    if "o" in args.attn_update_unet: attn_config = attn_config + "o" + str(args.unet_lora_rank_out)
+    if(args.unet_tune_mlp): attn_config = attn_config + "f" + str(args.unet_lora_rank_mlp)
+    
+    if(args.train_text_encoder):
+        text_attn_config = ''
+        if "k" in args.attn_update_text: text_attn_config = text_attn_config + "k" + str(args.text_lora_rank_k)
+        if "q" in args.attn_update_text: text_attn_config = text_attn_config + "q" + str(args.text_lora_rank_q)
+        if "v" in args.attn_update_text: text_attn_config = text_attn_config + "v" + str(args.text_lora_rank_v)
+        if "o" in args.attn_update_text: text_attn_config = text_attn_config + "o" + str(args.text_lora_rank_out)
+        if(args.text_tune_mlp): text_attn_config = text_attn_config + "f" + str(args.text_lora_rank_mlp)
+        attn_config = attn_config + "_" + text_attn_config
+        
+    if(args.adapter_type=="lora"):
+        exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}_{args.max_train_steps}"
+    elif(args.adapter_type=="krona"): raise ValueError("currently not supported.")
     else: raise AttributeError("Wrong adapter format.")
+    
     exp_ = os.path.join(dataset_, exp)
     if(os.path.exists(exp_)): pass
     else: os.mkdir(exp_)
@@ -452,23 +469,76 @@ def parse_args(input_args=None):
 
     # our parsers
     parser.add_argument(
-        "--lora_rank",
+        "--unet_lora_rank_k",
         type=int,
         default=4,
-        help="Lora Rank size for matrix decomposition",
+        help="Lora Rank size for matrix decomposition => k matrix",
     )
     parser.add_argument(
-        "--krona_rank_a1",
-        type=int,
-        default=16,
-        help="Lora Rank size for matrix decomposition",
-    )
-    parser.add_argument(
-        "--krona_rank_a2",
+        "--unet_lora_rank_q",
         type=int,
         default=4,
-        help="Lora Rank size for matrix decomposition",
+        help="Lora Rank size for matrix decomposition => q matrix",
     )
+    parser.add_argument(
+        "--unet_lora_rank_v",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => v matrix",
+    )
+    parser.add_argument(
+        "--unet_lora_rank_out",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => out matrix",
+    )
+    parser.add_argument("--unet_lora_rank_mlp",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => ffn matrix",
+    )
+    parser.add_argument(
+        "--text_lora_rank_k",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => k matrix",
+    )
+    parser.add_argument(
+        "--text_lora_rank_q",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => q matrix",
+    )
+    parser.add_argument(
+        "--text_lora_rank_v",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => v matrix",
+    )
+    parser.add_argument(
+        "--text_lora_rank_o",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => out matrix",
+    )
+    parser.add_argument("--text_lora_rank_mlp",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => ffn matrix",
+    )
+    
+    # parser.add_argument(
+    #     "--krona_rank_a1",
+    #     type=int,
+    #     default=16,
+    #     help="KornA Rank size for matrix decomposition",
+    # )
+    # parser.add_argument(
+    #     "--krona_rank_a2",
+    #     type=int,
+    #     default=4,
+    #     help="KornA Rank size for matrix decomposition",
+    # )
     parser.add_argument(
         "--diffusion_model",
         type=str,
@@ -481,7 +551,7 @@ def parse_args(input_args=None):
         type=str,
         default="lora",
         help="Adapter type.",
-        choices=["lora", "krona", "slice_lora"],
+        choices=["lora", "krona"],
     )
 
     parser.add_argument(
@@ -508,22 +578,19 @@ def parse_args(input_args=None):
         help="Whether low rank parameterized format is there or not.",
     )
 
-    parser.add_argument("--tune_mlp",
+    parser.add_argument("--unet_tune_mlp",
         action="store_true",
         help="Whether we are finetuning MLP layers as well.",
     )
-    parser.add_argument("--lora_mlp_rank",
-        type=int,
-        default=4,
-        help="Lora Rank size for matrix decomposition",
+    parser.add_argument("--text_tune_mlp",
+        action="store_true",
+        help="Whether we are finetuning MLP layers as well.",
     )
 
     if input_args is not None: args = parser.parse_args(input_args)
     else: args = parser.parse_args()
     
     # our edit
-    if(args.adapter_type=="krona"): args.lora_rank = (args.krona_rank_a1, args.krona_rank_a2)
-    print(args.lora_rank)
     args.instance_prompt = instance_prompt(os.path.basename(args.instance_data_dir))
     if args.with_prior_preservation:
         args.class_prompt = 'a '+ args.instance_prompt.split(',')[1]
@@ -828,8 +895,7 @@ def main(args):
     vae = AutoencoderKL.from_pretrained(
         vae_path, subfolder="vae" if args.pretrained_vae_model_name_or_path is None else None, revision=args.revision
     )
-    # print(args.adapter_type, args.adapter_low_rank, args.tune_mlp)
-    # exit()
+    
     unet = UNet2DConditionModel.from_pretrained(
         args.pretrained_model_name_or_path, subfolder="unet", revision=args.revision, 
         # adapter_type = args.adapter_type,
@@ -868,7 +934,8 @@ def main(args):
             xformers_version = version.parse(xformers.__version__)
             if xformers_version == version.parse("0.0.16"):
                 logger.warn(
-                    "xFormers 0.0.16 cannot be used for training in some GPUs. If you observe problems during training, please update xFormers to at least 0.0.17. See https://huggingface.co/docs/diffusers/main/en/optimization/xformers for more details."
+                    "xFormers 0.0.16 cannot be used for training in some GPUs. If you observe problems during training,\
+                    please update xFormers to at least 0.0.17. See https://huggingface.co/docs/diffusers/main/en/optimization/xformers for more details."
                 )
             unet.enable_xformers_memory_efficient_attention()
         else:
@@ -903,19 +970,19 @@ def main(args):
         # To DO: May need to modify the rank of K, Q, V and Out (Future Experiments)
         module = lora_attn_processor_class(
             hidden_size=hidden_size, cross_attention_dim=cross_attention_dim, 
-            rank=args.lora_rank, # k rank
             adapter_type=args.adapter_type, # added 
             attn_update_unet=args.attn_update_unet, # added 
-            # q_rank=q_rank, # added 
-            # v_rank=v_rank, # added 
-            # out_rank=out_rank, # added 
+            k_rank=args.unet_lora_rank_k if "k" in args.attn_update_unet else None, # k rank
+            q_rank=args.unet_lora_rank_q if "q" in args.attn_update_unet else None, # added 
+            v_rank=args.unet_lora_rank_v if "v" in args.attn_update_unet else None, # added 
+            out_rank=args.unet_lora_rank_out if "o" in args.attn_update_unet else None, # added 
         )
         unet_lora_attn_procs[name] = module
         unet_lora_parameters.extend(module.parameters())
         # if(args.tune_mlp): ffn_layers.append(name)
         
     unet.set_attn_processor(unet_lora_attn_procs)
-    if(args.tune_mlp): 
+    if(args.unet_tune_mlp): 
         unet_lora_extended_parameters = unet.set_ffn_processors(adapter_type=args.adapter_type,
             lora_mlp_rank=args.lora_mlp_rank,
         )
@@ -929,12 +996,22 @@ def main(args):
     if args.train_text_encoder:
         # ensure that dtype is float32, even if rest of the model that isn't trained is loaded in fp16
         text_lora_parameters_one = LoraLoaderMixin._modify_text_encoder(
-            text_encoder_one, dtype=torch.float32, rank=args.lora_rank, adapter_type=args.adapter_type,
-            attn_update_text=args.attn_update_text,
+            text_encoder_one, dtype=torch.float32, adapter_type=args.adapter_type, attn_update_text=args.attn_update_text,
+            rank_k=args.text_lora_rank_k if "k" in args.attn_update_text else None, # added 
+            rank_q=args.text_lora_rank_q if "q" in args.attn_update_text else None, # added
+            rank_v=args.text_lora_rank_v if "v" in args.attn_update_text else None, # added 
+            rank_o=args.text_lora_rank_o if "o" in args.attn_update_text else None, # added
+            rank_mlp=args.text_lora_rank_mlp if args.text_tune_mlp else None, # added
+            patch_mlp=args.text_tune_mlp,
         )
         text_lora_parameters_two = LoraLoaderMixin._modify_text_encoder(
-            text_encoder_two, dtype=torch.float32, rank=args.lora_rank, adapter_type=args.adapter_type,
-            attn_update_text=args.attn_update_text,
+            text_encoder_two, dtype=torch.float32, adapter_type=args.adapter_type, attn_update_text=args.attn_update_text,
+            rank_k=args.text_lora_rank_k if "k" in args.attn_update_text else None, # added 
+            rank_q=args.text_lora_rank_q if "q" in args.attn_update_text else None, # added
+            rank_v=args.text_lora_rank_v if "v" in args.attn_update_text else None, # added 
+            rank_o=args.text_lora_rank_o if "o" in args.attn_update_text else None, # added
+            rank_mlp=args.text_lora_rank_mlp if args.text_tune_mlp else None, # added
+            patch_mlp=args.text_tune_mlp,
         )
 
     # create custom saving & loading hooks so that `accelerator.save_state(...)` serializes in a nice format
@@ -1153,9 +1230,7 @@ def main(args):
 
     # We need to initialize the trackers we use, and also store our configuration.
     # The trackers initializes automatically on the main process.
-    if args.adapter_type == "krona": args.lora_rank = 4
     if accelerator.is_main_process: accelerator.init_trackers("dreambooth-lora-sd-xl", config=vars(args))
-    if args.adapter_type == "krona": args.lora_rank = (args.krona_rank_a1, args.krona_rank_a2)
     # Train!
     total_batch_size = args.train_batch_size * accelerator.num_processes * args.gradient_accumulation_steps
 
