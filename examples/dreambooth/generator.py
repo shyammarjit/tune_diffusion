@@ -95,20 +95,21 @@ def generator(args, prompts):
         pipe = DiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16, 
             adapter_type = args.adapter_type,
             adapter_low_rank = args.adapter_low_rank,
-            tune_mlp=args.tune_mlp
+            unet_tune_mlp=args.unet_tune_mlp
         )
         pipe = pipe.to("cuda")
-        pipe.load_lora_weights(args.output_dir, adapter_type=args.adapter_type, 
+        pipe.load_lora_weights(args.output_dir, 
+            adapter_type=args.adapter_type, 
             attn_update_unet=args.attn_update_unet,
             attn_update_text=args.attn_update_text,
         )
         refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-refiner-1.0", torch_dtype=torch.float16, use_safetensors=True, variant="fp16",
-            adapter_type = args.adapter_type,
-            adapter_low_rank = args.adapter_low_rank,
-            tune_mlp=args.tune_mlp
+            # adapter_type = args.adapter_type,
+            # adapter_low_rank = args.adapter_low_rank,
+            # tune_mlp=args.tune_mlp
         )
-        refiner.to("cuda"); generator = torch.Generator("cuda").manual_seed(0)
+        refiner.to("cuda"); generator = torch.Generator("cuda").manual_seed(args.seed)
     
     elif(args.diffusion_model == "base"):
         model_id = "stabilityai/stable-diffusion-2-1-base"
@@ -159,17 +160,41 @@ def save_metrics(args, clipi, clipt):
     given root output folder """
     # save all the info in the form of *.json file
     exp_info = {"Dataset_Name": os.path.basename(args.instance_data_dir), 
-        "diffusion_ver": args.diffusion_model,
-        "Adaptor": args.adapter_type,
-        "lora_rank": args.lora_rank, 
-        "clipi": clipi, "clipt": clipt, 
-        "num_train_steps": args.max_train_steps, 
-        "no_of_images": number_of_input_img, 
-        "learning_rate": args.learning_rate, 
-        "output_path": args.output_dir, 
+        "diffusion_version": args.diffusion_model,
+        "adaptor": args.adapter_type,
+        "lr_scheduler": args.lr_scheduler,
+        "seed": args.seed,
+        "attn_update_unet": args.attn_update_unet,
+        "attn_update_text": args.attn_update_text if args.train_text_encoder else None,
+        "unet_lora_rank_k": args.unet_lora_rank_k if "k" in args.attn_update_unet else None,
+        "unet_lora_rank_q": args.unet_lora_rank_q if "q" in args.attn_update_unet else None,
+        "unet_lora_rank_v": args.unet_lora_rank_v if "v" in args.attn_update_unet else None,
+        "unet_lora_rank_out": args.unet_lora_rank_out if "o" in args.attn_update_unet else None,
+        "unet_lora_rank_mlp": args.unet_lora_rank_mlp if args.unet_tune_mlp else None,
+        "unet_tune_mlp": args.unet_tune_mlp,
+        "text_lora_rank_mlp": args.text_lora_rank_mlp if args.text_tune_mlp else None,
+        "text_tune_mlp": args.text_tune_mlp,
+        "clipi": clipi,
+        "clipt": clipt,
+        "num_train_steps": args.max_train_steps,
+        "no_of_images": number_of_input_img,
+        "learning_rate": args.learning_rate,
+        "output_path": args.output_dir,
         "with_prior_preservation": args.with_prior_preservation,
+    }
+    if args.train_text_encoder:
+        text_encoder_info = {"text_lora_rank_k": args.text_lora_rank_k if "k" in args.attn_update_text else None,
+            "text_lora_rank_q": args.text_lora_rank_q if "q" in args.attn_update_text else None,
+            "text_lora_rank_v": args.text_lora_rank_v if "v" in args.attn_update_text else None,
+            "text_lora_rank_out": args.text_lora_rank_out if "o" in args.attn_update_text else None,
         }
-    exp_name = f'{args.output_dir}/log_{args.diffusion_model}_{args.adapter_type}_{args.lora_rank}_{args.max_train_steps}_{number_of_input_img}_{args.learning_rate}_{args.with_prior_preservation}.json'
+        exp_info.update(text_encoder_info)
+    else:
+        text_encoder_info = {"text_lora_rank_k": None, "text_lora_rank_q": None, "text_lora_rank_v": None, "text_lora_rank_out": None}
+        exp_info.update(text_encoder_info)
+        
+    exp_name = args.output_dir + '/' + os.path.basename(args.output_dir) + '.json'
+    # }/log_{args.diffusion_model}_{args.adapter_type}_{args.lora_rank}_{args.max_train_steps}_{number_of_input_img}_{args.learning_rate}_{args.with_prior_preservation}.json'
     print(exp_name)
     
     with open(exp_name, 'w') as f:

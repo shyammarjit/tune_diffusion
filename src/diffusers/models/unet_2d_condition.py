@@ -612,7 +612,37 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
         for name, module in self.named_children():
             fn_recursive_add_processors(name, module, processors)
         return processors
+    
+    @property
+    def ffn_processors(self):
+        r"""
+        Returns:
+            `dict` of ffn processors: A dictionary containing all attention processors used in the model with
+            indexed by its weight name.
+        """
+        # This property function is gettting call when we do unet.attn_processors # added
+        # set recursively
+        extended_parameters = []
+        processors = {}
 
+        def fn_recursive_add_processors(name: str, module: torch.nn.Module, processors):
+            if hasattr(module, "set_lora_layer"):
+                # This has access to all comportable linear layers added in the codebase
+                # to access only ffn layers split the name by . then see if there is ff or not
+                
+                if "ff" in name.split("."): 
+                    processors[f"{name}.lora_layer"] = module.lora_layer
+
+            for sub_name, child in module.named_children():
+                fn_recursive_add_processors(f"{name}.{sub_name}", child, processors)
+
+            return processors
+        
+        for name, module in self.named_children():
+            fn_recursive_add_processors(name, module, processors)
+        
+        return processors
+    
     
     def set_ffn_processors(self, adapter_type, lora_mlp_rank):
         r"""
@@ -623,11 +653,13 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
         # This property function is gettting call when we do unet.attn_processors # added
         # set recursively
         extended_parameters = []
+        processors = {}
 
         def fn_recursive_add_processors(name: str, module: torch.nn.Module, 
             extended_parameters, 
             adapter_type,
             lora_mlp_rank,
+            processors,
         ):
             if hasattr(module, "set_lora_layer"):
                 # This has access to all comportable linear layers added in the codebase
@@ -637,27 +669,22 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                     if(adapter_type=="lora"):
                         from .lora import LoRALinearLayer
                         args, _ = module.get_config()
-                        module.set_lora_layer(lora_layer=LoRALinearLayer(args[0], args[1], rank = lora_mlp_rank))
+                        module.set_lora_layer(lora_layer=LoRALinearLayer(args[0], args[1], rank = lora_mlp_rank)) 
+                        processors[f"{name}.lora_layer"] = module.lora_layer
                     else: raise ValueError("only lora and krona are supported.")
                     
-                    # print(module); exit()
-                    # print(name, module.parameters())
-                    # print(name)
-                    for param in module.parameters():
-                        if(param.requires_grad == True):
-                            # print(param.shape)
-                            extended_parameters.append(param)
-                    # exit()
+                    for param in module.lora_layer.parameters():
+                        extended_parameters.append(param)
 
             for sub_name, child in module.named_children():
-                fn_recursive_add_processors(f"{name}.{sub_name}", child, extended_parameters, adapter_type, lora_mlp_rank)
+                fn_recursive_add_processors(f"{name}.{sub_name}", child, extended_parameters, adapter_type, lora_mlp_rank, processors)
 
-            return extended_parameters
+            return processors, extended_parameters
 
         for name, module in self.named_children():
-            fn_recursive_add_processors(name, module, extended_parameters, adapter_type, lora_mlp_rank)
-            
-        return extended_parameters
+            fn_recursive_add_processors(name, module, extended_parameters, adapter_type, lora_mlp_rank, processors)
+        
+        return processors, extended_parameters
 
     def set_attn_processor(self, processor: Union[AttentionProcessor, Dict[str, AttentionProcessor]]):
         r"""

@@ -516,7 +516,7 @@ def parse_args(input_args=None):
         help="Lora Rank size for matrix decomposition => v matrix",
     )
     parser.add_argument(
-        "--text_lora_rank_o",
+        "--text_lora_rank_out",
         type=int,
         default=4,
         help="Lora Rank size for matrix decomposition => out matrix",
@@ -756,6 +756,18 @@ def encode_prompt(text_encoders, tokenizers, prompt, text_input_ids_list=None, a
     pooled_prompt_embeds = pooled_prompt_embeds.view(bs_embed, -1)
     return prompt_embeds, pooled_prompt_embeds
 
+def unet_ffn_within_attn_processors_state_dict(unet):
+    """
+    Returns:
+        a state dict containing just the ffn processor parameters.
+    """
+    ffn_processors = unet.ffn_processors 
+    ffn_processors_state_dict = {}
+
+    for ffn_processor_key, ffn_processor in ffn_processors.items():
+        for parameter_key, parameter in ffn_processor.state_dict().items():
+            ffn_processors_state_dict[f"{ffn_processor_key}.{parameter_key}"] = parameter
+    return ffn_processors_state_dict
 
 def unet_attn_processors_state_dict(unet) -> Dict[str, torch.tensor]:
     """
@@ -763,13 +775,11 @@ def unet_attn_processors_state_dict(unet) -> Dict[str, torch.tensor]:
         a state dict containing just the attention processor parameters.
     """
     attn_processors = unet.attn_processors
-
     attn_processors_state_dict = {}
 
     for attn_processor_key, attn_processor in attn_processors.items():
         for parameter_key, parameter in attn_processor.state_dict().items():
             attn_processors_state_dict[f"{attn_processor_key}.{parameter_key}"] = parameter
-
     return attn_processors_state_dict
 
 
@@ -902,7 +912,6 @@ def main(args):
         # adapter_low_rank = args.adapter_low_rank,
         # tune_mlp=args.tune_mlp,
     )
-    # exit()
 
     # We only train the additional adapter LoRA layers
     vae.requires_grad_(False)
@@ -983,13 +992,10 @@ def main(args):
         
     unet.set_attn_processor(unet_lora_attn_procs)
     if(args.unet_tune_mlp): 
-        unet_lora_extended_parameters = unet.set_ffn_processors(adapter_type=args.adapter_type,
-            lora_mlp_rank=args.lora_mlp_rank,
+        ffn_info, unet_lora_extended_parameters = unet.set_ffn_processors(adapter_type=args.adapter_type,
+            lora_mlp_rank=args.unet_lora_rank_mlp,
         )
         unet_lora_parameters.extend(unet_lora_extended_parameters)
-    # print(len(unet_lora_parameters))
-    # print(unet_lora_parameters[0].shape)
-    # exit()
 
     # The text encoder comes from 🤗 transformers, so we cannot directly modify it.
     # So, instead, we monkey-patch the forward calls of its attention-blocks.
@@ -1025,6 +1031,9 @@ def main(args):
         for model in models:
             if isinstance(model, type(accelerator.unwrap_model(unet))):
                 unet_lora_layers_to_save = unet_attn_processors_state_dict(model)
+                if(args.unet_tune_mlp):
+                    unet_lora_layers_to_save_ffn = unet_ffn_within_attn_processors_state_dict(unet)
+                    unet_lora_layers_to_save.update(unet_lora_layers_to_save)
             elif isinstance(model, type(accelerator.unwrap_model(text_encoder_one))):
                 text_encoder_one_lora_layers_to_save = text_encoder_lora_state_dict(model)
             elif isinstance(model, type(accelerator.unwrap_model(text_encoder_two))):
@@ -1283,8 +1292,14 @@ def main(args):
     else: num_params_text = 0
 
     print(f"Total learnable parameters: {num_params + num_params_text}\n") # number of parameters
-
+    # print(first_epoch, args.num_train_epochs)
     for epoch in range(first_epoch, args.num_train_epochs):
+        # print(epoch)
+        # unet_lora_layers_ffn = unet_ffn_within_attn_processors_state_dict(unet)
+        # print(unet_lora_layers_ffn[list(unet_lora_layers_ffn.keys())[0]])
+        # temp = unet_attn_processors_state_dict(unet)
+        # print(temp[list(temp.keys())[0]])
+        
         unet.train()
         if args.train_text_encoder:
             text_encoder_one.train()
@@ -1500,6 +1515,12 @@ def main(args):
         unet = accelerator.unwrap_model(unet)
         unet = unet.to(torch.float32)
         unet_lora_layers = unet_attn_processors_state_dict(unet)
+        if(args.unet_tune_mlp): 
+            unet_lora_layers_ffn = unet_ffn_within_attn_processors_state_dict(unet)
+            # print(unet_lora_layers_ffn[list(unet_lora_layers_ffn.keys())[0]])
+            unet_lora_layers.update(unet_lora_layers_ffn)
+            # print(unet_lora_layers.keys())
+        
 
         if args.train_text_encoder:
             text_encoder_one = accelerator.unwrap_model(text_encoder_one)
@@ -1514,6 +1535,7 @@ def main(args):
             text_encoder_lora_layers = None
             text_encoder_2_lora_layers = None
 
+        
         StableDiffusionXLPipeline.save_lora_weights(
             save_directory=args.output_dir,
             unet_lora_layers=unet_lora_layers,
@@ -1595,7 +1617,6 @@ def main(args):
                 commit_message="End of training",
                 ignore_patterns=["step_*", "epoch_*"],
             )
-
     accelerator.end_training()
 
 

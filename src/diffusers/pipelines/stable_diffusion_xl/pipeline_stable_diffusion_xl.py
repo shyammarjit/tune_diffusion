@@ -877,6 +877,7 @@ class StableDiffusionXLPipeline(DiffusionPipeline, FromSingleFileMixin, LoraLoad
             unet_config=self.unet.config,
             **kwargs,
         )
+        
         self.load_lora_into_unet(state_dict, network_alphas=network_alphas, unet=self.unet, 
             adapter_type=adapter_type, 
             attn_update_unet=attn_update_unet,

@@ -122,10 +122,7 @@ class LoRACompatibleLinear(nn.Linear):
         self.lora_layer = lora_layer
 
     def forward(self, x):
-        # print("shyam"); exit()
         if self.lora_layer is None:
             return super().forward(x)
         else:
-            # print(x.shape)
-            # print(super().forward(x).shape); exit()
             return super().forward(x) + self.lora_layer(x)
