@@ -1006,7 +1006,7 @@ def main(args):
             rank_k=args.text_lora_rank_k if "k" in args.attn_update_text else None, # added 
             rank_q=args.text_lora_rank_q if "q" in args.attn_update_text else None, # added
             rank_v=args.text_lora_rank_v if "v" in args.attn_update_text else None, # added 
-            rank_o=args.text_lora_rank_o if "o" in args.attn_update_text else None, # added
+            rank_o=args.text_lora_rank_out if "o" in args.attn_update_text else None, # added
             rank_mlp=args.text_lora_rank_mlp if args.text_tune_mlp else None, # added
             patch_mlp=args.text_tune_mlp,
         )
@@ -1015,7 +1015,7 @@ def main(args):
             rank_k=args.text_lora_rank_k if "k" in args.attn_update_text else None, # added 
             rank_q=args.text_lora_rank_q if "q" in args.attn_update_text else None, # added
             rank_v=args.text_lora_rank_v if "v" in args.attn_update_text else None, # added 
-            rank_o=args.text_lora_rank_o if "o" in args.attn_update_text else None, # added
+            rank_o=args.text_lora_rank_out if "o" in args.attn_update_text else None, # added
             rank_mlp=args.text_lora_rank_mlp if args.text_tune_mlp else None, # added
             patch_mlp=args.text_tune_mlp,
         )

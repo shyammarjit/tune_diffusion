@@ -16,7 +16,7 @@ text_lora_rank_o=4
 text_lora_rank_mlp=4
 
 lr=1e-4
-steps=1
+steps=500
 export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
 export OUTPUT_DIR="/home/nmathur/diffusion_output"
 export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
@@ -35,18 +35,26 @@ accelerate launch train_dreambooth_lora_sdxl.py \
     --lr_warmup_steps=0 \
     --max_train_steps=$steps \
     --adapter_type="lora" \
-    --unet_lora_rank=$rank \
-    --
     --seed="0" \
     --diffusion_model="sdxl" \
     --use_8bit_adam \
     --gradient_checkpointing \
     --attn_update_unet=$attn_update_unet \
     --enable_xformers_memory_efficient_attention \
-    # --tune_mlp \
-    # --lora_mlp_rank=$rank \
-    # --attn_update_text=$attn_update_text \
-    # --train_text_encoder \
+    --unet_lora_rank_k=$unet_lora_rank_k \
+    --unet_lora_rank_q=$unet_lora_rank_q \
+    --unet_lora_rank_v=$unet_lora_rank_v \
+    --unet_lora_rank_out=$unet_lora_rank_o \
+    --attn_update_text=$attn_update_text \
+    --train_text_encoder \
+    --unet_lora_rank_k=$unet_lora_rank_k \
+    --unet_lora_rank_q=$unet_lora_rank_q \
+    --unet_lora_rank_v=$unet_lora_rank_v \
+    --unet_lora_rank_out=$unet_lora_rank_o \
+    --text_lora_rank_mlp=$text_lora_rank_mlp \
+    # --unet_lora_rank_mlp=$unet_lora_rank_mlp \
+    # --unet_tune_mlp \
+    
 
 # python3 generator.py \
 #     --pretrained_model_name_or_path=$MODEL_NAME \
@@ -62,15 +70,18 @@ accelerate launch train_dreambooth_lora_sdxl.py \
 #     --lr_warmup_steps=0 \
 #     --max_train_steps=$steps \
 #     --adapter_type="lora" \
-#     --lora_rank=$rank \
 #     --seed="0" \
 #     --diffusion_model="sdxl" \
-#     --enable_xformers_memory_efficient_attention \
 #     --use_8bit_adam \
 #     --gradient_checkpointing \
 #     --attn_update_unet=$attn_update_unet \
-#     # --tune_mlp \
-#     # --lora_mlp_rank=$rank \
-#     # --attn_update_text=$attn_update_text \
-#     # --train_text_encoder \
-#     # --delete_and_upload_drive
+#     --enable_xformers_memory_efficient_attention \
+#     --unet_lora_rank_k=$unet_lora_rank_k \
+#     --unet_lora_rank_q=$unet_lora_rank_q \
+#     --unet_lora_rank_v=$unet_lora_rank_v \
+#     --unet_lora_rank_out=$unet_lora_rank_o \
+#     # --unet_lora_rank_mlp=$unet_lora_rank_mlp \
+#     # --unet_tune_mlp \
+# #     # --attn_update_text=$attn_update_text \
+# #     # --train_text_encoder \
+# #     # --delete_and_upload_drive

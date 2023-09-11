@@ -68,7 +68,6 @@ class PatchedLoraProjection(nn.Module):
         super().__init__()
         from .models.lora import LoRALinearLayer
         from .models.krona import KronALinearLayer
-        from .models.slice_lora import SliceLoRALinearLayer
 
         self.regular_linear_layer = regular_linear_layer
 
@@ -95,18 +94,9 @@ class PatchedLoraProjection(nn.Module):
                 dtype=dtype,
                 rank=rank,
             )
-        elif(adapter_type=='slice_lora'):
-            self.lora_linear_layer = SliceLoRALinearLayer(
-                self.regular_linear_layer.in_features,
-                self.regular_linear_layer.out_features,
-                network_alpha=network_alpha,
-                device=device,
-                dtype=dtype,
-                rank=rank,
-            )
             
         else:
-            raise ValueError("Only LoRA, SliceLoRA and KronA are supported.")
+            raise ValueError("Only LoRA & KronA are supported.")
 
 
         self.lora_scale = lora_scale
@@ -1551,28 +1541,28 @@ class LoraLoaderMixin:
             if("k" in attn_update_text):
                 key_alpha = network_alphas.pop(name + ".to_k_lora.down.weight.alpha", None)
                 attn_module.k_proj = PatchedLoraProjection(
-                    attn_module.k_proj, lora_scale, network_alpha=key_alpha, rank=rank, dtype=dtype, adapter_type=adapter_type
+                    attn_module.k_proj, lora_scale, network_alpha=key_alpha, rank=rank_k, dtype=dtype, adapter_type=adapter_type
                 )
                 lora_parameters.extend(attn_module.k_proj.lora_linear_layer.parameters())
 
             if("q" in attn_update_text):
                 query_alpha = network_alphas.pop(name + ".to_q_lora.down.weight.alpha", None)
                 attn_module.q_proj = PatchedLoraProjection(
-                    attn_module.q_proj, lora_scale, network_alpha=query_alpha, rank=rank, dtype=dtype, adapter_type=adapter_type,
+                    attn_module.q_proj, lora_scale, network_alpha=query_alpha, rank=rank_q, dtype=dtype, adapter_type=adapter_type,
                 )
                 lora_parameters.extend(attn_module.q_proj.lora_linear_layer.parameters())
 
             if("v" in attn_update_text):
                 value_alpha = network_alphas.pop(name + ".to_v_lora.down.weight.alpha", None)
                 attn_module.v_proj = PatchedLoraProjection(
-                    attn_module.v_proj, lora_scale, network_alpha=value_alpha, rank=rank, dtype=dtype, adapter_type=adapter_type
+                    attn_module.v_proj, lora_scale, network_alpha=value_alpha, rank=rank_v, dtype=dtype, adapter_type=adapter_type
                 )
                 lora_parameters.extend(attn_module.v_proj.lora_linear_layer.parameters())
 
             if("o" in attn_update_text):
                 out_alpha = network_alphas.pop(name + ".to_out_lora.down.weight.alpha", None)
                 attn_module.out_proj = PatchedLoraProjection(
-                    attn_module.out_proj, lora_scale, network_alpha=out_alpha, rank=rank, dtype=dtype, adapter_type=adapter_type,
+                    attn_module.out_proj, lora_scale, network_alpha=out_alpha, rank=rank_o, dtype=dtype, adapter_type=adapter_type,
                 )
                 lora_parameters.extend(attn_module.out_proj.lora_linear_layer.parameters())
 
@@ -1582,12 +1572,12 @@ class LoraLoaderMixin:
                 fc2_alpha = network_alphas.pop(name + ".fc2.lora_linear_layer.down.weight.alpha")
 
                 mlp_module.fc1 = PatchedLoraProjection(
-                    mlp_module.fc1, lora_scale, network_alpha=fc1_alpha, rank=rank, dtype=dtype
+                    mlp_module.fc1, lora_scale, network_alpha=fc1_alpha, rank=rank_mlp, dtype=dtype
                 )
                 lora_parameters.extend(mlp_module.fc1.lora_linear_layer.parameters())
 
                 mlp_module.fc2 = PatchedLoraProjection(
-                    mlp_module.fc2, lora_scale, network_alpha=fc2_alpha, rank=rank, dtype=dtype
+                    mlp_module.fc2, lora_scale, network_alpha=fc2_alpha, rank=rank_mlp, dtype=dtype
                 )
                 lora_parameters.extend(mlp_module.fc2.lora_linear_layer.parameters())
 
