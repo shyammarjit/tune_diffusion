@@ -16,9 +16,9 @@ text_lora_rank_o=4
 text_lora_rank_mlp=4
 
 lr=1e-4
-steps=500
+steps=10
 export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
-export OUTPUT_DIR="/home/nmathur/diffusion_output"
+export OUTPUT_DIR="/home/nmathur/test_text"
 export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
 
 accelerate launch train_dreambooth_lora_sdxl.py \
@@ -47,12 +47,12 @@ accelerate launch train_dreambooth_lora_sdxl.py \
     --unet_lora_rank_out=$unet_lora_rank_o \
     --attn_update_text=$attn_update_text \
     --train_text_encoder \
-    --unet_lora_rank_k=$unet_lora_rank_k \
-    --unet_lora_rank_q=$unet_lora_rank_q \
-    --unet_lora_rank_v=$unet_lora_rank_v \
-    --unet_lora_rank_out=$unet_lora_rank_o \
-    --text_lora_rank_mlp=$text_lora_rank_mlp \
-    # --unet_lora_rank_mlp=$unet_lora_rank_mlp \
+    # --unet_lora_rank_k=$unet_lora_rank_k \
+    # --unet_lora_rank_q=$unet_lora_rank_q \
+    # --unet_lora_rank_v=$unet_lora_rank_v \
+    # --unet_lora_rank_out=$unet_lora_rank_o \
+    # --text_lora_rank_mlp=$text_lora_rank_mlp \
+    # --text_tune_mlp \
     # --unet_tune_mlp \
     
 
