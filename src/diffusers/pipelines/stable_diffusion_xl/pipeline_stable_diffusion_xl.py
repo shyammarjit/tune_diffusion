@@ -867,6 +867,7 @@ class StableDiffusionXLPipeline(DiffusionPipeline, FromSingleFileMixin, LoraLoad
             adapter_type=None,
             attn_update_unet=None,
             attn_update_text=None,
+            text_tune_mlp=None,
             **kwargs
         ):
         # We could have accessed the unet config from `lora_state_dict()` too. We pass
@@ -893,6 +894,7 @@ class StableDiffusionXLPipeline(DiffusionPipeline, FromSingleFileMixin, LoraLoad
                 lora_scale=self.lora_scale,
                 adapter_type=adapter_type,
                 attn_update_text=attn_update_text,
+                text_tune_mlp=text_tune_mlp,
             )
 
         text_encoder_2_state_dict = {k: v for k, v in state_dict.items() if "text_encoder_2." in k}
@@ -905,6 +907,7 @@ class StableDiffusionXLPipeline(DiffusionPipeline, FromSingleFileMixin, LoraLoad
                 lora_scale=self.lora_scale,
                 adapter_type=adapter_type,
                 attn_update_text=attn_update_text,
+                text_tune_mlp=text_tune_mlp,
             )
 
     @classmethod
@@ -929,6 +932,11 @@ class StableDiffusionXLPipeline(DiffusionPipeline, FromSingleFileMixin, LoraLoad
         state_dict.update(pack_weights(unet_lora_layers, "unet"))
 
         if text_encoder_lora_layers and text_encoder_2_lora_layers:
+            # print(pack_weights(text_encoder_lora_layers, "text_encoder").keys())
+            # # exit()
+            # print("shyam")
+            # print(pack_weights(text_encoder_2_lora_layers, "text_encoder_2").keys())
+            # exit()
             state_dict.update(pack_weights(text_encoder_lora_layers, "text_encoder"))
             state_dict.update(pack_weights(text_encoder_2_lora_layers, "text_encoder_2"))
 

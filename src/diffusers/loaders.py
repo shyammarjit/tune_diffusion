@@ -113,6 +113,8 @@ def text_encoder_attn_modules(text_encoder):
         for i, layer in enumerate(text_encoder.text_model.encoder.layers):
             name = f"text_model.encoder.layers.{i}.self_attn"
             mod = layer.self_attn
+            # try: print("shyam", mod.q_proj.lora_linear_layer.up.weight, "kamal")
+            # except: pass
             attn_modules.append((name, mod))
     else:
         raise ValueError(f"do not know how to get attention modules for: {text_encoder.__class__.__name__}")
@@ -127,6 +129,7 @@ def text_encoder_mlp_modules(text_encoder):
         for i, layer in enumerate(text_encoder.text_model.encoder.layers):
             mlp_mod = layer.mlp
             name = f"text_model.encoder.layers.{i}.mlp"
+            # print(kamla); exit()
             mlp_modules.append((name, mlp_mod))
     else:
         raise ValueError(f"do not know how to get mlp modules for: {text_encoder.__class__.__name__}")
@@ -134,15 +137,29 @@ def text_encoder_mlp_modules(text_encoder):
     return mlp_modules
 
 
-def text_encoder_lora_state_dict(text_encoder, attn_update_text=None):
+def text_encoder_lora_state_dict(text_encoder, attn_update_text=None, text_tune_mlp=None):
     state_dict = {}
 
     attn_update_text = list(attn_update_text)
-
+    # print(attn_update_text); exit()
+    t = text_encoder_attn_modules(text_encoder)
+    # print(t[0][1])
+    # print(t[0][1].q_proj.lora_linear_layer.down.weight)
+    # exit()
     for name, module in text_encoder_attn_modules(text_encoder):
+        # print(name)
+        # print(module.q_proj.lora_linear_layer.down.weight)
+        # # exit()
+        # print("shyam")
+        # print(module.q_proj.lora_linear_layer.state_dict())
+        # # print(module.q_proj.lora_linear_layer.state_dict().items())
+        # exit()
         if("q" in attn_update_text):
             for k, v in module.q_proj.lora_linear_layer.state_dict().items():
                 state_dict[f"{name}.q_proj.lora_linear_layer.{k}"] = v
+                # print(v)
+                # exit()
+            # exit()
 
         if("k" in attn_update_text):
             for k, v in module.k_proj.lora_linear_layer.state_dict().items():
@@ -156,6 +173,16 @@ def text_encoder_lora_state_dict(text_encoder, attn_update_text=None):
             for k, v in module.out_proj.lora_linear_layer.state_dict().items():
                 state_dict[f"{name}.out_proj.lora_linear_layer.{k}"] = v
     
+    if(text_tune_mlp):
+        for name, module in text_encoder_mlp_modules(text_encoder):
+            # first fc layer
+            for k, v in module.fc1.lora_linear_layer.state_dict().items():
+                state_dict[f"{name}.fc1.lora_linear_layer.{k}"] = v
+            
+            # 2nd fc layer
+            for k, v in module.fc1.lora_linear_layer.state_dict().items():
+                state_dict[f"{name}.fc2.lora_linear_layer.{k}"] = v
+                
     return state_dict
 
 
@@ -532,10 +559,10 @@ class UNet2DConditionLoadersMixin:
 
                     if attn_processor_class is not LoRAAttnAddedKVProcessor: # getting call
                         attn_processors[key] = attn_processor_class(
-                            k_rank=k_rank, # added
-                            q_rank=q_rank, # added
-                            v_rank=v_rank, # added
-                            out_rank=out_rank, # added
+                            k_rank=k_rank if "k" in attn_update_unet else None, # added
+                            q_rank=q_rank if "q" in attn_update_unet else None, # added
+                            v_rank=v_rank if "v" in attn_update_unet else None,  # added
+                            out_rank=out_rank if "o" in attn_update_unet else None, # added
                             hidden_size=hidden_size_,
                             cross_attention_dim=cross_attention_dim,
                             network_alpha=mapped_network_alphas.get(key),
@@ -1021,6 +1048,7 @@ class LoraLoaderMixin:
             adapter_type=None,
             attn_update_unet=None,
             attn_update_text=None,
+            text_tune_mlp=None,
             **kwargs,
         ):
         """
@@ -1059,6 +1087,7 @@ class LoraLoaderMixin:
             text_encoder=self.text_encoder,
             lora_scale=self.lora_scale,
             attn_update_text=attn_update_text,
+            text_tune_mlp=text_tune_mlp,
         )
         
 
@@ -1346,6 +1375,7 @@ class LoraLoaderMixin:
     def load_lora_into_text_encoder(cls, state_dict, network_alphas, text_encoder, prefix=None, lora_scale=1.0, 
             adapter_type=None,
             attn_update_text=None,
+            text_tune_mlp=None,
         ):
         """
         This will load the LoRA layers specified in `state_dict` into `text_encoder`
@@ -1431,23 +1461,28 @@ class LoraLoaderMixin:
                             ] = text_encoder_lora_state_dict.pop(f"{name}.to_out_lora.down.weight")
 
                 if("o" in attn_update_text):
-                    rank = text_encoder_lora_state_dict[
+                    rank_out = text_encoder_lora_state_dict[
                         "text_model.encoder.layers.0.self_attn.out_proj.lora_linear_layer.up.weight"
                     ].shape[1]
-                elif("k" in attn_update_text):
-                    rank = text_encoder_lora_state_dict[
+                    print(text_encoder_lora_state_dict[
+                        "text_model.encoder.layers.0.self_attn.out_proj.lora_linear_layer.up.weight"
+                    ])
+                    # exit()
+                
+                if("k" in attn_update_text):
+                    rank_k = text_encoder_lora_state_dict[
                         "text_model.encoder.layers.0.self_attn.k_proj.lora_linear_layer.up.weight"
                     ].shape[1]
-                elif("q" in attn_update_text):
-                    rank = text_encoder_lora_state_dict[
+                
+                if("q" in attn_update_text):
+                    rank_q = text_encoder_lora_state_dict[
                         "text_model.encoder.layers.0.self_attn.q_proj.lora_linear_layer.up.weight"
                     ].shape[1]
-                elif("v" in attn_update_text):
-                    rank = text_encoder_lora_state_dict[
+                
+                if("v" in attn_update_text):
+                    rank_v = text_encoder_lora_state_dict[
                         "text_model.encoder.layers.0.self_attn.v_proj.lora_linear_layer.up.weight"
                     ].shape[1]
-                else:
-                    raise ValueError("Wrong attention weight type")
                     
                 patch_mlp = any(".mlp." in key for key in text_encoder_lora_state_dict.keys())
 
@@ -1469,7 +1504,11 @@ class LoraLoaderMixin:
                     text_encoder,
                     lora_scale,
                     network_alphas,
-                    rank=rank,
+                    rank_k=rank_k if "k" in attn_update_text else None,
+                    rank_v=rank_v if "v" in attn_update_text else None,
+                    rank_q=rank_q if "q" in attn_update_text else None,
+                    rank_o=rank_out if "q" in attn_update_text else None,
+                    rank_mlp=rank_mlp if text_tune_mlp else None,
                     patch_mlp=patch_mlp,
                     adapter_type=adapter_type,
                     attn_update_text=attn_update_text,
@@ -1543,6 +1582,11 @@ class LoraLoaderMixin:
                 attn_module.k_proj = PatchedLoraProjection(
                     attn_module.k_proj, lora_scale, network_alpha=key_alpha, rank=rank_k, dtype=dtype, adapter_type=adapter_type
                 )
+                # print("kamal raja")
+                # print(attn_module.k_proj)
+                # for param in attn_module.k_proj.lora_linear_layer.parameters():
+                #     print(param)
+                # exit()
                 lora_parameters.extend(attn_module.k_proj.lora_linear_layer.parameters())
 
             if("q" in attn_update_text):
@@ -1568,16 +1612,22 @@ class LoraLoaderMixin:
 
         if patch_mlp:
             for name, mlp_module in text_encoder_mlp_modules(text_encoder):
-                fc1_alpha = network_alphas.pop(name + ".fc1.lora_linear_layer.down.weight.alpha")
-                fc2_alpha = network_alphas.pop(name + ".fc2.lora_linear_layer.down.weight.alpha")
+                try:
+                    fc1_alpha = network_alphas.pop(name + ".fc1.lora_linear_layer.down.weight.alpha")
+                    fc2_alpha = network_alphas.pop(name + ".fc2.lora_linear_layer.down.weight.alpha")
+                except:
+                    fc1_alpha = None
+                    fc2_alpha = None
 
                 mlp_module.fc1 = PatchedLoraProjection(
-                    mlp_module.fc1, lora_scale, network_alpha=fc1_alpha, rank=rank_mlp, dtype=dtype
+                    mlp_module.fc1, lora_scale, network_alpha=fc1_alpha, rank=rank_mlp, dtype=dtype,
+                    adapter_type=adapter_type,
                 )
                 lora_parameters.extend(mlp_module.fc1.lora_linear_layer.parameters())
 
                 mlp_module.fc2 = PatchedLoraProjection(
-                    mlp_module.fc2, lora_scale, network_alpha=fc2_alpha, rank=rank_mlp, dtype=dtype
+                    mlp_module.fc2, lora_scale, network_alpha=fc2_alpha, rank=rank_mlp, dtype=dtype,
+                    adapter_type=adapter_type,
                 )
                 lora_parameters.extend(mlp_module.fc2.lora_linear_layer.parameters())
 
