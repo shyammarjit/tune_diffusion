@@ -174,9 +174,9 @@ def struct_output(args):
         attn_config = attn_config + "_" + text_attn_config
         
     if(args.adapter_type=="lora"):
-        exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}_{args.max_train_steps}"
+        exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
     elif(args.adapter_type=="krona"): raise ValueError("currently not supported.")
-    else: raise AttributeError("Wrong adapter format.")
+    else: raise AttributeError("Wrong adapter format.") 
     
     exp_ = os.path.join(dataset_, exp)
     if(os.path.exists(exp_)): pass

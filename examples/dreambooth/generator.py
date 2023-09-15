@@ -81,14 +81,14 @@ def CLIP_T(gen_folder_path = None, prompts = None):
 
 
 
-def evaluator(args, prompts):
-    image_dir = os.path.join(args.output_dir, 'images') 
+def evaluator(args, prompts, from_checkpoint):
+    image_dir = os.path.join(args.output_dir, f'images-{from_checkpoint}') 
     clipi = CLIP_I(org_folder_path = args.instance_data_dir, gen_folder_path = image_dir)
     clipt = CLIP_T(gen_folder_path = image_dir, prompts = prompts)
     return clipi, clipt
 
 
-def generator(args, prompts):
+def generator(args, prompts, from_checkpoint):
     if(args.diffusion_model == "sdxl"):
         # load the SDXL model
         model_id = "stabilityai/stable-diffusion-xl-base-1.0"
@@ -98,7 +98,7 @@ def generator(args, prompts):
             unet_tune_mlp=args.unet_tune_mlp
         )
         pipe = pipe.to("cuda")
-        pipe.load_lora_weights(args.output_dir, 
+        pipe.load_lora_weights(os.path.join(args.output_dir, from_checkpoint), 
             adapter_type=args.adapter_type, 
             attn_update_unet=args.attn_update_unet,
             attn_update_text=args.attn_update_text,
@@ -115,12 +115,12 @@ def generator(args, prompts):
         model_id = "stabilityai/stable-diffusion-2-1-base"
         pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
         pipe = pipe.to("cuda")
-        pipe.load_lora_weights(args.output_dir, adapter_type=args.adapter_type)
+        pipe.load_lora_weights(os.path.join(args.output_dir, from_checkpoint), adapter_type=args.adapter_type)
     else:
         raise AttributeError("only supported base and sdxl model")
 
     # create the image folder
-    image_dir = os.path.join(args.output_dir, 'images') 
+    image_dir = os.path.join(args.output_dir, f'images-{from_checkpoint}') 
     if(os.path.exists(image_dir)): pass
     else: os.mkdir(image_dir)
     
@@ -147,7 +147,7 @@ def generator(args, prompts):
         del pipe
 
 
-def save_metrics(args, clipi, clipt):
+def save_metrics(args, clipi, clipt, from_checkpoint):
     if not os.path.isdir(args.instance_data_dir):
         raise ValueError("The provided path is not a valid directory.")
     image_extensions = ['*.png', '*.jpg', '*.jpeg', '*.gif', '*.bmp']
@@ -179,7 +179,7 @@ def save_metrics(args, clipi, clipt):
         "num_train_steps": args.max_train_steps,
         "no_of_images": number_of_input_img,
         "learning_rate": args.learning_rate,
-        "output_path": args.output_dir,
+        "output_path": f"{args.output_dir}-{from_checkpoint}",
         "with_prior_preservation": args.with_prior_preservation,
     }
     if args.train_text_encoder:
@@ -193,7 +193,7 @@ def save_metrics(args, clipi, clipt):
         text_encoder_info = {"text_lora_rank_k": None, "text_lora_rank_q": None, "text_lora_rank_v": None, "text_lora_rank_out": None}
         exp_info.update(text_encoder_info)
         
-    exp_name = args.output_dir + '/' + os.path.basename(args.output_dir) + '.json'
+    exp_name = args.output_dir + '/' + os.path.basename(args.output_dir) + from_checkpoint + '.json'
     # }/log_{args.diffusion_model}_{args.adapter_type}_{args.lora_rank}_{args.max_train_steps}_{number_of_input_img}_{args.learning_rate}_{args.with_prior_preservation}.json'
     print(exp_name)
     
@@ -253,9 +253,17 @@ if __name__ == "__main__":
     args = parse_args()
     # generate the prompts
     prompts = get_promts(os.path.basename(args.instance_data_dir))
-    # generate images base don given prompts
-    generator(args, prompts)
-    # compute the quantiative results (CLIP-I, CLIP-T)
-    clipi, clipt = evaluator(args, prompts)
-    save_metrics(args, clipi, clipt)
+    
+    # find the availabel checkpoint list name
+    run_generator = []
+    if os.path.join(args.output_dir, 'checkpoint-500'): run_generator.append('checkpoint-500') 
+    if os.path.join(args.output_dir, 'checkpoint-1000'): run_generator.append('checkpoint-1000')
+    
+    for from_checkpoint in run_generator:
+        print(f"For {from_checkpoint}")
+        # generate images based on given prompts
+        generator(args, prompts, from_checkpoint)
+        # compute the quantiative results (CLIP-I, CLIP-T)
+        clipi, clipt = evaluator(args, prompts, from_checkpoint)
+        save_metrics(args, clipi, clipt, from_checkpoint)
 
