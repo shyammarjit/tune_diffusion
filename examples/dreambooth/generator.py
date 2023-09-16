@@ -131,7 +131,7 @@ def generator(args, prompts, from_checkpoint):
         else: # without sdxl run
             image = pipe(prompts[i], num_inference_steps=50, guidance_scale=7).images[0]
         
-        image_save_path = os.path.join(image_dir, "image_{}.jpg".format(i+1))
+        image_save_path = os.path.join(image_dir, f"image_{i+1}_{args.seed}.jpg")
         # wandb.log({'Final Images': wandb.Image(image)})
         # # wandb.log({'subject': wandb.weights(args.learning_rate_text)})
         # wandb.log({'rank(r)': wandb.weights(args.lora_rank)})
