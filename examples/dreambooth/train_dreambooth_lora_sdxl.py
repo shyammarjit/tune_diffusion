@@ -1331,6 +1331,11 @@ def main(args):
         if args.train_text_encoder:
             text_encoder_one.train()
             text_encoder_two.train()
+            
+            # set top parameter requires_grad = True for gradient checkpointing works
+            text_encoder_one.text_model.embeddings.requires_grad_(True)
+            text_encoder_two.text_model.embeddings.requires_grad_(True)
+            
         for step, batch in enumerate(train_dataloader):
             # Skip steps until we reach the resumed step
             if args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
@@ -1430,6 +1435,20 @@ def main(args):
                 optimizer.step()
                 lr_scheduler.step()
                 optimizer.zero_grad()
+                
+                # print("shyam")
+                # for i in range(len(unet_lora_parameters)):
+                #     if unet_lora_parameters[i].grad is None:
+                #         print("unet",i)
+                # for i in range(len(text_lora_parameters_one)):
+                #     if text_lora_parameters_one[i].grad is None:
+                #         print("t1", i)
+                # for i in range(len(text_lora_parameters_two)):
+                #     if text_lora_parameters_two[i].grad is None:
+                #         print("t2", i)
+                # # print(text_lora_parameters_one[-1].grad)
+                # exit()
+                
 
             # print("shyam kamal")
             # # print(text_lora_parameters_two[0])
@@ -1562,17 +1581,22 @@ def main(args):
 
         if args.train_text_encoder:
             text_encoder_one = accelerator.unwrap_model(text_encoder_one)
+            # print(text_encoder_one)
+            # print(text_encoder_two)
+            # exit()
             text_encoder_lora_layers = text_encoder_lora_state_dict(text_encoder_one.to(torch.float32), 
                 attn_update_text=args.attn_update_text,
                 text_tune_mlp=args.text_tune_mlp,
             )
-            # print(text_encoder_lora_layers); exit()
+            
             text_encoder_two = accelerator.unwrap_model(text_encoder_two)
             text_encoder_2_lora_layers = text_encoder_lora_state_dict(text_encoder_two.to(torch.float32), 
                 attn_update_text=args.attn_update_text,
                 text_tune_mlp=args.text_tune_mlp,
             )
-            
+            # print("shyam")
+            # print(text_encoder_lora_layers)
+            exit()
         else:
             text_encoder_lora_layers = None
             text_encoder_2_lora_layers = None

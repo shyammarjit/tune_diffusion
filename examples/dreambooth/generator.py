@@ -124,7 +124,7 @@ def generator(args, prompts, from_checkpoint):
     if(os.path.exists(image_dir)): pass
     else: os.mkdir(image_dir)
     
-    for i in trange(1, desc = "generating images"):
+    for i in trange(len(prompts), desc = "generating images"):
         if(args.diffusion_model == "sdxl"):
             image = pipe(prompt=prompts[i], output_type="latent", generator=generator).images[0]
             image = refiner(prompt=prompts[i], image=image[None, :], generator=generator).images[0]
