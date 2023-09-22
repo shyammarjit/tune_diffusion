@@ -38,7 +38,7 @@ accelerate launch train_dreambooth_lora_sdxl.py \
     --unet_lora_rank_v=$unet_lora_rank_v \
     --unet_lora_rank_out=$unet_lora_rank_o \
     --unet_lora_rank_mlp=$unet_lora_rank_mlp \
-    # --lphm \
+    --lphm \
     # --unet_tune_mlp \
     # --attn_update_text=$attn_update_text \
     # --train_text_encoder \

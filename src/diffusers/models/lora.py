@@ -16,31 +16,63 @@ from typing import Optional
 
 import torch.nn.functional as F
 from torch import nn
+import torch
+
+
 
 
 class LoRALinearLayer(nn.Module):
-    def __init__(self, in_features, out_features, rank=4, network_alpha=None, device=None, dtype=None):
+    def __init__(self, in_features, out_features, rank=4, network_alpha=None, device=None, dtype=None, lphm=None):
         super().__init__()
         # print(kamal)
         # exit()
-
-        self.down = nn.Linear(in_features, rank, bias=False, device=device, dtype=dtype)
-        self.up = nn.Linear(rank, out_features, bias=False, device=device, dtype=dtype)
+        self.lphm = lphm
         # This value has the same meaning as the `--network_alpha` option in the kohya-ss trainer script.
         # See https://github.com/darkstorm2150/sd-scripts/blob/main/docs/train_network_README-en.md#execute-learning
         self.network_alpha = network_alpha
         self.rank = rank
 
-        nn.init.normal_(self.down.weight, std=1 / rank)
-        nn.init.zeros_(self.up.weight)
+        
+        if lphm:
+            self.down_in = nn.Linear(1, in_features, bias=False, device=device, dtype=dtype)
+            self.down_out = nn.Linear(rank, 1, bias=False, device=device, dtype=dtype)
+
+            self.up_in = nn.Linear(1, rank, bias=False, device=device, dtype=dtype)
+            self.up_out = nn.Linear(out_features, 1, bias=False, device=device, dtype=dtype)
+
+            nn.init.normal_(self.down_in.weight, std=1 / rank)
+            nn.init.normal_(self.down_out.weight, std=1 / rank)
+            nn.init.zeros_(self.up_in.weight)
+            nn.init.zeros_(self.up_out.weight)
+            
+        else: 
+            self.down = nn.Linear(in_features, rank, bias=False, device=device, dtype=dtype)
+            self.up = nn.Linear(rank, out_features, bias=False, device=device, dtype=dtype)
+            
+            nn.init.normal_(self.down.weight, std=1 / rank)
+            nn.init.zeros_(self.up.weight)
+
+        
+        
 
     def forward(self, hidden_states):
         # print('in')
+        # print(self.down_in.weight.device)
+        # exit()
         orig_dtype = hidden_states.dtype
-        dtype = self.down.weight.dtype
 
-        down_hidden_states = self.down(hidden_states.to(dtype))
-        up_hidden_states = self.up(down_hidden_states)
+        if self.lphm:
+            dtype = self.down_in.weight.dtype
+            self.down = torch.kron(self.down_in.weight, self.down_out.weight)#.to(dtype).to(device)
+            self.up = torch.kron(self.up_in.weight, self.up_out.weight)#.to(dtype).to(device)
+            # print(hidden_states.shape, self.down.shape)
+            # exit()
+            down_hidden_states = hidden_states.to(dtype)@self.down
+            up_hidden_states = down_hidden_states@self.up
+        else:
+            dtype = self.down.weight.dtype
+            down_hidden_states = self.down(hidden_states.to(dtype))
+            up_hidden_states = self.up(down_hidden_states)
 
         if self.network_alpha is not None:
             up_hidden_states *= self.network_alpha / self.rank

@@ -868,6 +868,7 @@ class StableDiffusionXLPipeline(DiffusionPipeline, FromSingleFileMixin, LoraLoad
             attn_update_unet=None,
             attn_update_text=None,
             text_tune_mlp=None,
+            lphm=None,
             **kwargs
         ):
         # We could have accessed the unet config from `lora_state_dict()` too. We pass
@@ -878,10 +879,12 @@ class StableDiffusionXLPipeline(DiffusionPipeline, FromSingleFileMixin, LoraLoad
             unet_config=self.unet.config,
             **kwargs,
         )
-        
+        # print(lphm)
+        # exit()
         self.load_lora_into_unet(state_dict, network_alphas=network_alphas, unet=self.unet, 
             adapter_type=adapter_type, 
             attn_update_unet=attn_update_unet,
+            lphm=lphm,
         )
 
         text_encoder_state_dict = {k: v for k, v in state_dict.items() if "text_encoder." in k}

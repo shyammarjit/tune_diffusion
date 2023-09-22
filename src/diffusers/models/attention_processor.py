@@ -1309,6 +1309,7 @@ class LoRAAttnProcessor2_0(nn.Module):
             q_rank=None,
             v_rank=None,
             out_rank=None,
+            lphm=None,
             **kwargs,
         ):
         super().__init__()
@@ -1331,13 +1332,13 @@ class LoRAAttnProcessor2_0(nn.Module):
         
         if(adapter_type == "lora"):
             if("q" in attn_update_unet):
-                self.to_q_lora = LoRALinearLayer(q_hidden_size, q_hidden_size, q_rank, network_alpha)
+                self.to_q_lora = LoRALinearLayer(q_hidden_size, q_hidden_size, q_rank, network_alpha, lphm=lphm)
             if("k" in attn_update_unet):
-                self.to_k_lora = LoRALinearLayer(cross_attention_dim or hidden_size, hidden_size, k_rank, network_alpha)
+                self.to_k_lora = LoRALinearLayer(cross_attention_dim or hidden_size, hidden_size, k_rank, network_alpha, lphm=lphm)
             if("v" in attn_update_unet):
-                self.to_v_lora = LoRALinearLayer(cross_attention_dim or v_hidden_size, v_hidden_size, v_rank, network_alpha)
+                self.to_v_lora = LoRALinearLayer(cross_attention_dim or v_hidden_size, v_hidden_size, v_rank, network_alpha, lphm=lphm)
             if("o" in attn_update_unet):
-                self.to_out_lora = LoRALinearLayer(out_hidden_size, out_hidden_size, out_rank, network_alpha)
+                self.to_out_lora = LoRALinearLayer(out_hidden_size, out_hidden_size, out_rank, network_alpha, lphm=lphm)
             
         elif(adapter_type == "krona"):
             raise ValueError("Currently not supported")

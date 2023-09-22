@@ -235,6 +235,7 @@ class UNet2DConditionLoadersMixin:
     def load_attn_procs(self, pretrained_model_name_or_path_or_dict: Union[str, Dict[str, torch.Tensor]],
             adapter_type=None,
             attn_update_unet=None,
+            lphm=None,
             **kwargs,
         ):
         r"""
@@ -488,7 +489,14 @@ class UNet2DConditionLoadersMixin:
                     non_attn_lora_layers.append((attn_processor, lora))
                 else: 
                     # To handle SDXL.
-                    
+                    # keys_ = list(value_dict.keys())
+                    # print("kamal raja ")
+                    # for i in keys_:
+                    #     print(i, value_dict[i].shape)
+                    # exit()
+                    # print(value_dict['to_v_lora.down_in.weight'].shape, value_dict['to_v_lora.down_out.weight'].shape)
+                    # print(value_dict['to_v_lora.up_in.weight'].shape, value_dict['to_v_lora.up_out.weight'].shape)
+                    # exit()
                     rank_mapping = {}
                     hidden_size_mapping = {}
                     projection_ids_list = []
@@ -497,10 +505,14 @@ class UNet2DConditionLoadersMixin:
                     if("v" in attn_update_unet): projection_ids_list.append("to_v")
                     if("o" in attn_update_unet): projection_ids_list.append("to_out")
                     for projection_id in projection_ids_list:
-                        rank = value_dict[f"{projection_id}_lora.down.weight"].shape[0]
+                        if(lphm): rank = value_dict[f"{projection_id}_lora.down_out.weight"].shape[1]
+                        else: rank = value_dict[f"{projection_id}_lora.down.weight"].shape[0]
 
                         # Added lora and KronA
-                        if(adapter_type=="lora"): hidden_size = value_dict[f"{projection_id}_lora.up.weight"].shape[0]
+                        if(adapter_type=="lora"):
+                            if lphm: hidden_size = value_dict[f"{projection_id}_lora.up_out.weight"].shape[1]
+                            else: hidden_size = value_dict[f"{projection_id}_lora.up.weight"].shape[0]
+                                
                         elif(adapter_type=="krona"): raise ValueError("Currently not supported.")
                         else: raise ValueError("Only LoRA and KronA are supported.")
 
@@ -511,10 +523,18 @@ class UNet2DConditionLoadersMixin:
                     if isinstance(
                         attn_processor, (AttnAddedKVProcessor, SlicedAttnAddedKVProcessor, AttnAddedKVProcessor2_0)
                     ):
-                        if("k" in attn_update_unet): _, dim_ = value_dict["add_k_proj_lora.down.weight"].size()
-                        elif("v" in attn_update_unet): _, dim_ = value_dict["add_v_proj_lora.down.weight"].size()
-                        elif("q" in attn_update_unet): _, dim_ = value_dict["add_q_proj_lora.down.weight"].size()
-                        elif("o" in attn_update_unet): _, dim_ = value_dict["add_out_proj_lora.down.weight"].size()
+                        if("k" in attn_update_unet): 
+                            if lphm: dim_, _ = value_dict["add_k_proj_lora.down_in.weight"].size()
+                            else: _, dim_ = value_dict["add_k_proj_lora.down.weight"].size()
+                        elif("v" in attn_update_unet): 
+                            if lphm: dim_, _ = value_dict["add_v_proj_lora.down_in.weight"].size()
+                            else: _, dim_ = value_dict["add_v_proj_lora.down.weight"].size()
+                        elif("q" in attn_update_unet):
+                            if lphm: dim_, _ = value_dict["add_q_proj_lora.down_in.weight"].size()
+                            else: _, dim_ = value_dict["add_q_proj_lora.down.weight"].size()
+                        elif("o" in attn_update_unet): 
+                            if lphm: dim_, _ = value_dict["add_out_proj_lora.down.weight"].size()
+                            else: _, dim_ = value_dict["add_out_proj_lora.down.weight"].size()
                         else: raise ValueError("attention weight type error.")
                         
                         # Added lora and KronA
@@ -523,10 +543,18 @@ class UNet2DConditionLoadersMixin:
                         else: raise ValueError("Only LoRA and KronA are supported.")
                         attn_processor_class = LoRAAttnAddedKVProcessor
                     else:
-                        if("k" in attn_update_unet): _, dim_ = value_dict["to_k_lora.down.weight"].size()
-                        elif("v" in attn_update_unet): _, dim_ = value_dict["to_v_lora.down.weight"].size()
-                        elif("q" in attn_update_unet): _, dim_ = value_dict["to_q_lora.down.weight"].size()
-                        elif("o" in attn_update_unet): _, dim_ = value_dict["to_out_lora.down.weight"].size()
+                        if("k" in attn_update_unet): 
+                            if lphm: dim_, _ = value_dict["to_k_lora.down_in.weight"].size()
+                            else: _, dim_ = value_dict["to_k_lora.down.weight"].size()
+                        elif("v" in attn_update_unet): 
+                            if lphm: dim_, _ = value_dict["to_v_lora.down_in.weight"].size()
+                            else: _, dim_ = value_dict["to_v_lora.down.weight"].size()
+                        elif("q" in attn_update_unet):
+                            if lphm: dim_, _ = value_dict["to_q_lora.down_in.weight"].size()
+                            else: _, dim_ = value_dict["to_q_lora.down.weight"].size()
+                        elif("o" in attn_update_unet): 
+                            if lphm: dim_, _ = value_dict["to_out_lora.down.weight"].size()
+                            else: _, dim_ = value_dict["to_out_lora.down.weight"].size()
                         else: raise ValueError("attention weight type error.")
 
                         # Added lora and KronA
@@ -552,11 +580,12 @@ class UNet2DConditionLoadersMixin:
                     if("v" in attn_update_unet): 
                         v_rank = rank_mapping.get("to_v_lora.down.weight")
                         hidden_size_ = hidden_size_mapping.get("to_v_lora.up.weight")
+                        # print(hidden_size_)
                     if("o" in attn_update_unet): 
                         out_rank = rank_mapping.get("to_out_lora.down.weight")
                         hidden_size_ = hidden_size_mapping.get("to_out_lora.up.weight")
                                    
-
+                    # print(k_rank, q_rank, v_rank, out_rank, hidden_size_, cross_attention_dim)
                     if attn_processor_class is not LoRAAttnAddedKVProcessor: # getting call
                         attn_processors[key] = attn_processor_class(
                             k_rank=k_rank if "k" in attn_update_unet else None, # added
@@ -571,7 +600,10 @@ class UNet2DConditionLoadersMixin:
                             out_hidden_size=hidden_size_mapping.get("to_out_lora.up.weight"),
                             adapter_type=adapter_type,
                             attn_update_unet=attn_update_unet,
+                            lphm=lphm,
                         )
+                        # print(attn_processors[key])
+                        # exit()
                     else:
                         attn_processors[key] = attn_processor_class(
                             k_rank=k_rank, # added
@@ -1326,7 +1358,7 @@ class LoraLoaderMixin:
         return new_state_dict
 
     @classmethod
-    def load_lora_into_unet(cls, state_dict, network_alphas, unet, adapter_type=None, attn_update_unet=None):
+    def load_lora_into_unet(cls, state_dict, network_alphas, unet, adapter_type=None, attn_update_unet=None, lphm=None):
         """
         This will load the LoRA layers specified in `state_dict` into `unet`.
 
@@ -1369,7 +1401,7 @@ class LoraLoaderMixin:
             warnings.warn(warn_message)
 
         # load loras into unet
-        unet.load_attn_procs(state_dict, network_alphas=network_alphas, adapter_type=adapter_type, attn_update_unet=attn_update_unet)
+        unet.load_attn_procs(state_dict, network_alphas=network_alphas, adapter_type=adapter_type, attn_update_unet=attn_update_unet, lphm=lphm)
 
     @classmethod
     def load_lora_into_text_encoder(cls, state_dict, network_alphas, text_encoder, prefix=None, lora_scale=1.0, 
