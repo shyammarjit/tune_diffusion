@@ -573,7 +573,7 @@ def parse_args(input_args=None):
         help="Whether or not to push the model to the GDrive.",
     )
     
-    parser.add_argument("--adapter_low_rank", 
+    parser.add_argument("--adapter_low_rank",
         action="store_true",
         help="Whether low rank parameterized format is there or not.",
     )
@@ -582,9 +582,16 @@ def parse_args(input_args=None):
         action="store_true",
         help="Whether we are finetuning MLP layers as well.",
     )
+    
     parser.add_argument("--text_tune_mlp",
         action="store_true",
         help="Whether we are finetuning MLP layers as well.",
+    )
+    
+    parser.add_argument(
+        "--lphm",
+        action="store_true",
+        help="Whether we are using compacter lphm format inside LoRA weights or not",
     )
 
     if input_args is not None: args = parser.parse_args(input_args)
@@ -986,6 +993,7 @@ def main(args):
             q_rank=args.unet_lora_rank_q if "q" in args.attn_update_unet else None, # added 
             v_rank=args.unet_lora_rank_v if "v" in args.attn_update_unet else None, # added 
             out_rank=args.unet_lora_rank_out if "o" in args.attn_update_unet else None, # added 
+            lphm=args.lphm, # added
         )
         unet_lora_attn_procs[name] = module
         unet_lora_parameters.extend(module.parameters())
@@ -997,6 +1005,8 @@ def main(args):
             lora_mlp_rank=args.unet_lora_rank_mlp,
         )
         unet_lora_parameters.extend(unet_lora_extended_parameters)
+    # print(unet)
+    # exit()
 
     # The text encoder comes from 🤗 transformers, so we cannot directly modify it.
     # So, instead, we monkey-patch the forward calls of its attention-blocks.
@@ -1027,10 +1037,11 @@ def main(args):
         # # print(text_lora_parameters_two)
         # exit()
         # print(text_encoder_one)
-        text_lora_layers_ffn = text_encoder_lora_state_dict(text_encoder_one, attn_update_text=args.attn_update_text, 
-                                                                text_tune_mlp=args.text_tune_mlp)
-        # print(text_lora_layers_ffn[list(text_lora_layers_ffn.keys())[0]])
+        # text_lora_layers_ffn = text_encoder_lora_state_dict(text_encoder_one, attn_update_text=args.attn_update_text, 
+        #                                                         text_tune_mlp=args.text_tune_mlp)
+        # # print(text_lora_layers_ffn[list(text_lora_layers_ffn.keys())[0]])
         # exit()
+        
 
     # create custom saving & loading hooks so that `accelerator.save_state(...)` serializes in a nice format
     def save_model_hook(models, weights, output_dir):
@@ -1315,6 +1326,7 @@ def main(args):
     
     # print(first_epoch, args.num_train_epochs)
     # prev_shyam = text_lora_parameters_two[0]
+    
     for epoch in range(first_epoch, args.num_train_epochs):
         # print(epoch)
         # unet_lora_layers_ffn = unet_ffn_within_attn_processors_state_dict(unet)
@@ -1329,12 +1341,16 @@ def main(args):
         
         unet.train()
         if args.train_text_encoder:
-            text_encoder_one.train()
-            text_encoder_two.train()
-            
             # set top parameter requires_grad = True for gradient checkpointing works
             text_encoder_one.text_model.embeddings.requires_grad_(True)
             text_encoder_two.text_model.embeddings.requires_grad_(True)
+            
+            text_encoder_one.train()
+            text_encoder_two.train()
+            # print(text_encoder_one)
+            
+            # print(text_encoder_two)
+            
             
         for step, batch in enumerate(train_dataloader):
             # Skip steps until we reach the resumed step
@@ -1384,6 +1400,11 @@ def main(args):
                 else:
                     # print("training text encoder")
                     unet_added_conditions = {"time_ids": add_time_ids.repeat(elems_to_repeat, 1)}
+                    # print(elems_to_repeat)
+                    # print(add_time_ids)
+                    # print(unet_added_conditions)
+                    # print(tokens_one, tokens_two)
+                    # exit()
                     # print(tokens_one.requires_grad, tokens_two.requires_grad)
                     prompt_embeds, pooled_prompt_embeds = encode_prompt(
                         text_encoders=[text_encoder_one, text_encoder_two],
@@ -1423,6 +1444,10 @@ def main(args):
                     loss = loss + args.prior_loss_weight * prior_loss
                 else:
                     loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                
+                # from torchviz import make_dot
+                # make_dot(loss)
+                # exit()
 
                 accelerator.backward(loss)
                 if accelerator.sync_gradients:
@@ -1439,10 +1464,11 @@ def main(args):
                 # print("shyam")
                 # for i in range(len(unet_lora_parameters)):
                 #     if unet_lora_parameters[i].grad is None:
-                #         print("unet",i)
+                #         print("unet", i)
                 # for i in range(len(text_lora_parameters_one)):
                 #     if text_lora_parameters_one[i].grad is None:
-                #         print("t1", i)
+                #         print("t1", i, text_lora_parameters_one[i])#, text_lora_parameters_one[i].is_leaf, text_lora_parameters_one[i].requires_grad_())
+                #         break
                 # for i in range(len(text_lora_parameters_two)):
                 #     if text_lora_parameters_two[i].grad is None:
                 #         print("t2", i)
@@ -1572,7 +1598,7 @@ def main(args):
         unet = accelerator.unwrap_model(unet)
         unet = unet.to(torch.float32)
         unet_lora_layers = unet_attn_processors_state_dict(unet)
-        if(args.unet_tune_mlp): 
+        if(args.unet_tune_mlp):
             unet_lora_layers_ffn = unet_ffn_within_attn_processors_state_dict(unet)
             # print(unet_lora_layers_ffn[list(unet_lora_layers_ffn.keys())[0]])
             unet_lora_layers.update(unet_lora_layers_ffn)
@@ -1596,7 +1622,7 @@ def main(args):
             )
             # print("shyam")
             # print(text_encoder_lora_layers)
-            exit()
+            # exit()
         else:
             text_encoder_lora_layers = None
             text_encoder_2_lora_layers = None
@@ -1645,6 +1671,7 @@ def main(args):
             attn_update_unet=args.attn_update_unet,
             attn_update_text=args.attn_update_text,
             text_tune_mlp=args.text_tune_mlp,
+            lphm = args.lphm,
         )
 
         # run inference
