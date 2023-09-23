@@ -1462,9 +1462,12 @@ def main(args):
                 optimizer.zero_grad()
                 
                 # print("shyam")
-                # for i in range(len(unet_lora_parameters)):
-                #     if unet_lora_parameters[i].grad is None:
-                #         print("unet", i)
+                for i in range(len(unet_lora_parameters)):
+                    # print(unet_lora_parameters[i].grad)
+                    if unet_lora_parameters[i].grad is None:
+                        print("unet", i)
+                # exit()
+                # print(unet_lora_parameters[2].grad)
                 # for i in range(len(text_lora_parameters_one)):
                 #     if text_lora_parameters_one[i].grad is None:
                 #         print("t1", i, text_lora_parameters_one[i])#, text_lora_parameters_one[i].is_leaf, text_lora_parameters_one[i].requires_grad_())

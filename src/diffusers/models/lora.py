@@ -18,7 +18,8 @@ import torch.nn.functional as F
 from torch import nn
 import torch
 
-
+def kronecker(A, B):
+    return torch.einsum("ab,cd->acbd", A, B).view(A.size(0)*B.size(0),  A.size(1)*B.size(1))
 
 
 class LoRALinearLayer(nn.Module):
@@ -34,16 +35,22 @@ class LoRALinearLayer(nn.Module):
 
         
         if lphm:
+            # self.down_in = nn.Parameter(torch.FloatTensor(in_features, 1).to(dtype).to(device), requires_grad=True)
             self.down_in = nn.Linear(1, in_features, bias=False, device=device, dtype=dtype)
+            # self.down_out = nn.Parameter(torch.FloatTensor(1, rank).to(dtype).to(device), requires_grad=True)
             self.down_out = nn.Linear(rank, 1, bias=False, device=device, dtype=dtype)
 
+            # self.up_in = nn.Parameter(torch.FloatTensor(rank, 1).to(dtype).to(device), requires_grad=True)
             self.up_in = nn.Linear(1, rank, bias=False, device=device, dtype=dtype)
+            # self.up_out = nn.Parameter(torch.FloatTensor(1, out_features).to(dtype).to(device), requires_grad=True)
             self.up_out = nn.Linear(out_features, 1, bias=False, device=device, dtype=dtype)
 
             nn.init.normal_(self.down_in.weight, std=1 / rank)
             nn.init.normal_(self.down_out.weight, std=1 / rank)
             nn.init.zeros_(self.up_in.weight)
             nn.init.zeros_(self.up_out.weight)
+            # self.down = torch.kron(self.down_in.weight, self.down_out.weight)#.to(dtype).to(device)
+            # self.up = torch.kron(self.up_in.weight, self.up_out.weight)#.to(dtype).to(device)
             
         else: 
             self.down = nn.Linear(in_features, rank, bias=False, device=device, dtype=dtype)
@@ -63,12 +70,13 @@ class LoRALinearLayer(nn.Module):
 
         if self.lphm:
             dtype = self.down_in.weight.dtype
-            self.down = torch.kron(self.down_in.weight, self.down_out.weight)#.to(dtype).to(device)
-            self.up = torch.kron(self.up_in.weight, self.up_out.weight)#.to(dtype).to(device)
+            device = self.down_in.weight.device
             # print(hidden_states.shape, self.down.shape)
             # exit()
-            down_hidden_states = hidden_states.to(dtype)@self.down
-            up_hidden_states = down_hidden_states@self.up
+            self.down = torch.kron(self.down_in.weight, self.down_out.weight)#.to(dtype).to(device)
+            self.up = torch.kron(self.up_in.weight, self.up_out.weight)#.to(dtype).to(device)
+            down_hidden_states = hidden_states.to(dtype)@self.down.to(device)
+            up_hidden_states = down_hidden_states@self.up.to(device)
         else:
             dtype = self.down.weight.dtype
             down_hidden_states = self.down(hidden_states.to(dtype))
