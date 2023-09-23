@@ -27,7 +27,7 @@ pip install -r requirements_sdxl.txt
 
 ## Install CLIP
 ```
-conda install --yes -c pytorch pytorch=1.7.1 torchvision cudatoolkit=11.0
+# conda install --yes -c pytorch pytorch=1.7.1 torchvision cudatoolkit=11.0
 pip install ftfy regex tqdm scipy pandas
 pip install git+https://github.com/openai/CLIP.git
 ```
