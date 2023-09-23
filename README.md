@@ -1,12 +1,16 @@
 # Installation Steps
+Inspired from [KronA-ViT](https://github.com/eric-ai-lab/PEViT/blob/master/vision_benchmark/evaluation/compacter_model.py)
+
 ## Conda env Create
 ```
-conda create -n name_of_env
+conda create -n diffusers
 ```
+
 ## Install acclerator
 ```
 pip install accelerator
 ```
+
 ## Install diffuser
 ```
 pip install git+https://github.com/huggingface/diffusers
@@ -24,7 +28,7 @@ pip install -r requirements_sdxl.txt
 ## Install CLIP
 ```
 conda install --yes -c pytorch pytorch=1.7.1 torchvision cudatoolkit=11.0
-pip install ftfy regex tqdm
+pip install ftfy regex tqdm scipy pandas
 pip install git+https://github.com/openai/CLIP.git
 ```
 
@@ -32,6 +36,7 @@ pip install git+https://github.com/openai/CLIP.git
 ```
 bash run_lora_sdxl.sh
 ```
+
 ## Generate images from the finetuned weights 
 ```
 python generator.py
