@@ -16,7 +16,7 @@ for dataset in "${subjects[@]}"; do
                     --instance_data_dir=$INSTANCE_DIR \
                     --output_dir=$OUTPUT_DIR \
                     --mixed_precision="fp16" \
-                    --instance_prompt="a photo of sks$dataset" \
+                    --instance_prompt="a photo of $dataset" \
                     --resolution=1024 \
                     --train_batch_size=1 \
                     --gradient_accumulation_steps=4 \
@@ -27,14 +27,18 @@ for dataset in "${subjects[@]}"; do
                     --adapter_type="krona" \
                     --lora_rank=$rank \
                     --seed="0" \
-                    --diffusion_model="base"
+                    --diffusion_model="base" \
+                    --enable_xformers_memory_efficient_attention \
+                    --gradient_checkpointing \
+                    --use_8bit_adam 
+
 
                 python3 generator.py \
                     --pretrained_model_name_or_path=$MODEL_NAME \
                     --instance_data_dir=$INSTANCE_DIR \
                     --output_dir=$OUTPUT_DIR \
                     --mixed_precision="fp16" \
-                    --instance_prompt="a photo of aks$dataset" \
+                    --instance_prompt="a photo of $dataset" \
                     --resolution=1024 \
                     --train_batch_size=1 \
                     --gradient_accumulation_steps=4 \
@@ -45,7 +49,11 @@ for dataset in "${subjects[@]}"; do
                     --adapter_type="krona" \
                     --lora_rank=$rank \
                     --seed="0" \
-                    --diffusion_model="base"
+                    --diffusion_model="base" \
+                    --enable_xformers_memory_efficient_attention \
+                    --gradient_checkpointing \
+                    --use_8bit_adam 
+
             done
         done
     done

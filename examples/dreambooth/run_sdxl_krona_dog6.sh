@@ -26,7 +26,11 @@ for dataset in "${subjects[@]}"; do
                     --max_train_steps=$s \
                     --adapter_type="krona" \
                     --lora_rank=$rank \
-                    --seed="0"
+                    --seed="0" \
+                    --enable_xformers_memory_efficient_attention \
+                    --gradient_checkpointing \
+                    --use_8bit_adam 
+
 
                 python3 generator.py \
                     --pretrained_model_name_or_path=$MODEL_NAME \
@@ -43,7 +47,11 @@ for dataset in "${subjects[@]}"; do
                     --max_train_steps=$s \
                     --adapter_type="krona" \
                     --lora_rank=$rank \
-                    --seed="0"
+                    --seed="0" \
+                    --enable_xformers_memory_efficient_attention \
+                    --gradient_checkpointing \
+                    --use_8bit_adam 
+
             done
         done
     done

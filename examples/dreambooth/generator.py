@@ -89,14 +89,20 @@ def evaluator(args, prompts):
 
 
 def generator(args, prompts):
+    # create the image folder
+    image_dir = os.path.join(args.output_dir, 'images') 
+    if(os.path.exists(image_dir)): print(f" image dir already exist {image_dir}")#; exit()
+    else: os.mkdir(image_dir)
+
+    # load the diffusion model pipeline
     if(args.diffusion_model == "sdxl"):
         # load the SDXL model
-        model_id = "stabilityai/stable-diffusion-xl-base-0.9"
+        model_id = "stabilityai/stable-diffusion-xl-base-1.0"
         pipe = DiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
         pipe = pipe.to("cuda")
         pipe.load_lora_weights(args.output_dir, adapter_type=args.adapter_type)
         refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
-            "stabilityai/stable-diffusion-xl-refiner-0.9", torch_dtype=torch.float16, use_safetensors=True, variant="fp16"
+            "stabilityai/stable-diffusion-xl-refiner-1.0", torch_dtype=torch.float16, use_safetensors=True, variant="fp16"
         )
         refiner.to("cuda"); generator = torch.Generator("cuda").manual_seed(0)
     
@@ -110,10 +116,7 @@ def generator(args, prompts):
 
     
 
-    # create the image folder
-    image_dir = os.path.join(args.output_dir, 'images') 
-    if(os.path.exists(image_dir)): pass
-    else: os.mkdir(image_dir)
+    
     
     for i in trange(len(prompts), desc = "generating images"):
         if(args.diffusion_model == "sdxl"):
@@ -178,7 +181,7 @@ def save_metrics(args, clipi, clipt):
 
     # delete the save files
     if(args.diffusion_model=="sdxl"):
-        os.remove(os.path.join(args.output_dir, "pytorch_lora_weights.bin")) # delet lora weights
+        # os.remove(os.path.join(args.output_dir, "pytorch_lora_weights.bin")) # delet lora weights
         if(os.path.isdir(os.path.join(args.output_dir, 'logs'))):
             shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
         if(os.path.isdir(os.path.join(args.output_dir, 'checkpoint-500'))):
@@ -187,7 +190,7 @@ def save_metrics(args, clipi, clipt):
             shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
     
     elif(args.diffusion_model=="base"):
-        os.remove(os.path.join(args.output_dir, "pytorch_lora_weights.bin")) # delet lora weights
+        # os.remove(os.path.join(args.output_dir, "pytorch_lora_weights.bin")) # delet lora weights
         if(os.path.isdir(os.path.join(args.output_dir, 'logs'))):
             shutil.rmtree(os.path.join(args.output_dir, 'logs'), ignore_errors=True)
         if(os.path.isdir(os.path.join(args.output_dir, 'checkpoint-500'))):
@@ -205,7 +208,7 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model, preprocess = clip.load('ViT-B/32', device=device, jit=False)
     # get the arguments
-    args = parse_args()
+    args = parse_args(inference=True)
     # generate the prompts
     prompts = get_promts(os.path.basename(args.instance_data_dir))
     # generate images base don given prompts

@@ -37,13 +37,15 @@ def instance_prompt(dataset):
         'takadaakemi':'skstakada,akemi',
         'supersaiyan':'skssupersaiyan,saiyan',
         'pokemon':'skspokemon',
-        'kiriko':'skskiriko'
+        'kiriko':'skskiriko',
+        'hs': 'sks,hs',
+        'nisheetkaran':'sks,nisheetkaran'
     }
     return subject_class_dict[dataset]
  
 
 def get_promts(dataset):
-    livig_dataset=["cat","cat2","dog","dog2","dog3","dog5","dog6","dog7","dog8"]
+    livig_dataset=["hs","cat","cat2","dog","dog2","dog3","dog5","dog6","dog7","dog8","nisheetkaran"]
     non_living_dataset= ['backpack','backpack_dog','bear_plushie','berry_bowl','can','candle' ,'clock' ,'colorful_sneaker','duck_toy','fancy_boot','grey_sloth_plushie','monster_toy','pink_sunglasses','poop_emoji','rc_car','red_cartoon','robot_toy','shiny_sneaker','teapot','vase','wolf_plushie']
     unique_token = os.path.basename(dataset)
     class_token = instance_prompt(unique_token)
@@ -93,10 +95,25 @@ def get_promts(dataset):
         
     elif unique_token == "cat":
         add_ones = [
-            'a {0} cat seen from the top'.format(unique_token),
-            'a {0} cat seen from the bottom'.format(unique_token),
-            'a {0} cat seen from the side'.format(unique_token),
-            'a {0} cat seen from the back'.format(unique_token)
+            # 'a {0} cat seen from the top'.format(unique_token),
+            # 'a {0} cat seen from the bottom'.format(unique_token),
+            # 'a {0} cat seen from the side'.format(unique_token),
+            # 'a {0} cat seen from the back'.format(unique_token)
+            'a {0} {1} is acting in a play, wearing a costume'.format(unique_token, class_token),
+            'a {0} {1} is playing with a ball in the water'.format(unique_token, class_token),
+            'a {0} {1} is reading a book'.format(unique_token, class_token),
+            'watercolor {0} {1} , painting of a cat sitting on chair'.format(unique_token, class_token),
+            'the {0} {1}  playing with the pot in the garden'.format(unique_token, class_token),
+            'a {0} {1} in a chef outfit'.format(unique_token, class_token),
+            'the {0} {1} is dancing with the dog'.format(unique_token, class_token),
+            'A {0} {1} is riding a bicycle'.format(unique_token, class_token),
+            'a {0} {1} on surfboard, jumping in the air'.format(unique_token, class_token),
+            'a {0} {1}, wearing a romper and white brimmed hat at a beach, with a view of seashore'.format(unique_token, class_token),
+            'a {0} {1} dressed like a wizard'.format(unique_token, class_token),
+            'a {0} {1} wearing headphones'.format(unique_token, class_token),
+            'a {0} {1} sculpture'.format(unique_token, class_token),
+            'a {0} {1} digital painting 3d render geometric style.'.format(unique_token, class_token),
+            'a {0} {1} in a construction outfit '.format(unique_token, class_token),
         ]
 
     elif unique_token == "dog2":
@@ -159,12 +176,112 @@ def get_promts(dataset):
             'A blue {0} car'.format(unique_token),
             'A yellow {0} car'.format(unique_token)
         ]
+    elif unique_token == "hs":
+        add_ones = [
     
+    "a {0} {1} full body image wearing an elegant Sherwani for Groom: Generate an image of an elegant sherwani for a groom, featuring intricate embroidery, a regal turban, and traditional mojari shoes.".format("Groom", "Indian Traditional"),
+    "a {0} {1} full body image wearing a Kurta-Pajama with Embroidered Jacket: Create an image of a classic kurta-pajama paired with a beautifully embroidered jacket, complete with traditional juttis.".format("Gentleman", "Indian Traditional"),
+    "a {0} {1} full body image dressed in a royal Bandhgala Suit: Generate an image of a royal bandhgala suit with ornate buttons, a mandarin collar, and rich brocade fabric, perfect for formal occasions.".format("Man", "Indian Traditional"),
+    "a {0} {1} full body image wearing a Dhoti-Kurta Ensemble: Create an image of a dhoti-kurta ensemble with a stylish waistcoat, showcasing the traditional essence of Indian attire.".format("Man", "Indian Traditional"),
+    "a {0} {1} full body image adorned in a Rajasthani Safa and Jodhpuri Suit: Generate an image of a Rajasthani safa (turban) paired with a Jodhpuri suit, reflecting the vibrant culture of Rajasthan.".format("Gentleman", "Indian Traditional"),
+    "a {0} {1} full body image showcasing a Punjabi Bhangra Outfit: Create an image of a vibrant Punjabi Bhangra outfit, including a colorful kurta, Patiala salwar, and embroidered pagri.".format("Man", "Indian Traditional"),
+    "a {0} {1} full body image wearing a classic Pathani Suit: Generate an image of a classic Pathani suit with a straight-cut kurta and matching salwar, offering a blend of comfort and style.".format("Man", "Indian Traditional"),
+    "a {0} {1} full body image dressed in a Banarasi Silk Sherwani: Create an image of a Banarasi silk sherwani adorned with intricate zari work, showcasing the beauty of Indian craftsmanship.".format("Man", "Indian Traditional"),
+    "a {0} {1} full body image wearing a South Indian Veshti and Angavastram: Generate an image of a South Indian traditional attire with a veshti (dhoti) and angavastram (shawl), ideal for ceremonial occasions.".format("Gentleman", "Indian Traditional"),
+    "a {0} {1} full body image donning a Traditional Rajput Attire: Create an image of a traditional Rajput attire, featuring a long coat, churidar pants, and a striking Rajputana sword.".format("Man", "Indian Traditional"),
+    "a {0} {1} full body image wearing a Bengali Dhoti-Kurta with Panjabi: Generate an image of a Bengali-style dhoti-kurta paired with a panjabi, reflecting the cultural heritage of Bengal.".format("Gentleman", "Indian Traditional"),
+    "a {0} {1} full body image showcasing a Hyderabadi Nawabi Look: Create an image of a Hyderabadi nawabi ensemble, including an intricately designed sherwani, regal jewelry, and a feathered turban.".format("Man", "Indian Traditional"),
+    "a {0} {1} full body image wearing a Kerala Mundu and Mel Mundu: Generate an image of the Kerala mundu worn with a mel mundu, showcasing the simplicity and elegance of traditional South Indian clothing.".format("Man", "Indian Traditional"),
+    "a {0} {1} full body image in a Gujarati Bandhani Kurta: Create an image of a Gujarati-style bandhani kurta paired with vibrant mojari shoes, capturing the essence of Gujarat's textile art.".format("Gentleman", "Indian Traditional"),
+    "a {0} {1} full body image wearing a Maharashtrian Dhotar and Pheta: Generate an image of a Maharashtrian dhotar (dhoti) paired with a pheta (traditional turban), representing Marathi culture.".format("Man", "Indian Traditional"),
+    "a {0} {1} full body image dressed in an Assamese Mekhela Chador: Create an image of an Assamese mekhela chador, a two-piece garment, known for its rich handwoven patterns and vibrant colors.".format("Man", "Indian Traditional"),
+    "a {0} {1} full body image in Sikh Traditional Attire: Generate an image of a Sikh gentleman's traditional attire, featuring a turban, kurta, churidar, and a ceremonial sword.".format("Gentleman", "Indian Traditional"),
+    "a {0} {1} full body image wearing a Kashmiri Pheran and Pashmina Shawl: Create an image of a Kashmiri pheran paired with a luxurious Pashmina shawl, showcasing the elegance of Kashmiri craftsmanship.".format("Man", "Indian Traditional"),
+    "a {0} {1} full body image donning a Tamil Nadu Veshti and Shirt: Generate an image of the Tamil Nadu veshti paired with a shirt, offering a comfortable and classic South Indian look.".format("Gentleman", "Indian Traditional"),
+    "a {0} {1} full body image dressed in a Goan Traditional Outfit: Create an image of a Goan traditional outfit, featuring a kurta with unique Goan embroidery and comfortable footwear.".format("Man", "Indian Traditional")
+
+            # "a {0} {1} full body image in  baggy outfit with accessories white tshirt olive cargo tshirt print anime rings chain with casio watch shoes converse chuck 70".format(unique_token, class_token),
+            # "a {0} {1} full body image in An outfit for men for a casual meeting with casual blue shirt and funky shorts with matching shoes and watch with a hat".format(unique_token, class_token),
+            # "a {0} {1} full body image in a chic and elegant outfit, wearing a little black dress paired with high heels, a statement necklace, and a clutch purse".format(unique_token, class_token),
+            # "a {0} {1} full body image in Classic Suit by Armani with its logo . logo is present in the background of the image : a classic black suit for men, inspired by Armani's style. The suit should have a tailored fit, notch lapels, and a crisp white dress shirt.".format(unique_token, class_token),
+            # "a {0} {1} full body image in treetwear Look by Supreme with its logo. logo is present in the background of the image : a streetwear outfit with a Supreme brand influence. Include a graphic hoodie, baggy jeans, high-top sneakers, and a distinctive Supreme accessory.".format(unique_token, class_token),
+            # "a {0} {1} full body image in porty Outfit by Nike with its logo. logo is present in the background of the image : a sporty and casual outfit with a Nike touch. Combine a tech jacket, moisture-wicking t-shirt, athletic shorts, sneakers, and a sporty cap.".format(unique_token, class_token),
+            # "a {0} {1} full body image in usiness Casual Attire by Ralph Lauren with its logo. logo is present in the background of the image : a business casual ensemble with a Ralph Lauren vibe. Incorporate a button-down shirt, khaki chinos, a leather belt, loafers, and a subtle designer wristwatch.".format(unique_token, class_token),
+            # "a {0} {1} full body image in uxury Leisurewear by Gucci with its logo. logo is present in the background of the image : a luxurious leisure outfit inspired by Gucci. Combine a silk bomber jacket, patterned silk shirt, tailored jogger pants, high-end sneakers, and a statement belt.".format(unique_token, class_token),
+            # "a {0} {1} full body image in reppy Look by Tommy Hilfiger with its logo. logo is present in the background of the image : a preppy outfit influenced by Tommy Hilfiger. Include a cable-knit sweater, collared polo shirt, slim-fit chinos, boat shoes, and a nautical-inspired accessory.".format(unique_token, class_token),
+            # "a {0} {1} full body image in enim Ensemble by Levi's with its logo. logo is present in the background of the image : a denim-focused outfit with a Levi's touch. Combine a denim jacket, distressed jeans, a vintage graphic tee, rugged boots, and a denim cap.".format(unique_token, class_token),
+            # "a {0} {1} full body image in inimalist Style by Calvin Klein with its logo. logo is present in the background of the image : a minimalist men's outfit with a Calvin Klein aesthetic. Include a clean-lined overcoat, monochromatic turtleneck, tailored trousers, sleek dress shoes, and a simple watch.".format(unique_token, class_token),
+            # "a {0} {1} full body image in utdoor Adventure Gear by The North Face with its logo. logo is present in the background of the image : outdoor adventure attire with The North Face inspiration. Combine a waterproof jacket, performance hiking pants, hiking boots, a beanie, and a durable backpack.".format(unique_token, class_token),
+            # "a {0} {1} full body image in asual Urban Look by H&M with its logo. logo is present in the background of the image : a trendy and affordable urban outfit influenced by H&M. Include a graphic print t-shirt, distressed skinny jeans, sneakers, a beanie, and layered necklaces.".format(unique_token, class_token)
+            
+            ]
+
+    elif unique_token == "nisheetkaran":
+        add_ones = [
+        
+    "{0} {1} showcasing a Classic Suit from Ralph Lauren. The image should capture the essence of a navy blue suit with peak lapels and a subtle pinstripe pattern".format(unique_token, class_token),
+    "{0} {1} exuding sophistication in a Classic Charcoal Suit by Hugo Boss. slim-fit design, and the contrast of a light blue dress shirt underneath.".format(unique_token, class_token),
+    "{0} {1} embracing the charm of a Classic Double-Breasted Suit. bold checkered pattern, wide peak lapels, and a pocket square adding a touch of flair.".format(unique_token, class_token),
+    "{0} {1} embodying refinement in a Classic Glen Plaid Suit by Brooks Brothers. The picture should showcase the suit's subtle pattern, two-button configuration.".format(unique_token, class_token),
+    "{0} {1} radiating confidence wearing a Classic Tweed Suit by Burberry. rustic texture of the tweed fabric, the earthy tones, three-piece composition.".format(unique_token, class_token),
+    "{0} {1} epitome of luxury in a Classic Velvet Tuxedo by Dolce & Gabbana. plush velvet material, contrasting black satin lapels, and a crisp white formal shirt.".format(unique_token, class_token),
+    "{0} {1} projecting elegance with a Classic White Dinner Jacket by Giorgio Armani. ivory-white hue, black silk shawl lapels.".format(unique_token, class_token),
+    "{0} {1} exuding sophistication in a Classic Navy Pinstripe Suit from Canali. pinstripe pattern, the slim-cut silhouette, and a deep red tie for a pop of color.".format(unique_token, class_token),
+    "{0} {1} showcasing the timelessness of a Classic Herringbone Suit by Ermenegildo Zegna. distinctive herringbone weave, peak lapels, and a monogrammed cufflink.".format(unique_token, class_token),
+    "{0} {1} embracing the classic vibe of a Brown Plaid Suit from Prada, warm brown tones, the subtle plaid pattern, and a matching vest three-piece look.".format(unique_token, class_token),
+    "{0} {1} embodying traditional charm in a Classic Corduroy Suit by J.Crew, fine corduroy texture, the earthy color palette, and a woolen turtleneck undershirt.".format(unique_token, class_token),
+    "{0} {1} radiating vintage flair with a Classic Double-Breasted Pinstripe Suit by Yves Saint Laurent, bold pinstripes, wide notched lapels, and a pocket square".format(unique_token, class_token),
+    "{0} {1} presenting understated elegance in a Classic Black Suit by Calvin Klein, suit's minimalist design, notch lapels, black tie for a formal look.".format(unique_token, class_token),
+    "{0} {1} projecting confidence wearing a Classic Linen Suit by Brooks Brothern ,linen fabric, the soft beige color".format(unique_token, class_token),
+    "{0} {1} exuding sophistication in a Classic Gray Flannel Suit by Hugo Boss, flannel material, the tailored fit, and a subtle checkered pattern.".format(unique_token, class_token),
+    "{0} {1} showcasing timeless style with a Classic Seersucker Suit from Ralph Lauren, the light blue stripes, and the suit's relaxed summer aesthetic.".format(unique_token, class_token),
+    "{0} {1} embracing the allure of a Classic Shawl Collar Tuxedo by Tom Ford, refined satin shawl lapels, the single-button closure, and a pleated dress shirt.".format(unique_token, class_token),
+    "{0} {1} embodying sophistication in a Classic Windowpane Suit by Ermenegildo Zegna, bold windowpane pattern, peak lapels, and a silk tie.".format(unique_token, class_token),
+    "{0} {1} radiating elegance wearing a Classic Velvet Dinner Jacket by Gucci, velvet texture, intricate embroidery details, and the opulent feel".format(unique_token, class_token),
+    "{0} {1} presenting a refined look with a Classic Charcoal Pinstripe Suit by Armani Exchange. sleek pinstripe pattern, a modern slim-fit silhouette".format(unique_token, class_token),
+
+            "a {0} {1} face and full body image in  baggy outfit white tshirt olive cargo tshirt rings chain with casio watch shoes converse chuck 70".format(unique_token, class_token),
+            "a {0} {1} full body image in An outfit for men for a casual meeting with casual blue shirt and funky shorts with matching shoes and watch with a hat".format(unique_token, class_token),
+            "a {0} {1} full body image in a chic and elegant outfit, wearing a little black dress paired with high heels, and a clutch purse".format(unique_token, class_token),
+            "a {0} {1} in a classic black suit for men, inspired by Armani's style. The suit should have a tailored fit, notch lapels, and a hite dress shirt.".format(unique_token, class_token),
+            "a {0} {1} in a streetwear outfit with a Supreme brand influence. Include a graphic hoodie, baggy jeans, high-top sneakers.".format(unique_token, class_token),
+            "a {0} {1} in a sporty and casual outfit with a Nike touch, tech jacket, moisture-wicking t-shirt, athletic shorts, sneakers, and a sporty cap.".format(unique_token, class_token),
+            "a {0} {1} in a business casual ensemble with a Ralph Lauren vibe. a button-down shirt, khaki chinos, a leather belt, loafers.".format(unique_token, class_token),
+            "a {0} {1} in a luxurious leisure outfit inspired by Gucci. patterned silk shirt, tailored jogger pants, high-end sneakers, and a statement belt.".format(unique_token, class_token),
+            "a {0} {1} in a preppy outfit influenced by Tommy Hilfiger. Include a cable-knit sweater, collared polo shirt, slim-fit chinos, boat shoes".format(unique_token, class_token),
+            "a {0} {1} in a denim-focused outfit with a Levi's touch. Combine a denim jacket, distressed jeans, rugged boots, and a denim cap.".format(unique_token, class_token),
+            "a {0} {1} in a minimalist men's outfit with a Calvin Klein aesthetic. Include a clean-lined overcoat, monochromatic turtleneck, tailored trousers".format(unique_token, class_token),
+            "a {0} {1} in outdoor adventure attire with The North Face inspiration. Combine a waterproof jacket, performance hiking pants, hiking boots, a beanie.".format(unique_token, class_token),
+            "a {0} {1} in a trendy and affordable urban outfit influenced by H&M. Include a graphic print t-shirt, distressed skinny jeans, sneakers, a beanie".format(unique_token, class_token)
+
+    #             "a {0} {1} face and full body image wearing an elegant Sherwani for Groom: Generate an image of an elegant sherwani for a groom, featuring intricate embroidery, a regal turban, and traditional mojari shoes.".format("Groom", "Indian Traditional"),
+    # "a {0} {1} face and full body image wearing a Kurta-Pajama with Embroidered Jacket: Create an image of a classic kurta-pajama paired with a beautifully embroidered jacket, complete with traditional juttis.".format("Gentleman", "Indian Traditional"),
+    # "a {0} {1} face and full body image dressed in a royal Bandhgala Suit: Generate an image of a royal bandhgala suit with ornate buttons, a mandarin collar, and rich brocade fabric, perfect for formal occasions.".format("Man", "Indian Traditional"),
+    # "a {0} {1} face and full body image wearing a Dhoti-Kurta Ensemble: Create an image of a dhoti-kurta ensemble with a stylish waistcoat, showcasing the traditional essence of Indian attire.".format("Man", "Indian Traditional"),
+    # "a {0} {1} face and full body image adorned in a Rajasthani Safa and Jodhpuri Suit: Generate an image of a Rajasthani safa (turban) paired with a Jodhpuri suit, reflecting the vibrant culture of Rajasthan.".format("Gentleman", "Indian Traditional"),
+    # "a {0} {1} face and full body image showcasing a Punjabi Bhangra Outfit: Create an image of a vibrant Punjabi Bhangra outfit, including a colorful kurta, Patiala salwar, and embroidered pagri.".format("Man", "Indian Traditional"),
+    # "a {0} {1} face and full body image wearing a classic Pathani Suit: Generate an image of a classic Pathani suit with a straight-cut kurta and matching salwar, offering a blend of comfort and style.".format("Man", "Indian Traditional"),
+    # "a {0} {1} face and full body image dressed in a Banarasi Silk Sherwani: Create an image of a Banarasi silk sherwani adorned with intricate zari work, showcasing the beauty of Indian craftsmanship.".format("Man", "Indian Traditional"),
+    # "a {0} {1} face and full body image wearing a South Indian Veshti and Angavastram: Generate an image of a South Indian traditional attire with a veshti (dhoti) and angavastram (shawl), ideal for ceremonial occasions.".format("Gentleman", "Indian Traditional"),
+    # "a {0} {1} face and full body image donning a Traditional Rajput Attire: Create an image of a traditional Rajput attire, featuring a long coat, churidar pants, and a striking Rajputana sword.".format("Man", "Indian Traditional"),
+    # "a {0} {1} face and full body image wearing a Bengali Dhoti-Kurta with Panjabi: Generate an image of a Bengali-style dhoti-kurta paired with a panjabi, reflecting the cultural heritage of Bengal.".format("Gentleman", "Indian Traditional"),
+    # "a {0} {1} face and full body image showcasing a Hyderabadi Nawabi Look: Create an image of a Hyderabadi nawabi ensemble, including an intricately designed sherwani, regal jewelry, and a feathered turban.".format("Man", "Indian Traditional"),
+    # "a {0} {1} face and full body image wearing a Kerala Mundu and Mel Mundu: Generate an image of the Kerala mundu worn with a mel mundu, showcasing the simplicity and elegance of traditional South Indian clothing.".format("Man", "Indian Traditional"),
+    # "a {0} {1} face and full body image in a Gujarati Bandhani Kurta: Create an image of a Gujarati-style bandhani kurta paired with vibrant mojari shoes, capturing the essence of Gujarat's textile art.".format("Gentleman", "Indian Traditional"),
+    # "a {0} {1} face and full body image wearing a Maharashtrian Dhotar and Pheta: Generate an image of a Maharashtrian dhotar (dhoti) paired with a pheta (traditional turban), representing Marathi culture.".format("Man", "Indian Traditional"),
+    # "a {0} {1} face and full body image dressed in an Assamese Mekhela Chador: Create an image of an Assamese mekhela chador, a two-piece garment, known for its rich handwoven patterns and vibrant colors.".format("Man", "Indian Traditional"),
+    # "a {0} {1} face and full body image in Sikh Traditional Attire: Generate an image of a Sikh gentleman's traditional attire, featuring a turban, kurta, churidar, and a ceremonial sword.".format("Gentleman", "Indian Traditional"),
+    # "a {0} {1} face and full body image wearing a Kashmiri Pheran and Pashmina Shawl: Create an image of a Kashmiri pheran paired with a luxurious Pashmina shawl, showcasing the elegance of Kashmiri craftsmanship.".format("Man", "Indian Traditional"),
+    # "a {0} {1} face and full body image donning a Tamil Nadu Veshti and Shirt: Generate an image of the Tamil Nadu veshti paired with a shirt, offering a comfortable and classic South Indian look.".format("Gentleman", "Indian Traditional"),
+    # "a {0} {1} face and full body image dressed in a Goan Traditional Outfit: Create an image of a Goan traditional outfit, featuring a kurta with unique Goan embroidery and comfortable footwear.".format("Man", "Indian Traditional"),
+        
+        ]
     else:
         add_ones = []
 
     if unique_token in non_living_dataset :
-        object_prompt_list = ['a {0} {1} in the jungle'.format(unique_token, class_token),
+        object_prompt_list = [
+            'a {0} {1} in the jungle'.format(unique_token, class_token),
             'a {0} {1} in the snow'.format(unique_token, class_token),
             'a {0} {1} on the beach'.format(unique_token, class_token),
             'a {0} {1} on a cobblestone street'.format(unique_token, class_token),
@@ -195,7 +312,8 @@ def get_promts(dataset):
         return object_prompt_list
 
     if(unique_token in livig_dataset):
-        live_prompt_list = ['a {0} {1} in the jungle'.format(unique_token, class_token),
+        live_prompt_list = [
+            'a {0} {1} in the jungle'.format(unique_token, class_token),
             'a {0} {1} in the snow'.format(unique_token, class_token),
             'a {0} {1} on the beach'.format(unique_token, class_token),
             'a {0} {1} on a cobblestone street'.format(unique_token, class_token),
@@ -228,6 +346,7 @@ def get_promts(dataset):
     if(unique_token == "face"):
         face_prompts = [""]
         return face_prompts
+
     
     if(unique_token == "pokemon"):
         from datasets import load_dataset
@@ -343,22 +462,22 @@ def get_promts(dataset):
         return supersaiyan_prompts
     
     if(unique_token == "takadaakemi"):
-        prompts = ["image of skstakadaakemi, creamy mami, morisawa yuu, nega (creamy mami), posi (creamy mami), 1girl, ahoge, blue background, blue eyes, cat, choker, copyright name, dress, elbow gloves, flower, frills, gloves, hair flower, hair ornament, microphone, purple hair, short hair, smile, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+        prompts = ["image of skstakadaakemi, creamy mami, morisawa yuu, nega (creamy mami), posi (creamy mami), ahoge, blue background, blue eyes, cat, choker, dress, elbow gloves, flower, frills, gloves, hair flower, hair ornament, microphone, purple hair, short hair, smile, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
             "image of skstakadaakemi, creamy mami, morisawa yuu, 2girls, dress one wearing white other blue, hug, idol, magical girl, multiple girls, wings, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "image of skstakadaakemi, lucy (cyberpunk), 1girl, against railing, arm rest, bangs, bare shoulders, belt, black belt, black leotard, black pants, blurry, bob cut, breasts, building, cityscape, clothing cutout, cropped jacket, cyberpunk, depth of field, from side, gradient eyes, grey eyes, grey hair, holding, jacket, leotard, lips, long sleeves, looking afar, looking ahead, mechanical parts, medium breasts, multicolored eyes, multicolored hair, night, night sky, off shoulder, open clothes, open jacket, outdoors, pants, parted lips, railing, red eyeliner, science fiction, short hair with long locks, short shorts, shorts, sidelocks, sky, smoke, smoking, solo, standing, teeth, thigh cutout, upper teeth only, white jacket, white shorts, cyberpunk (series), cyberpunk edgerunners, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "image of skstakadaakemi, pyra (xenoblade), 1girl, armor, bangs, black gloves, breasts, red eyes, closed mouth, earrings, eyelashes, fingerless gloves, floating hair, framed breasts, gem, gloves, hair ornament, headpiece, jewelry, large breasts, leaning back, leotard, neon trim, official art, pose, red hair, red shorts, saitou masatsugu, short hair, short shorts, short sleeves, shorts, sidelocks, skin tight, solo, standing, swept bangs, thighhighs, tiara, space background, turtleneck, underbust, vambraces, xenoblade chronicles (series), (xenoblade chronicles 2), 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "image of skstakadaakemi, (komi shouko), 1girl, bangs, blazer, blue jacket, blush, bow, bowtie, breasts, closed mouth, collared shirt, cowboy shot, expressionless, outdoors, highres, jacket, (komi-san wa komyushou desu), long hair, looking at viewer, medium breasts, purple eyes, purple hair, red bow, red bowtie school uniform, shirt, striped, striped bow, striped bowtie, striped skirt, swept bangs, white shirt, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "image of skstakadaakemi, creamy mami, morisawa yuu, nega (creamy mami), posi (creamy mami), 1girl, ahoge, blue background, blue eyes, cat, choker, copyright name,light purple-pink dress, elbow gloves, flower, frills, gloves, hair flower, hair ornament, microphone, purple hair, short hair, smile, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "image of skstakadaakemi, princess zelda, 1girl, bangs, blonde hair, breasts, bridal gauntlets, closed mouth, expressionless, from side, green eyes, highres, jewelry, long hair, long sleeves, nintendo, outdoors, pointy ears, ring, small breasts, solo, standing, the legend of zelda, tree, triforce print, upper body, blue shirt 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "image of skstakadaakemi, yorha no. 2 type b, 1girl, black dress, black hairband, breasts, cleavage, black dress, hair over one eye, hairband, lips, long sleeves, looking at viewer, medium breasts, mole, mole under mouth, puffy long sleeves, puffy sleeves, short hair, signature, solo, white hair, blue eyes, outdoors, grass, trees, ruins, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "image of skstakadaakemi, eula (genshin impact), 1980s (style), 1girl, solo, mature female, mature, curvy, 1girl, solo, thighhighs, gloves, hairband, breasts, cape, bangs, thighs, leotard, necktie, light blue hair, blue hair, outdoors, long sleeves, looking at viewer, medium breasts, black gloves, blue necktie, hair ornament, black, black hairband, yellow eyes, closed mouth, blue cape, medium hair, arms above head, painting (medium), retro artstyle, traditional media, watercolor (medium)",
-            "image of skstakadaakemi, mythra (xenoblade), 1girl, armor, bangs, bare shoulders, blonde hair, breasts, cleavage, closed mouth, dress, earrings, elbow gloves, eyelashes, floating hair, gem, gloves, hair ornament, hairband, headpiece, jewelry, large breasts, leaning back, long hair, neon trim, official art, pose, saitou masatsugu, sidelocks, skin tight, smile, solo, standing, swept bangs, tiara, space background, very long hair, white dress, xenoblade chronicles (series), (xenoblade chronicles 2), 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "Image of skstakadaakemi, Lucy (cyberpunk), 1girl, against railing, black pants, bob cut, cityscape, cyberpunk, grey eyes and hair, mechanical parts, multicolored hair and eyes, night sky, open jacket, outdoors, short hair, short shorts, smoke, solo, standing, thigh cutout, white jacket and shorts, cyberpunk (series), cyberpunk edgerunners",
+            "Image of skstakadaakemi as Pyra (Xenoblade), a girl with armor, black gloves, red eyes, closed mouth, fingerless gloves, jewelry, large breasts, leotard, neon trim, official art, red hair, Saitou Masatsugu, short hair, short sleeves, shorts, standing, thigh highs, tiara, space background, turtleneck, underbust, vambraces, Xenoblade Chronicles 2",
+            "image of skstakadaakemi , 1girl, blue jacket, blush, bow, bowtie, closed mouth, collared shirt, expressionless, outdoors, highres, long hair, looking at viewer, medium breasts, purple eyes, purple hair, red bow, red bowtie, school uniform, striped, swept bangs, white shirt, retro artstyle, watercolor medium." ,
+            "image of skstakadaakemi, creamy mami, morisawa yuu, nega (creamy mami), posi (creamy mami), 1girl, ahoge, blue background, blue eyes, choker,light purple-pink dress, elbow gloves, flower, frills, gloves, hair flower ornament, microphone, purple hair, short hair, smile, 1980s (style), painting watercolor (medium), retro artstyle,",
+            "image of skstakadaakemi, princess zedla, 1girl, blonde hair, green eyes, bangs, bridal gauntlets, jewelry, long hair, long sleeves, pointy ears. Outdoors with a tree, standing solo. Small breasts, closed mouth, expressionless. Retro artstyle, Nintendo character with Triforce print. Blue shirt 1980s style.",
+            "Image of skstakadaakemi, Yorha No. 2 Type B, 1 girl in a black dress with a black hairband, showing cleavage, hair over one eye, puffy long sleeves, and a mole under the mouth. She has short white hair, striking blue eyes, and a captivating signature style. Outdoors amidst grass, trees, and ruins, in a retro 1980s artstyle using watercolors.",
+            "Image of Skstakadaakemi, Eula , 1980s (style), 1 girl, solo, curvy, thigh-highs, gloves, hairband, breasts, cape, bangs, thighs, leotard, necktie, light blue hair, outdoors, long sleeves, black gloves, blue necktie, hair ornament, black hairband, blue cape, medium hair, arms above head. Retro traditional watercolor (medium).",
+            "Image of skstakadaakemi, Mythra (Xenoblade), 1girl, armor, blonde hair, cleavage, closed mouth, dress, earrings, elbow gloves, floating hair, gem, hairband, headpiece, jewelry, large breasts, long hair, neon trim, pose, smile, standing, space background, very long hair, white dress,Xenoblade Chronicles 2, 1980s painting (medium).",
             "image of skstakadaakemi, creamy mami, morisawa yuu, 2girls, dress, hug, idol, magical girl, multiple girls, wings, black background like space 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
             "image of skstakadaakemi, ((1boy)), bangs, black footwear, blue eyes, casual, dated, denim, headphones, hood, hood down, hoodie, jeans, long sleeves, looking at viewer, pants, red hair, short hair, sitting, solo, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "image of skstakadaakemi, white top black bottom dress, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair,side parted hair, hair behind ear, upper body, stylish black dress, indoors, bar, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
+            "image of skstakadaakemi, white top black bottom dress, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair,side parted hair, hair behind ear, upper body, stylish black dress, indoors, bar, 1980s (style), painting (medium), retro artstyle",
             "image of skstakadaakemi, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair, side parted hair, hair behind ear, upper body, stylish black dress, indoors, bar 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
             "image of skstakadaakemi, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair, side parted hair, hair behind ear, upper body, white sky blue stylish dress, indoors, bar, 1980s (style), painting (medium), retro artstyle, watercolor (medium)",
-            "image of skstakadaakemi, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair, side parted hair, hair behind ear, upper body, stylish purple-violet dress, indoors, bar, 1980s (style), painting (medium), retro artstyle, watercolor (medium), holding wine glass",
+            "image of skstakadaakemi, Tifa lockhart as magician, Final Fantasy VII, 1girl, small breast, beautiful eyes, brown hair, smiling, red eyes, highres, diamond earring, long hair, side parted hair, hair behind ear, upper body, stylish purple-violet dress, indoors, bar, 1980s (style), retro artstyle, watercolor (medium), holding wine glass",
             "image of skstakadaakemi, painting (medium), retro artstyle, traditional media, watercolor (medium), 1980s (style), A beautiful woman, raw portrait, best quality, without makeup, lighting, highly detailed, outdoor, sleeveless white lace, freckle",
             "image of skstakadaakemi, painting (medium), retro artstyle, traditional media, watercolor (medium), 1980s (style), A beautiful girl, idol, pure face, best quality, raw portrait, highly detailed, skinny, supple and pale skin, sunlight, sleeveless, bow, tidy street",
             "image of skstakadaakemi, traditional media, 1980s (style), A beautiful woman, fantasy, nature, japan traditional dress, perfect face, masterpiece, best quality, lighting, highly detailed, body, balcony, sexy, trending on artstation",

@@ -123,7 +123,7 @@ def import_model_class_from_model_name_or_path(
         raise ValueError(f"{model_class} is not supported.")
 
 
-def struct_output(args):
+def struct_output(args, inference=False):
     """
     output:
 	|- backpack
@@ -162,11 +162,26 @@ def struct_output(args):
     elif(args.adapter_type=="lora"): exp = f"lora_{args.diffusion_model}_{args.lora_rank}_{args.learning_rate}_{args.max_train_steps}_{args.with_prior_preservation}"
     else: raise AttributeError("Wrong adapter format.")
     exp_ = os.path.join(dataset_, exp)
-    if(os.path.exists(exp_)): pass
-    else: os.mkdir(exp_)
+
+    def check_file_format_in_directory(directory_path, file_format):
+        for filename in os.listdir(directory_path):
+            if filename.endswith(file_format):
+                return True
+        return False
+    if not (os.path.exists(exp_)):
+        os.mkdir(exp_) 
+        return exp_
+    # if(check_file_format_in_directory(exp_,".json")): print("json is there ", exp_); exit()
+    # if(check_file_format_in_directory(exp_,".bin")): 
+    #     if(inference): pass
+    #     else: print("json is there ", exp_); exit()
+    # else:
+    #     if(os.path.exists(exp_)): shutil.rmtree(exp_)
+    #     os.mkdir(exp_)
+        
     return exp_
 
-def parse_args(input_args=None):
+def parse_args(input_args=None, inference=False):
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
     parser.add_argument(
         "--pretrained_model_name_or_path",
@@ -475,7 +490,7 @@ def parse_args(input_args=None):
     args.instance_prompt = instance_prompt(os.path.basename(args.instance_data_dir))
     if args.with_prior_preservation:
         args.class_prompt = 'a '+ args.instance_prompt.split(',')[1]
-    args.output_dir = struct_output(args) # structure the output folder 
+    args.output_dir = struct_output(args, inference=inference) # structure the output folder 
 
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
