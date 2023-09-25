@@ -18,8 +18,22 @@ import torch.nn.functional as F
 from torch import nn
 import torch
 
-def kronecker(A, B):
-    return torch.einsum("ab,cd->acbd", A, B).view(A.size(0)*B.size(0),  A.size(1)*B.size(1))
+
+def kronecker(a, b):
+    """
+    Kronecker product of matrices a and b with leading batch dimensions.
+    Batch dimensions are broadcast. The number of them mush
+    :type a: torch.Tensor
+    :type b: torch.Tensor
+    :rtype: torch.Tensor
+    """
+    siz1 = torch.Size(torch.tensor(a.shape[-2:]) * torch.tensor(b.shape[-2:]))
+    res = a.unsqueeze(-1).unsqueeze(-3) * b.unsqueeze(-2).unsqueeze(-4)
+    siz0 = res.shape[:-4]
+    return res.reshape(siz0 + siz1)
+
+# def kronecker(A, B):
+#     return torch.einsum("ab,cd->acbd", A, B).view(A.size(0)*B.size(0),  A.size(1)*B.size(1))
 
 
 class LoRALinearLayer(nn.Module):
@@ -47,8 +61,10 @@ class LoRALinearLayer(nn.Module):
 
             nn.init.normal_(self.down_in.weight, std=1 / rank)
             nn.init.normal_(self.down_out.weight, std=1 / rank)
-            nn.init.zeros_(self.up_in.weight)
-            nn.init.zeros_(self.up_out.weight)
+            nn.init.normal_(self.up_out.weight, std=1 / rank)
+            nn.init.normal_(self.up_in.weight, std=1 / rank)
+            # nn.init.zeros_(self.up_in.weight)
+            # nn.init.zeros_(self.up_out.weight)
             # self.down = torch.kron(self.down_in.weight, self.down_out.weight)#.to(dtype).to(device)
             # self.up = torch.kron(self.up_in.weight, self.up_out.weight)#.to(dtype).to(device)
             
@@ -75,6 +91,10 @@ class LoRALinearLayer(nn.Module):
             # exit()
             self.down = torch.kron(self.down_in.weight, self.down_out.weight)#.to(dtype).to(device)
             self.up = torch.kron(self.up_in.weight, self.up_out.weight)#.to(dtype).to(device)
+            
+            # self.down = kronecker(self.down_in.weight, self.down_out.weight)
+            # self.up = kronecker(self.up_in.weight, self.up_out.weight)
+            
             down_hidden_states = hidden_states.to(dtype)@self.down.to(device)
             up_hidden_states = down_hidden_states@self.up.to(device)
         else:
@@ -146,7 +166,7 @@ class LoRACompatibleLinear(nn.Linear):
     """
     A Linear layer that can be used with LoRA.
     """
-
+    
     def __init__(self, *args, lora_layer: Optional[LoRALinearLayer] = None, adapter_low_rank=None, **kwargs):
         super().__init__(*args, **kwargs)
         # print('shyam', args, kwargs)

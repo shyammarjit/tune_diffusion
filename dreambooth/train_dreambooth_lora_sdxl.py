@@ -404,7 +404,7 @@ def parse_args(input_args=None):
     )
     parser.add_argument("--adam_beta1", type=float, default=0.9, help="The beta1 parameter for the Adam optimizer.")
     parser.add_argument("--adam_beta2", type=float, default=0.999, help="The beta2 parameter for the Adam optimizer.")
-    parser.add_argument("--adam_weight_decay", type=float, default=1e-2, help="Weight decay to use.")
+    parser.add_argument("--adam_weight_decay", type=float, default=1e-02, help="Weight decay to use.")
     parser.add_argument("--adam_epsilon", type=float, default=1e-08, help="Epsilon value for the Adam optimizer")
     parser.add_argument("--max_grad_norm", default=1.0, type=float, help="Max gradient norm.")
     parser.add_argument("--push_to_hub", action="store_true", help="Whether or not to push the model to the Hub.")
@@ -1131,8 +1131,11 @@ def main(args):
             )
 
         optimizer_class = bnb.optim.AdamW8bit
+        # optimizer_class = bnb.optim.SGD8bit
     else:
         optimizer_class = torch.optim.AdamW
+        # optimizer_class = torch.optim.SGD
+        
 
     # Optimizer creation
     params_to_optimize = (
@@ -1147,6 +1150,7 @@ def main(args):
         betas=(args.adam_beta1, args.adam_beta2),
         weight_decay=args.adam_weight_decay,
         eps=args.adam_epsilon,
+        # momentum=0.9,
     )
 
     # Computes additional embeddings/ids required by the SDXL UNet.
@@ -1457,15 +1461,17 @@ def main(args):
                         else unet_lora_parameters
                     )
                     accelerator.clip_grad_norm_(params_to_clip, args.max_grad_norm)
+                
                 optimizer.step()
                 lr_scheduler.step()
                 optimizer.zero_grad()
                 
+                
                 # print("shyam")
-                # for i in range(len(unet_lora_parameters)):
-                #     # print(unet_lora_parameters[i].grad)
-                #     if unet_lora_parameters[i].grad is None:
-                #         print("unet", i)
+                for i in range(len(unet_lora_parameters)):
+                    # print(unet_lora_parameters[i].grad)
+                    if unet_lora_parameters[i].grad is None:
+                        print("unet", i)
                 # exit()
                 # print(unet_lora_parameters[2].grad)
                 # for i in range(len(text_lora_parameters_one)):
