@@ -22,6 +22,8 @@ Install requirements
 ```
 pip install -r requirements.txt 
 pip install -r requirements_sdxl.txt
+pip install bitsandbytes>=0.40.0
+pip install xformers>=0.0.20
 ```
 
 Install CLIP
