@@ -8,7 +8,7 @@ unet_lora_rank_o=4
 unet_lora_rank_mlp=4
 
 lr=1e-4
-steps=2
+steps=1000
 export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
 export OUTPUT_DIR="/home/nmathur/test"
 export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"

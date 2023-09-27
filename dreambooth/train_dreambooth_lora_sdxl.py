@@ -199,7 +199,7 @@ def struct_output(args):
             
         exp = f"krona_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
         # raise ValueError("currently not supported.")
-    else: raise AttributeError("Wrong adapter format.") 
+    else: raise AttributeError(f"{args.adapter_type} wrong adapter format.") 
     
     exp_ = os.path.join(dataset_, exp)
     if(os.path.exists(exp_)): pass
@@ -1633,7 +1633,7 @@ def main(args):
             )
             # print("shyam")
             # print(text_encoder_lora_layers)
-            exit()
+            # exit()
         else:
             text_encoder_lora_layers = None
             text_encoder_2_lora_layers = None

@@ -517,6 +517,7 @@ class UNet2DConditionLoadersMixin:
                         hidden_size_mapping.update({f"{projection_id}_lora.up.weight": hidden_size})
                         
 
+                    """ For cross attention dimention """
                     if isinstance(
                         attn_processor, (AttnAddedKVProcessor, SlicedAttnAddedKVProcessor, AttnAddedKVProcessor2_0)
                     ):
@@ -543,19 +544,19 @@ class UNet2DConditionLoadersMixin:
                         
                         elif(adapter_type=='krona'): 
                             if("k" in attn_update_unet): 
-                                rank_a1, rank_a2 = value_dict["to_k_lora.down.weight"].size() # A
+                                rank_a2, rank_a1 = value_dict["to_k_lora.down.weight"].size() # A
                                 rank_b1, rank_b2 = value_dict["to_k_lora.up.weight"].size() # B
-                                cross_attention_dim = rank_a1 * rank_b1
+                                cross_attention_dim = rank_a2 * rank_b2
                             elif("v" in attn_update_unet):
-                                rank_a1, rank_a2 = value_dict["to_v_lora.down.weight"].size() # A
+                                rank_a2, rank_a1 = value_dict["to_v_lora.down.weight"].size() # A
                                 rank_b1, rank_b2 = value_dict["to_v_lora.up.weight"].size() # B
                                 cross_attention_dim = rank_a2 * rank_b2
                             elif("q" in attn_update_unet): 
-                                rank_a1, rank_a2 = value_dict["to_q_lora.down.weight"].size() # A
+                                rank_a2, rank_a1 = value_dict["to_q_lora.down.weight"].size() # A
                                 rank_b1, rank_b2 = value_dict["to_q_lora.up.weight"].size() # B
                                 cross_attention_dim = rank_a2 * rank_b2
                             elif("o" in attn_update_unet): 
-                                rank_a1, rank_a2 = value_dict["to_out_lora.down.weight"].size() # A 
+                                rank_a2, rank_a1 = value_dict["to_out_lora.down.weight"].size() # A 
                                 rank_b1, rank_b2 = value_dict["to_out_lora.up.weight"].size() # A 
                                 cross_attention_dim = rank_a2 * rank_b2
                             else: raise ValueError("attention weight type error.")
@@ -587,9 +588,9 @@ class UNet2DConditionLoadersMixin:
                                    
                     # print(k_rank, q_rank, v_rank, out_rank)
                     # exit()
-                    print(k_rank, q_rank, v_rank, out_rank, hidden_size, cross_attention_dim,
-                    hidden_size_mapping.get("to_q_lora.up.weight"), hidden_size_mapping.get("to_v_lora.up.weight"),
-                    hidden_size_mapping.get("to_out_lora.up.weight"))
+                    # print(k_rank, q_rank, v_rank, out_rank, hidden_size, cross_attention_dim,
+                    # hidden_size_mapping.get("to_q_lora.up.weight"), hidden_size_mapping.get("to_v_lora.up.weight"),
+                    # hidden_size_mapping.get("to_out_lora.up.weight"))
                     # exit()
                     if attn_processor_class is not LoRAAttnAddedKVProcessor: # getting call
                         attn_processors[key] = attn_processor_class(
