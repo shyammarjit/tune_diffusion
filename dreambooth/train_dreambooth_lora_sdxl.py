@@ -156,26 +156,49 @@ def struct_output(args):
     if(os.path.exists(dataset_)): pass
     else: os.mkdir(dataset_)
     
-    # Now create folder for experiments
-    attn_config = ''
-    if "k" in args.attn_update_unet: attn_config = attn_config + "k" + str(args.unet_lora_rank_k)
-    if "q" in args.attn_update_unet: attn_config = attn_config + "q" + str(args.unet_lora_rank_q)
-    if "v" in args.attn_update_unet: attn_config = attn_config + "v" + str(args.unet_lora_rank_v)
-    if "o" in args.attn_update_unet: attn_config = attn_config + "o" + str(args.unet_lora_rank_out)
-    if(args.unet_tune_mlp): attn_config = attn_config + "f" + str(args.unet_lora_rank_mlp)
     
-    if(args.train_text_encoder):
-        text_attn_config = ''
-        if "k" in args.attn_update_text: text_attn_config = text_attn_config + "k" + str(args.text_lora_rank_k)
-        if "q" in args.attn_update_text: text_attn_config = text_attn_config + "q" + str(args.text_lora_rank_q)
-        if "v" in args.attn_update_text: text_attn_config = text_attn_config + "v" + str(args.text_lora_rank_v)
-        if "o" in args.attn_update_text: text_attn_config = text_attn_config + "o" + str(args.text_lora_rank_out)
-        if(args.text_tune_mlp): text_attn_config = text_attn_config + "f" + str(args.text_lora_rank_mlp)
-        attn_config = attn_config + "_" + text_attn_config
         
     if(args.adapter_type=="lora"):
+        
+        # Now create folder for experiments
+        attn_config = ''
+        if "k" in args.attn_update_unet: attn_config = attn_config + "k" + str(args.unet_lora_rank_k)
+        if "q" in args.attn_update_unet: attn_config = attn_config + "q" + str(args.unet_lora_rank_q)
+        if "v" in args.attn_update_unet: attn_config = attn_config + "v" + str(args.unet_lora_rank_v)
+        if "o" in args.attn_update_unet: attn_config = attn_config + "o" + str(args.unet_lora_rank_out)
+        if(args.unet_tune_mlp): attn_config = attn_config + "f" + str(args.unet_lora_rank_mlp)
+        
+        if(args.train_text_encoder):
+            text_attn_config = ''
+            if "k" in args.attn_update_text: text_attn_config = text_attn_config + "k" + str(args.text_lora_rank_k)
+            if "q" in args.attn_update_text: text_attn_config = text_attn_config + "q" + str(args.text_lora_rank_q)
+            if "v" in args.attn_update_text: text_attn_config = text_attn_config + "v" + str(args.text_lora_rank_v)
+            if "o" in args.attn_update_text: text_attn_config = text_attn_config + "o" + str(args.text_lora_rank_out)
+            if(args.text_tune_mlp): text_attn_config = text_attn_config + "f" + str(args.text_lora_rank_mlp)
+            attn_config = attn_config + "_" + text_attn_config
+        
         exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
-    elif(args.adapter_type=="krona"): raise ValueError("currently not supported.")
+    elif(args.adapter_type=="krona"): 
+        
+        # Now create folder for experiments
+        attn_config = ''
+        if "k" in args.attn_update_unet: attn_config = attn_config + "k" + str(args.unet_lora_rank_k)
+        if "q" in args.attn_update_unet: attn_config = attn_config + "q" + str(args.unet_lora_rank_q)
+        if "v" in args.attn_update_unet: attn_config = attn_config + "v" + str(args.unet_lora_rank_v)
+        if "o" in args.attn_update_unet: attn_config = attn_config + "o" + str(args.unet_lora_rank_out)
+        if(args.unet_tune_mlp): attn_config = attn_config + "f" + str(args.unet_lora_rank_mlp)
+        
+        if(args.train_text_encoder):
+            text_attn_config = ''
+            if "k" in args.attn_update_text: text_attn_config = text_attn_config + "k" + str(args.text_lora_rank_k)
+            if "q" in args.attn_update_text: text_attn_config = text_attn_config + "q" + str(args.text_lora_rank_q)
+            if "v" in args.attn_update_text: text_attn_config = text_attn_config + "v" + str(args.text_lora_rank_v)
+            if "o" in args.attn_update_text: text_attn_config = text_attn_config + "o" + str(args.text_lora_rank_out)
+            if(args.text_tune_mlp): text_attn_config = text_attn_config + "f" + str(args.text_lora_rank_mlp)
+            attn_config = attn_config + "_" + text_attn_config
+            
+        exp = f"krona_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
+        # raise ValueError("currently not supported.")
     else: raise AttributeError("Wrong adapter format.") 
     
     exp_ = os.path.join(dataset_, exp)
@@ -527,18 +550,18 @@ def parse_args(input_args=None):
         help="Lora Rank size for matrix decomposition => ffn matrix",
     )
     
-    # parser.add_argument(
-    #     "--krona_rank_a1",
-    #     type=int,
-    #     default=16,
-    #     help="KornA Rank size for matrix decomposition",
-    # )
-    # parser.add_argument(
-    #     "--krona_rank_a2",
-    #     type=int,
-    #     default=4,
-    #     help="KornA Rank size for matrix decomposition",
-    # )
+    parser.add_argument(
+        "--krona_rank_a1",
+        type=int,
+        default=32,
+        help="KornA Rank size for matrix decomposition",
+    )
+    parser.add_argument(
+        "--krona_rank_a2",
+        type=int,
+        default=16,
+        help="KornA Rank size for matrix decomposition",
+    )
     parser.add_argument(
         "--diffusion_model",
         type=str,
@@ -978,15 +1001,29 @@ def main(args):
         )
 
         # To DO: May need to modify the rank of K, Q, V and Out (Future Experiments)
-        module = lora_attn_processor_class(
-            hidden_size=hidden_size, cross_attention_dim=cross_attention_dim, 
-            adapter_type=args.adapter_type, # added 
-            attn_update_unet=args.attn_update_unet, # added 
-            k_rank=args.unet_lora_rank_k if "k" in args.attn_update_unet else None, # k rank
-            q_rank=args.unet_lora_rank_q if "q" in args.attn_update_unet else None, # added 
-            v_rank=args.unet_lora_rank_v if "v" in args.attn_update_unet else None, # added 
-            out_rank=args.unet_lora_rank_out if "o" in args.attn_update_unet else None, # added 
-        )
+        if(args.adapter_type=="lora"):
+            module = lora_attn_processor_class(
+                hidden_size=hidden_size, cross_attention_dim=cross_attention_dim, 
+                adapter_type=args.adapter_type, # added 
+                attn_update_unet=args.attn_update_unet, # added 
+                k_rank=args.unet_lora_rank_k if "k" in args.attn_update_unet else None, # k rank
+                q_rank=args.unet_lora_rank_q if "q" in args.attn_update_unet else None, # added 
+                v_rank=args.unet_lora_rank_v if "v" in args.attn_update_unet else None, # added 
+                out_rank=args.unet_lora_rank_out if "o" in args.attn_update_unet else None, # added 
+            )
+        elif(args.adapter_type=="krona"):
+            module = lora_attn_processor_class(
+                hidden_size=hidden_size, cross_attention_dim=cross_attention_dim, 
+                adapter_type=args.adapter_type, # added 
+                attn_update_unet=args.attn_update_unet, # added 
+                k_rank=(args.krona_rank_a1, args.krona_rank_a2) if "k" in args.attn_update_unet else None, # k rank
+                q_rank=(args.krona_rank_a1, args.krona_rank_a2) if "q" in args.attn_update_unet else None, # added 
+                v_rank=(args.krona_rank_a1, args.krona_rank_a2) if "v" in args.attn_update_unet else None, # added 
+                out_rank=(args.krona_rank_a1, args.krona_rank_a2) if "o" in args.attn_update_unet else None, # added 
+            )
+        else:
+            raise AttributeError(f"{args.adapter_type} is not supported.")
+        
         unet_lora_attn_procs[name] = module
         unet_lora_parameters.extend(module.parameters())
         # if(args.tune_mlp): ffn_layers.append(name)

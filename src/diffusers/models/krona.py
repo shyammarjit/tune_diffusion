@@ -17,6 +17,9 @@ from typing import Optional
 import torch.nn.functional as F
 from torch import nn
 import math
+
+
+""" This is slice LoRA version of code """
 # class KronALinearLayer(nn.Module):
 #     def __init__(self, in_features, out_features, rank=4, network_alpha=None, device=None, dtype=None):
 #         super().__init__()

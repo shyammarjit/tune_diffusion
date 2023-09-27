@@ -496,12 +496,21 @@ class UNet2DConditionLoadersMixin:
                     if("q" in attn_update_unet): projection_ids_list.append("to_q")
                     if("v" in attn_update_unet): projection_ids_list.append("to_v")
                     if("o" in attn_update_unet): projection_ids_list.append("to_out")
+                    
                     for projection_id in projection_ids_list:
-                        rank = value_dict[f"{projection_id}_lora.down.weight"].shape[0]
 
                         # Added lora and KronA
-                        if(adapter_type=="lora"): hidden_size = value_dict[f"{projection_id}_lora.up.weight"].shape[0]
-                        elif(adapter_type=="krona"): raise ValueError("Currently not supported.")
+                        if(adapter_type=="lora"):
+                            rank = value_dict[f"{projection_id}_lora.down.weight"].shape[0]
+                            hidden_size = value_dict[f"{projection_id}_lora.up.weight"].shape[0]
+                        elif(adapter_type=="krona"):
+                            rank_a2, rank_a1 = value_dict[f"{projection_id}_lora.down.weight"].shape # A
+                            rank_b1, rank_b2 = value_dict[f"{projection_id}_lora.up.weight"].shape # B
+                            # print(rank_a1, rank_a2, rank_b1, rank_b2)
+                            rank = (rank_a1, rank_a2)
+                            hidden_size = rank_a1 * rank_b1 # in_features
+                            # exit()
+                            # raise ValueError("Currently not supported.")
                         else: raise ValueError("Only LoRA and KronA are supported.")
 
                         rank_mapping.update({f"{projection_id}_lora.down.weight": rank})
@@ -523,15 +532,35 @@ class UNet2DConditionLoadersMixin:
                         else: raise ValueError("Only LoRA and KronA are supported.")
                         attn_processor_class = LoRAAttnAddedKVProcessor
                     else:
-                        if("k" in attn_update_unet): _, dim_ = value_dict["to_k_lora.down.weight"].size()
-                        elif("v" in attn_update_unet): _, dim_ = value_dict["to_v_lora.down.weight"].size()
-                        elif("q" in attn_update_unet): _, dim_ = value_dict["to_q_lora.down.weight"].size()
-                        elif("o" in attn_update_unet): _, dim_ = value_dict["to_out_lora.down.weight"].size()
-                        else: raise ValueError("attention weight type error.")
-
                         # Added lora and KronA
-                        if(adapter_type=='lora'): cross_attention_dim = dim_
-                        elif(adapter_type=='krona'): raise ValueError("Currently not supported.")
+                        if(adapter_type=='lora'): 
+                            if("k" in attn_update_unet): _, dim_ = value_dict["to_k_lora.down.weight"].size()
+                            elif("v" in attn_update_unet): _, dim_ = value_dict["to_v_lora.down.weight"].size()
+                            elif("q" in attn_update_unet): _, dim_ = value_dict["to_q_lora.down.weight"].size()
+                            elif("o" in attn_update_unet): _, dim_ = value_dict["to_out_lora.down.weight"].size()
+                            else: raise ValueError("attention weight type error.")
+                            cross_attention_dim = dim_
+                        
+                        elif(adapter_type=='krona'): 
+                            if("k" in attn_update_unet): 
+                                rank_a1, rank_a2 = value_dict["to_k_lora.down.weight"].size() # A
+                                rank_b1, rank_b2 = value_dict["to_k_lora.up.weight"].size() # B
+                                cross_attention_dim = rank_a1 * rank_b1
+                            elif("v" in attn_update_unet):
+                                rank_a1, rank_a2 = value_dict["to_v_lora.down.weight"].size() # A
+                                rank_b1, rank_b2 = value_dict["to_v_lora.up.weight"].size() # B
+                                cross_attention_dim = rank_a2 * rank_b2
+                            elif("q" in attn_update_unet): 
+                                rank_a1, rank_a2 = value_dict["to_q_lora.down.weight"].size() # A
+                                rank_b1, rank_b2 = value_dict["to_q_lora.up.weight"].size() # B
+                                cross_attention_dim = rank_a2 * rank_b2
+                            elif("o" in attn_update_unet): 
+                                rank_a1, rank_a2 = value_dict["to_out_lora.down.weight"].size() # A 
+                                rank_b1, rank_b2 = value_dict["to_out_lora.up.weight"].size() # A 
+                                cross_attention_dim = rank_a2 * rank_b2
+                            else: raise ValueError("attention weight type error.")
+                            
+                            # raise ValueError("Currently not supported.")
                         else: raise ValueError("Only LoRA and KronA are supported.")
                         
                         if isinstance(attn_processor, (XFormersAttnProcessor, LoRAXFormersAttnProcessor)):
@@ -556,7 +585,12 @@ class UNet2DConditionLoadersMixin:
                         out_rank = rank_mapping.get("to_out_lora.down.weight")
                         hidden_size_ = hidden_size_mapping.get("to_out_lora.up.weight")
                                    
-
+                    # print(k_rank, q_rank, v_rank, out_rank)
+                    # exit()
+                    print(k_rank, q_rank, v_rank, out_rank, hidden_size, cross_attention_dim,
+                    hidden_size_mapping.get("to_q_lora.up.weight"), hidden_size_mapping.get("to_v_lora.up.weight"),
+                    hidden_size_mapping.get("to_out_lora.up.weight"))
+                    # exit()
                     if attn_processor_class is not LoRAAttnAddedKVProcessor: # getting call
                         attn_processors[key] = attn_processor_class(
                             k_rank=k_rank if "k" in attn_update_unet else None, # added

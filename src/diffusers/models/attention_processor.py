@@ -19,9 +19,9 @@ from torch import nn
 
 from ..utils import deprecate, logging, maybe_allow_in_graph
 from ..utils.import_utils import is_xformers_available
-from .lora import LoRALinearLayer
-from .krona import KronALinearLayer
+from .lora import LoRALinearLayer, KronALinearLayer
 from .slice_lora import SliceLoRALinearLayer
+""" Current krona is the clice LoRA version. It's not official KronA codebase """
 
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
@@ -1340,7 +1340,15 @@ class LoRAAttnProcessor2_0(nn.Module):
                 self.to_out_lora = LoRALinearLayer(out_hidden_size, out_hidden_size, out_rank, network_alpha)
             
         elif(adapter_type == "krona"):
-            raise ValueError("Currently not supported")
+            if("q" in attn_update_unet):
+                self.to_q_lora = KronALinearLayer(q_hidden_size, q_hidden_size, q_rank, network_alpha)
+            if("k" in attn_update_unet):
+                self.to_k_lora = KronALinearLayer(cross_attention_dim or hidden_size, hidden_size, k_rank, network_alpha)
+            if("v" in attn_update_unet):
+                self.to_v_lora = KronALinearLayer(cross_attention_dim or v_hidden_size, v_hidden_size, v_rank, network_alpha)
+            if("o" in attn_update_unet):
+                self.to_out_lora = KronALinearLayer(out_hidden_size, out_hidden_size, out_rank, network_alpha)
+            
         else:
             raise ValueError("Only lora & krona supported.")
     
