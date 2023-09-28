@@ -69,7 +69,7 @@ python3 generator.py \
     --unet_lora_rank_out=$unet_lora_rank_o \
     --unet_lora_rank_mlp=$unet_lora_rank_mlp \
     --lphm \
-# #     # --unet_tune_mlp \
-# #     # --attn_update_text=$attn_update_text \
-# #     # --train_text_encoder \
-# #     # --delete_and_upload_drive
+    # --unet_tune_mlp \
+    # --attn_update_text=$attn_update_text \
+    # --train_text_encoder \
+    # --delete_and_upload_drive
