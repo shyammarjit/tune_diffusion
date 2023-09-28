@@ -1605,7 +1605,7 @@ def main(args):
                 del pipeline
                 torch.cuda.empty_cache()
 
-    print(unet_lora_parameters[0])
+    # print(unet_lora_parameters[0])
     # exit()
     # Save the lora layers
     accelerator.wait_for_everyone()
@@ -1614,7 +1614,8 @@ def main(args):
         unet = unet.to(torch.float32)
         unet_lora_layers = unet_attn_processors_state_dict(unet)
         # print("shyam")
-        print(unet_lora_layers[list(unet_lora_layers.keys())[0]])
+        # print(unet_lora_layers[list(unet_lora_layers.keys())[0]])
+        # print(unet_lora_layers[list(unet_lora_layers.keys())[0]][0])
         # exit()
         if(args.unet_tune_mlp): 
             unet_lora_layers_ffn = unet_ffn_within_attn_processors_state_dict(unet)

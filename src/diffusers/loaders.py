@@ -496,9 +496,9 @@ class UNet2DConditionLoadersMixin:
                     if("q" in attn_update_unet): projection_ids_list.append("to_q")
                     if("v" in attn_update_unet): projection_ids_list.append("to_v")
                     if("o" in attn_update_unet): projection_ids_list.append("to_out")
-                    print("check")
-                    print(value_dict[list(value_dict.keys())[0]].shape)
-                    exit()
+                    # print("check")
+                    # print(value_dict[list(value_dict.keys())[0]].shape)
+                    # exit()
                     for projection_id in projection_ids_list:
 
                         # Added lora and KronA
