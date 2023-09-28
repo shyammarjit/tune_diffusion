@@ -1,11 +1,8 @@
 subjects="teapot"
 attn_update_unet="kqvo"
 # unet parameters
-unet_lora_rank_k=4
-unet_lora_rank_q=4
-unet_lora_rank_v=4
-unet_lora_rank_o=4
-unet_lora_rank_mlp=4
+krona_rank_a1=32
+krona_rank_a2=16
 
 lr=1e-3
 steps=1000
