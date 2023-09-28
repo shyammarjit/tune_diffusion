@@ -32,7 +32,6 @@ accelerate launch train_dreambooth_lora_sdxl.py \
     --gradient_checkpointing \
     --attn_update_unet=$attn_update_unet \
     --enable_xformers_memory_efficient_attention \
-    
     # --unet_tune_mlp \
     # --attn_update_text=$attn_update_text \
     # --train_text_encoder \
@@ -59,7 +58,7 @@ python3 generator.py \
     --gradient_checkpointing \
     --attn_update_unet=$attn_update_unet \
     --enable_xformers_memory_efficient_attention \
-# #     # --unet_tune_mlp \
-# #     # --attn_update_text=$attn_update_text \
-# #     # --train_text_encoder \
-# #     # --delete_and_upload_drive
+    # --unet_tune_mlp \
+    # --attn_update_text=$attn_update_text \
+    # --train_text_encoder \
+    # --delete_and_upload_drive
