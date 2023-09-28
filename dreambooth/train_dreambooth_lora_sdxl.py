@@ -1485,6 +1485,8 @@ def main(args):
                 #         print("t2", i)
                 # # print(text_lora_parameters_one[-1].grad)
                 # exit()
+                # print(len(unet_lora_parameters))
+        
                 
 
             # print("shyam kamal")
@@ -1603,12 +1605,17 @@ def main(args):
                 del pipeline
                 torch.cuda.empty_cache()
 
+    print(unet_lora_parameters[0])
+    # exit()
     # Save the lora layers
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
         unet = accelerator.unwrap_model(unet)
         unet = unet.to(torch.float32)
         unet_lora_layers = unet_attn_processors_state_dict(unet)
+        # print("shyam")
+        print(unet_lora_layers[list(unet_lora_layers.keys())[0]])
+        # exit()
         if(args.unet_tune_mlp): 
             unet_lora_layers_ffn = unet_ffn_within_attn_processors_state_dict(unet)
             # print(unet_lora_layers_ffn[list(unet_lora_layers_ffn.keys())[0]])

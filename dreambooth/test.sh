@@ -8,7 +8,7 @@ unet_lora_rank_o=4
 unet_lora_rank_mlp=4
 
 lr=1e-4
-steps=1000
+steps=5
 export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
 export OUTPUT_DIR="/home/nmathur/test"
 export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
@@ -53,19 +53,16 @@ accelerate launch train_dreambooth_lora_sdxl.py \
 #     --lr_scheduler="constant" \
 #     --lr_warmup_steps=0 \
 #     --max_train_steps=$steps \
-#     --adapter_type="lora" \
+#     --adapter_type="krona" \
 #     --seed="0" \
 #     --diffusion_model="sdxl" \
+#     --krona_rank_a1=32 \
+#     --krona_rank_a2=16 \
 #     --use_8bit_adam \
 #     --gradient_checkpointing \
 #     --attn_update_unet=$attn_update_unet \
 #     --enable_xformers_memory_efficient_attention \
-#     --unet_lora_rank_k=$unet_lora_rank_k \
-#     --unet_lora_rank_q=$unet_lora_rank_q \
-#     --unet_lora_rank_v=$unet_lora_rank_v \
-#     --unet_lora_rank_out=$unet_lora_rank_o \
-#     --unet_lora_rank_mlp=$unet_lora_rank_mlp \
-#     # --unet_tune_mlp \
-#     # --attn_update_text=$attn_update_text \
-#     # --train_text_encoder \
-#     # --delete_and_upload_drive
+# #     # --unet_tune_mlp \
+# #     # --attn_update_text=$attn_update_text \
+# #     # --train_text_encoder \
+# #     # --delete_and_upload_drive

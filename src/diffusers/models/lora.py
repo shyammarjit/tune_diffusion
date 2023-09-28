@@ -41,16 +41,22 @@ class KronALinearLayer(nn.Module):
         self.b2 = int(in_features/self.a2); self.b1 = int(out_features/self.a1)
         self.down = nn.Linear(self.a1, self.a2, bias=False, device=device, dtype=dtype) # A
         self.up = nn.Linear(self.b2, self.b1, bias=False, device=device, dtype=dtype) # B
+        # self.down = nn.Parameter(torch.FloatTensor(self.a2, self.a1).to(dtype).to(device), requires_grad=True)
+        # self.up = nn.Parameter(torch.FloatTensor(self.b1, self.b2).to(dtype).to(device), requires_grad=True)
         # This value has the same meaning as the `--network_alpha` option in the kohya-ss trainer script.
         # See https://github.com/darkstorm2150/sd-scripts/blob/main/docs/train_network_README-en.md#execute-learning
         self.network_alpha = network_alpha
 
         nn.init.normal_(self.down.weight, std=1 / rank[0])
         nn.init.zeros_(self.up.weight)
+        # nn.init.normal_(self.down, std=1 / rank[0])
+        # nn.init.zeros_(self.up)
 
     def forward(self, hidden_states):
         orig_dtype = hidden_states.dtype
         dtype = self.down.weight.dtype
+        # dtype = self.down.dtype
+        
         
         # print(self.a1, self.a2, self.b1, self.b2)
         # exit()
@@ -59,6 +65,9 @@ class KronALinearLayer(nn.Module):
             hidden_states = hidden_states.view(-1, self.b2, self.a2).contiguous().view(-1, self.a2, self.b2).transpose(1, 2)
             
             up_hidden_states = self.up.weight@(hidden_states.to(dtype)@self.down.weight)
+            # up_hidden_states = @(hidden_states.to(dtype)@self.down)
+            # up_hidden_states = torch.matmul(self.up, torch.matmul(hidden_states.to(dtype), self.down))
+            
             up_hidden_states = up_hidden_states.view(B1, C, self.a1*self.b1)
 
         else: 
