@@ -44,13 +44,13 @@ python generator.py
 ```
 
 ## What to run?
-To run without text encoder config please hit
+To run without text encoder config please hit this inside ```dreambooth``` folder.
 ```
-bash dreambooth/test.sh
+bash test.sh
 ```
 
 
-To run with text encoder config please hit
+To run with text encoder config please hit this inside ```dreambooth``` folder.
 ```
-bash dreambooth/test_text.sh
+bash test_text.sh
 ```
