@@ -666,20 +666,18 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                 # to access only ffn layers split the name by . then see if there is ff or not
                 
                 if "ff" in name.split("."):
-                    if(adapter_type=="lora"):
-                        args, _ = module.get_config()
-                        if adapter_type == "lora":
-                            from .lora import LoRALinearLayer
-                            module.set_lora_layer(lora_layer=LoRALinearLayer(args[0], args[1], rank = lora_mlp_rank)) 
-                        elif adapter_type == "krona":
-                            from .lora import KronALinearLayer
-                            # lora_mlp_rank is a tuple here 
-                            module.set_lora_layer(lora_layer=KronALinearLayer(args[0], args[1], rank = lora_mlp_rank)) 
-                        else:
-                            raise AttributeError("Wrong adapter type")
-                        processors[f"{name}.lora_layer"] = module.lora_layer
-                    else: raise ValueError("only lora and krona are supported.")
-                    
+                    args, _ = module.get_config()
+                    if adapter_type == "lora":
+                        from .lora import LoRALinearLayer
+                        module.set_lora_layer(lora_layer=LoRALinearLayer(args[0], args[1], rank = lora_mlp_rank)) 
+                    elif adapter_type == "krona":
+                        from .lora import KronALinearLayer
+                        # lora_mlp_rank is a tuple here 
+                        print(lora_mlp_rank)
+                        module.set_lora_layer(lora_layer=KronALinearLayer(args[0], args[1], rank = lora_mlp_rank)) 
+                    else:
+                        raise AttributeError("Wrong adapter type")
+                    processors[f"{name}.lora_layer"] = module.lora_layer                    
                     for param in module.lora_layer.parameters():
                         extended_parameters.append(param)
 

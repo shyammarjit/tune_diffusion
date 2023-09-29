@@ -909,7 +909,7 @@ class StableDiffusionXLPipeline(DiffusionPipeline, FromSingleFileMixin, LoraLoad
                 attn_update_text=attn_update_text,
                 text_tune_mlp=text_tune_mlp,
             )
-
+        
     @classmethod
     def save_lora_weights(
         self,

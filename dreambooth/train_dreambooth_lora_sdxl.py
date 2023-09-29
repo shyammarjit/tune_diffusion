@@ -1158,7 +1158,7 @@ def main(args):
         elif args.adapter_type=="krona": lora_mlp_rank=(args.krona_unet_ffn_rank_a1, args.krona_unet_ffn_rank_a2)
         else: raise AttributeError("wrong adapter type")
         ffn_info, unet_lora_extended_parameters = unet.set_ffn_processors(adapter_type=args.adapter_type,
-            lora_mlp_rank=args.unet_lora_rank_mlp,
+            lora_mlp_rank=lora_mlp_rank,
         )
         unet_lora_parameters.extend(unet_lora_extended_parameters)
 
@@ -1819,6 +1819,7 @@ def main(args):
             attn_update_unet=args.attn_update_unet,
             attn_update_text=args.attn_update_text,
             text_tune_mlp=args.text_tune_mlp,
+            train_text_encoder=args.train_text_encoder,
         )
 
         # run inference

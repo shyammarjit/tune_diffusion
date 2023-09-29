@@ -48,7 +48,7 @@ accelerate launch train_dreambooth_lora.py \
     --krona_unet_o_rank_a2=16 \
     --krona_unet_ffn_rank_a1=32 \
     --krona_unet_ffn_rank_a2=16 \
-    # --unet_tune_mlp \
+    --unet_tune_mlp \
     # --attn_update_text=$attn_update_text \
     # --train_text_encoder \
 
