@@ -546,31 +546,129 @@ def parse_args(input_args=None):
         default=4,
         help="Lora Rank size for matrix decomposition => ffn matrix",
     )
+    # krona unet 
+    parser.add_argument(
+        "--krona_unet_k_rank_a1",
+        type=int,
+        default=32,
+        help="KornA Rank size for matrix decomposition for K attention matrices in Unet",
+    )
+    parser.add_argument(
+        "--krona_unet_k_rank_a2",
+        type=int,
+        default=16,
+        help="KornA Rank size for matrix decomposition for K attention matrices in Unet",
+    )
+    parser.add_argument(
+        "--krona_unet_q_rank_a1",
+        type=int,
+        default=32,
+        help="KornA Rank size for matrix decomposition for Q attention matrices in Unet",
+    )
+    parser.add_argument(
+        "--krona_unet_q_rank_a2",
+        type=int,
+        default=16,
+        help="KornA Rank size for matrix decomposition for Q attention matrices in Unet",
+    )
+    parser.add_argument(
+        "--krona_unet_v_rank_a1",
+        type=int,
+        default=32,
+        help="KornA Rank size for matrix decomposition for V attention matrices in Unet",
+    )
+    parser.add_argument(
+        "--krona_unet_v_rank_a2",
+        type=int,
+        default=16,
+        help="KornA Rank size for matrix decomposition for V attention matrices in Unet",
+    )
+    parser.add_argument(
+        "--krona_unet_o_rank_a1",
+        type=int,
+        default=32,
+        help="KornA Rank size for matrix decomposition for out attention matrices in Unet",
+    )
+    parser.add_argument(
+        "--krona_unet_o_rank_a2",
+        type=int,
+        default=16,
+        help="KornA Rank size for matrix decomposition for out attention matrices in Unet",
+    )
+    parser.add_argument(
+        "--krona_unet_ffn_rank_a2",
+        type=int,
+        default=16,
+        help="KornA Rank size for matrix decomposition for ffn/mlp layers in Unet",
+    )
+    parser.add_argument(
+        "--krona_unet_ffn_rank_a1",
+        type=int,
+        default=32,
+        help="KornA Rank size for matrix decomposition for ffn/mlp layers in Unet",
+    )
+    # krona text encoder 
+    parser.add_argument(
+        "--krona_text_k_rank_a1",
+        type=int,
+        default=32,
+        help="KornA Rank size for matrix decomposition for K attention matrices in Text",
+    )
+    parser.add_argument(
+        "--krona_text_k_rank_a2",
+        type=int,
+        default=16,
+        help="KornA Rank size for matrix decomposition for K attention matrices in Text",
+    )
+    parser.add_argument(
+        "--krona_text_q_rank_a1",
+        type=int,
+        default=32,
+        help="KornA Rank size for matrix decomposition for Q attention matrices in Text",
+    )
+    parser.add_argument(
+        "--krona_text_q_rank_a2",
+        type=int,
+        default=16,
+        help="KornA Rank size for matrix decomposition for Q attention matrices in Text",
+    )
+    parser.add_argument(
+        "--krona_text_v_rank_a1",
+        type=int,
+        default=32,
+        help="KornA Rank size for matrix decomposition for V attention matrices in Text",
+    )
+    parser.add_argument(
+        "--krona_text_v_rank_a2",
+        type=int,
+        default=16,
+        help="KornA Rank size for matrix decomposition for V attention matrices in Text",
+    )
+    parser.add_argument(
+        "--krona_text_o_rank_a1",
+        type=int,
+        default=32,
+        help="KornA Rank size for matrix decomposition for out attention matrices in Text",
+    )
+    parser.add_argument(
+        "--krona_text_o_rank_a2",
+        type=int,
+        default=16,
+        help="KornA Rank size for matrix decomposition for out attention matrices in Text",
+    )
+    parser.add_argument(
+        "--krona_text_ffn_rank_a2",
+        type=int,
+        default=16,
+        help="KornA Rank size for matrix decomposition for ffn/mlp layers in Text",
+    )
+    parser.add_argument(
+        "--krona_text_ffn_rank_a1",
+        type=int,
+        default=32,
+        help="KornA Rank size for matrix decomposition for ffn/mlp layers in Text",
+    )
     
-    parser.add_argument(
-        "--krona_k_rank_a1",
-        type=int,
-        default=32,
-        help="KornA Rank size for matrix decomposition",
-    )
-    parser.add_argument(
-        "--krona_k_rank_a2",
-        type=int,
-        default=16,
-        help="KornA Rank size for matrix decomposition",
-    )
-    parser.add_argument(
-        "--krona_q_rank_a1",
-        type=int,
-        default=32,
-        help="KornA Rank size for matrix decomposition",
-    )
-    parser.add_argument(
-        "--krona_q_rank_a2",
-        type=int,
-        default=16,
-        help="KornA Rank size for matrix decomposition",
-    )
     parser.add_argument(
         "--diffusion_model",
         type=str,
