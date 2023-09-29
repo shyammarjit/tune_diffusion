@@ -57,7 +57,7 @@ from diffusers.utils import check_min_version, is_wandb_available
 from diffusers.utils.import_utils import is_xformers_available
 from prompts import instance_prompt
 from diffusers.models.lora import LoRALinearLayer
-
+from logger import setup_logger
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
 check_min_version("0.21.0.dev0")
@@ -928,6 +928,7 @@ def unet_attn_processors_state_dict(unet) -> Dict[str, torch.tensor]:
 
 
 def main(args):
+    
     logging_dir = Path(args.output_dir, args.logging_dir)
 
     accelerator_project_config = ProjectConfiguration(project_dir=args.output_dir, logging_dir=logging_dir)
@@ -1857,8 +1858,16 @@ def main(args):
                 ignore_patterns=["step_*", "epoch_*"],
             )
     accelerator.end_training()
-
+    
+    # delete the log folder completely
+    log_folder = os.path.join(args.output_dir, "logs")
+    if os.path.exists(log_folder):
+        shutil.rmtree(log_folder)
+    
+    
+    
 
 if __name__ == "__main__":
     args = parse_args()
+    setup_logger(output=args.output_dir, name_of_file="log") # set up our own logger
     main(args)
