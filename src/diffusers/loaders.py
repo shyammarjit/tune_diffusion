@@ -295,8 +295,6 @@ class UNet2DConditionLoadersMixin:
             XFormersAttnProcessor,
         )
         from .models.lora import LoRACompatibleConv, LoRACompatibleLinear, LoRAConv2dLayer, LoRALinearLayer
-        from .models.krona import KronACompatibleConv, KronACompatibleLinear, KronAConv2dLayer, KronALinearLayer
-
         cache_dir = kwargs.pop("cache_dir", DIFFUSERS_CACHE)
         force_download = kwargs.pop("force_download", False)
         resume_download = kwargs.pop("resume_download", False)

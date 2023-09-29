@@ -241,14 +241,13 @@ if __name__ == "__main__":
     
     # find the availabel checkpoint list name
     run_generator = []
-    if os.path.join(args.output_dir, 'checkpoint-500'): run_generator.append('checkpoint-500') 
-    if os.path.join(args.output_dir, 'checkpoint-1000'): run_generator.append('checkpoint-1000')
+    # if os.path.join(args.output_dir, 'checkpoint-500'): run_generator.append('checkpoint-500') 
+    # if os.path.join(args.output_dir, 'checkpoint-1000'): run_generator.append('checkpoint-1000')
     
-    for from_checkpoint in run_generator:
-        print(f"For {from_checkpoint}")
-        # generate images based on given prompts
-        generator(args, prompts, from_checkpoint)
-        # compute the quantiative results (CLIP-I, CLIP-T)
-        clipi, clipt = evaluator(args, prompts, from_checkpoint)
-        save_metrics(args, clipi, clipt, from_checkpoint)
+    from_checkpoint = ""
+    # generate images based on given prompts
+    generator(args, prompts, from_checkpoint)
+    # compute the quantiative results (CLIP-I, CLIP-T)
+    clipi, clipt = evaluator(args, prompts, from_checkpoint)
+    save_metrics(args, clipi, clipt, from_checkpoint)
 

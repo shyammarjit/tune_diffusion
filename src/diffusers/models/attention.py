@@ -24,7 +24,6 @@ from .embeddings import CombinedTimestepLabelEmbeddings
 # Import adapter layers for FFN layer finetune
 from .lora import LoRACompatibleLinear, LoRALinearLayer
 from .slice_lora import SliceLoRACompatibleLinear, SliceLoRALinearLayer
-from .krona import KronACompatibleLinear, KronALinearLayer
 
 
 

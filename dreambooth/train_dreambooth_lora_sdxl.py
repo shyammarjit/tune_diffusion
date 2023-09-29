@@ -181,17 +181,30 @@ def struct_output(args):
     elif(args.adapter_type=="krona"): 
         
         # Now create folder for experiments
-        attn_config = f"{args.krona_rank_a1}-{args.krona_rank_a2}"
-        # if "k" in args.attn_update_unet: attn_config = attn_config + "k" + str(args.unet_lora_rank_k)
-        # if "q" in args.attn_update_unet: attn_config = attn_config + "q" + str(args.unet_lora_rank_q)
-        # if "v" in args.attn_update_unet: attn_config = attn_config + "v" + str(args.unet_lora_rank_v)
-        # if "o" in args.attn_update_unet: attn_config = attn_config + "o" + str(args.unet_lora_rank_out)
-        if(args.unet_tune_mlp): attn_config = attn_config + "f" + str(args.unet_lora_rank_mlp)
+        attn_config = ""
+        if "k" in args.attn_update_unet: 
+            attn_config = attn_config + "k" + str(args.krona_unet_k_rank_a1) + ":" + str(args.krona_unet_k_rank_a2)
+        if "q" in args.attn_update_unet: 
+            attn_config = attn_config + "q" + str(args.krona_unet_q_rank_a1) + ":" + str(args.krona_unet_q_rank_a2)
+        if "v" in args.attn_update_unet: 
+            attn_config = attn_config + "v" + str(args.krona_unet_v_rank_a1) + ":" + str(args.krona_unet_q_rank_a2)
+        if "o" in args.attn_update_unet: 
+            attn_config = attn_config + "o" + str(args.krona_unet_o_rank_a1) + ":" + str(args.krona_unet_q_rank_a2)
+        if(args.unet_tune_mlp): 
+            attn_config = attn_config + "f" + str(args.krona_unet_ffn_rank_a1) + ":" + str(args.krona_unet_ffn_rank_a2)
         
         if(args.train_text_encoder):
             text_attn_config = ''
-            attn_config = f"{args.krona_rank_a1}_{args.krona_rank_a2}"
-            if(args.text_tune_mlp): text_attn_config = text_attn_config + "f" + str(args.text_lora_rank_mlp)
+            if "k" in args.attn_update_text: 
+                text_attn_config = text_attn_config + "k" + str(args.krona_text_k_rank_a1) + ":" + str(args.krona_text_k_rank_a2)
+            if "q" in args.attn_update_text: 
+                text_attn_config = text_attn_config + "q" + str(args.krona_text_q_rank_a1) + ":" + str(args.krona_text_q_rank_a2)
+            if "v" in args.attn_update_text: 
+                text_attn_config = text_attn_config + "v" + str(args.krona_text_v_rank_a1) + ":" + str(args.krona_text_q_rank_a2)
+            if "o" in args.attn_update_text: 
+                text_attn_config = text_attn_config + "o" + str(args.krona_text_o_rank_a1) + ":" + str(args.krona_text_q_rank_a2)
+            if(args.text_tune_mlp): 
+                text_attn_config = text_attn_config + "f" + str(args.krona_text_ffn_rank_a1) + ":" + str(args.krona_text_ffn_rank_a2)    
             attn_config = attn_config + "_" + text_attn_config
             
         exp = f"krona_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
@@ -1123,10 +1136,10 @@ def main(args):
                 hidden_size=hidden_size, cross_attention_dim=cross_attention_dim, 
                 adapter_type=args.adapter_type, # added 
                 attn_update_unet=args.attn_update_unet, # added 
-                k_rank=(args.krona_rank_a1, args.krona_rank_a2) if "k" in args.attn_update_unet else None, # k rank
-                q_rank=(args.krona_rank_a1, args.krona_rank_a2) if "q" in args.attn_update_unet else None, # added 
-                v_rank=(args.krona_rank_a1, args.krona_rank_a2) if "v" in args.attn_update_unet else None, # added 
-                out_rank=(args.krona_rank_a1, args.krona_rank_a2) if "o" in args.attn_update_unet else None, # added 
+                k_rank=(args.krona_unet_k_rank_a1, args.krona_unet_k_rank_a2) if "k" in args.attn_update_unet else None, # k rank
+                q_rank=(args.krona_unet_q_rank_a1, args.krona_unet_q_rank_a2) if "q" in args.attn_update_unet else None, # added 
+                v_rank=(args.krona_unet_v_rank_a1, args.krona_unet_v_rank_a2) if "v" in args.attn_update_unet else None, # added 
+                out_rank=(args.krona_unet_o_rank_a1, args.krona_unet_o_rank_a2) if "o" in args.attn_update_unet else None, # added 
             )
         else:
             raise AttributeError(f"{args.adapter_type} is not supported.")
@@ -1137,6 +1150,7 @@ def main(args):
         
     unet.set_attn_processor(unet_lora_attn_procs)
     if(args.unet_tune_mlp): 
+        # ToDo: fix krona ffn layer 
         ffn_info, unet_lora_extended_parameters = unet.set_ffn_processors(adapter_type=args.adapter_type,
             lora_mlp_rank=args.unet_lora_rank_mlp,
         )

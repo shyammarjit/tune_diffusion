@@ -224,8 +224,10 @@ class LoRACompatibleLinear(nn.Linear):
     def get_config(self):
         return self.args, self.kwargs
 
-    def set_lora_layer(self, lora_layer: Optional[LoRALinearLayer]):
-        self.lora_layer = lora_layer
+    def set_lora_layer(self, lora_layer: Optional[LoRALinearLayer], adapter_type="lora"):
+        if adapter_type=="lora": self.lora_layer = lora_layer
+        elif adapter_type=="krona": self.lora_layer = KronALinearLayer
+        else: raise AttributeError("wrong adapter type")
 
     def forward(self, x):
         if self.lora_layer is None:
