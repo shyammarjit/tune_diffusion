@@ -1151,6 +1151,9 @@ def main(args):
     unet.set_attn_processor(unet_lora_attn_procs)
     if(args.unet_tune_mlp): 
         # ToDo: fix krona ffn layer 
+        if args.adapter_type=="lora": lora_mlp_rank=args.unet_lora_rank_mlp
+        elif args.adapter_type=="krona": lora_mlp_rank=(args.krona_unet_ffn_rank_a1, args.krona_unet_ffn_rank_a2)
+        else: raise AttributeError("wrong adapter type")
         ffn_info, unet_lora_extended_parameters = unet.set_ffn_processors(adapter_type=args.adapter_type,
             lora_mlp_rank=args.unet_lora_rank_mlp,
         )

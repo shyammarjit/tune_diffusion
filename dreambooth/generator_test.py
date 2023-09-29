@@ -124,7 +124,7 @@ def generator(args, prompts, from_checkpoint):
     if(os.path.exists(image_dir)): pass
     else: os.mkdir(image_dir)
     
-    for i in trange(len(prompts), desc = "generating images"):
+    for i in trange(1, desc = "generating images"): # run for one prompt only to test all OK
         if(args.diffusion_model == "sdxl"):
             image = pipe(prompt=prompts[i], output_type="latent", generator=generator).images[0]
             image = refiner(prompt=prompts[i], image=image[None, :], generator=generator).images[0]
@@ -158,7 +158,11 @@ def save_metrics(args, clipi, clipt, from_checkpoint):
 
     """ This function saves the config and evaluation results in the .csv format at the 
     given root output folder """
-    # save all the info in the form of *.json file
+    # save all the info in the form of *.json file    
+    if(args.train_text_encoder):
+        t_ = os.path.basename(args.output_dir).split('_')
+        what_config = t_[1] + "_" + t_[2]
+    else: what_config = os.path.basename(args.output_dir).split('_')[1]
     exp_info = {"Dataset_Name": os.path.basename(args.instance_data_dir), 
         "diffusion_version": args.diffusion_model,
         "adaptor": args.adapter_type,
@@ -175,7 +179,7 @@ def save_metrics(args, clipi, clipt, from_checkpoint):
         "learning_rate": args.learning_rate,
         "output_path": f"{args.output_dir}-{from_checkpoint}",
         "with_prior_preservation": args.with_prior_preservation,
-        "where_to_add": os.path.dirname(output_dir).split('_')[1],
+        "what_config": what_config,
     }
     
     exp_name = args.output_dir + '/' + os.path.basename(args.output_dir) + from_checkpoint + '.json'

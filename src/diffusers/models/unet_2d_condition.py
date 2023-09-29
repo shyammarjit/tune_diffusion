@@ -667,9 +667,16 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                 
                 if "ff" in name.split("."):
                     if(adapter_type=="lora"):
-                        from .lora import LoRALinearLayer
                         args, _ = module.get_config()
-                        module.set_lora_layer(lora_layer=LoRALinearLayer(args[0], args[1], rank = lora_mlp_rank)) 
+                        if adapter_type == "lora":
+                            from .lora import LoRALinearLayer
+                            module.set_lora_layer(lora_layer=LoRALinearLayer(args[0], args[1], rank = lora_mlp_rank)) 
+                        elif adapter_type == "krona":
+                            from .lora import KronALinearLayer
+                            # lora_mlp_rank is a tuple here 
+                            module.set_lora_layer(lora_layer=KronALinearLayer(args[0], args[1], rank = lora_mlp_rank)) 
+                        else:
+                            raise AttributeError("Wrong adapter type")
                         processors[f"{name}.lora_layer"] = module.lora_layer
                     else: raise ValueError("only lora and krona are supported.")
                     

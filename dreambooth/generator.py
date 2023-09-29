@@ -159,6 +159,10 @@ def save_metrics(args, clipi, clipt, from_checkpoint):
     """ This function saves the config and evaluation results in the .csv format at the 
     given root output folder """
     # save all the info in the form of *.json file
+    if(args.train_text_encoder):
+        t_ = os.path.basename(args.output_dir).split('_')
+        what_config = t_[1] + "_" + t_[2]
+    else: what_config = os.path.basename(args.output_dir).split('_')[1]
     exp_info = {"Dataset_Name": os.path.basename(args.instance_data_dir), 
         "diffusion_version": args.diffusion_model,
         "adaptor": args.adapter_type,
@@ -175,9 +179,8 @@ def save_metrics(args, clipi, clipt, from_checkpoint):
         "learning_rate": args.learning_rate,
         "output_path": f"{args.output_dir}-{from_checkpoint}",
         "with_prior_preservation": args.with_prior_preservation,
-        "where_to_add": os.path.dirname(output_dir).split('_')[1],
+        "what_config": what_config,
     }
-    
     exp_name = args.output_dir + '/' + os.path.basename(args.output_dir) + from_checkpoint + '.json'
     # }/log_{args.diffusion_model}_{args.adapter_type}_{args.lora_rank}_{args.max_train_steps}_{number_of_input_img}_{args.learning_rate}_{args.with_prior_preservation}.json'
     print(exp_name)
