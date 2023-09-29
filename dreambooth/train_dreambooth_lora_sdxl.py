@@ -1124,7 +1124,8 @@ def main(args):
         # To DO: May need to modify the rank of K, Q, V and Out (Future Experiments)
         if(args.adapter_type=="lora"):
             module = lora_attn_processor_class(
-                hidden_size=hidden_size, cross_attention_dim=cross_attention_dim, 
+                hidden_size=hidden_size, 
+                cross_attention_dim=cross_attention_dim, 
                 adapter_type=args.adapter_type, # added 
                 attn_update_unet=args.attn_update_unet, # added 
                 k_rank=args.unet_lora_rank_k if "k" in args.attn_update_unet else None, # k rank
@@ -1134,7 +1135,8 @@ def main(args):
             )
         elif(args.adapter_type=="krona"):
             module = lora_attn_processor_class(
-                hidden_size=hidden_size, cross_attention_dim=cross_attention_dim, 
+                hidden_size=hidden_size, 
+                cross_attention_dim=cross_attention_dim, 
                 adapter_type=args.adapter_type, # added 
                 attn_update_unet=args.attn_update_unet, # added 
                 k_rank=(args.krona_unet_k_rank_a1, args.krona_unet_k_rank_a2) if "k" in args.attn_update_unet else None, # k rank
@@ -1189,8 +1191,10 @@ def main(args):
         # # print(text_lora_parameters_two)
         # exit()
         # print(text_encoder_one)
-        text_lora_layers_ffn = text_encoder_lora_state_dict(text_encoder_one, attn_update_text=args.attn_update_text, 
-                                                                text_tune_mlp=args.text_tune_mlp)
+        
+        # To tune text encoder ffn/mlp layers 
+        # text_lora_layers_ffn = text_encoder_lora_state_dict(text_encoder_one, attn_update_text=args.attn_update_text, 
+        #                                                         text_tune_mlp=args.text_tune_mlp)
         # print(text_lora_layers_ffn[list(text_lora_layers_ffn.keys())[0]])
         # exit()
 
@@ -1207,7 +1211,7 @@ def main(args):
                 unet_lora_layers_to_save = unet_attn_processors_state_dict(model)
                 if(args.unet_tune_mlp):
                     unet_lora_layers_to_save_ffn = unet_ffn_within_attn_processors_state_dict(unet)
-                    unet_lora_layers_to_save.update(unet_lora_layers_to_save_ffn)
+                    unet_lora_layers_to_save.update(unet_lora_layers_to_save_ffn) # added 
             elif isinstance(model, type(accelerator.unwrap_model(text_encoder_one))):
                 text_encoder_one_lora_layers_to_save = text_encoder_lora_state_dict(model,
                     attn_update_text=args.attn_update_text,
