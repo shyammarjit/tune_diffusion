@@ -35,7 +35,7 @@ class KronALinearLayer(nn.Module):
             a1 * b1 = d_out = out_features
             a2 * b2 = d_in = in_features
         
-        Note: Supported a1 and a2 must be in multiplier of {2, 3}
+        Note: Supported a1 and a2 must be in multiplier of 2
         """
         assert in_features%self.a2==0 and out_features%self.a1==0
         self.b2 = int(in_features/self.a2); self.b1 = int(out_features/self.a1)

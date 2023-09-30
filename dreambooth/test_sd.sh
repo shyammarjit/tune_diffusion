@@ -1,16 +1,18 @@
 subjects="teapot"
 attn_update_unet="kqvo"
 # unet parameters
-krona_unet_k_rank_a1=32 # k 
-krona_unet_k_rank_a2=16 # k
-krona_unet_q_rank_a1=32 # q
-krona_unet_q_rank_a2=16 # q
-krona_unet_v_rank_a1=32 # v
-krona_unet_v_rank_a2=16 # v
-krona_unet_o_rank_a1=32 # out
-krona_unet_o_rank_a2=16 # out
-krona_unet_ffn_rank_a1=32 # out
-krona_unet_ffn_rank_a2=16 # out
+a1=2
+a2=2
+krona_unet_k_rank_a1=$a1 # k 
+krona_unet_k_rank_a2=$a2 # k
+krona_unet_q_rank_a1=$a1 # q
+krona_unet_q_rank_a2=$a2 # q
+krona_unet_v_rank_a1=$a1 # v
+krona_unet_v_rank_a2=$a2 # v
+krona_unet_o_rank_a1=$a1 # out
+krona_unet_o_rank_a2=$a2 # out
+krona_unet_ffn_rank_a1=$a1 # out
+krona_unet_ffn_rank_a2=$a2 # out
 
 lr=1e-3
 steps=2
@@ -38,17 +40,17 @@ accelerate launch train_dreambooth_lora.py \
     --gradient_checkpointing \
     --enable_xformers_memory_efficient_attention \
     --attn_update_unet=$attn_update_unet \
-    --krona_unet_k_rank_a1=32 \
-    --krona_unet_k_rank_a2=16 \
-    --krona_unet_q_rank_a1=32 \
-    --krona_unet_q_rank_a2=16 \
-    --krona_unet_v_rank_a1=32 \
-    --krona_unet_v_rank_a2=16 \
-    --krona_unet_o_rank_a1=32 \
-    --krona_unet_o_rank_a2=16 \
-    --krona_unet_ffn_rank_a1=32 \
-    --krona_unet_ffn_rank_a2=16 \
-    --unet_tune_mlp \
+    --krona_unet_k_rank_a1=$krona_unet_k_rank_a1 \
+    --krona_unet_k_rank_a2=$krona_unet_k_rank_a2 \
+    --krona_unet_q_rank_a1=$krona_unet_q_rank_a1 \
+    --krona_unet_q_rank_a2=$krona_unet_q_rank_a2 \
+    --krona_unet_v_rank_a1=$krona_unet_v_rank_a1 \
+    --krona_unet_v_rank_a2=$krona_unet_v_rank_a2 \
+    --krona_unet_o_rank_a1=$krona_unet_o_rank_a1 \
+    --krona_unet_o_rank_a2=$krona_unet_o_rank_a2 \
+    --krona_unet_ffn_rank_a1=$krona_unet_ffn_rank_a1 \
+    --krona_unet_ffn_rank_a2=$krona_unet_ffn_rank_a2 \
+    # --unet_tune_mlp \
     # --attn_update_text=$attn_update_text \
     # --train_text_encoder \
 
@@ -72,17 +74,17 @@ python3 generator_test.py \
     --gradient_checkpointing \
     --enable_xformers_memory_efficient_attention \
     --attn_update_unet=$attn_update_unet \
-    --krona_unet_k_rank_a1=32 \
-    --krona_unet_k_rank_a2=16 \
-    --krona_unet_q_rank_a1=32 \
-    --krona_unet_q_rank_a2=16 \
-    --krona_unet_v_rank_a1=32 \
-    --krona_unet_v_rank_a2=16 \
-    --krona_unet_o_rank_a1=32 \
-    --krona_unet_o_rank_a2=16 \
-    --krona_unet_ffn_rank_a1=32 \
-    --krona_unet_ffn_rank_a2=16 \
-    --unet_tune_mlp \
+    --krona_unet_k_rank_a1=$krona_unet_k_rank_a1 \
+    --krona_unet_k_rank_a2=$krona_unet_k_rank_a2 \
+    --krona_unet_q_rank_a1=$krona_unet_q_rank_a1 \
+    --krona_unet_q_rank_a2=$krona_unet_q_rank_a2 \
+    --krona_unet_v_rank_a1=$krona_unet_v_rank_a1 \
+    --krona_unet_v_rank_a2=$krona_unet_v_rank_a2 \
+    --krona_unet_o_rank_a1=$krona_unet_o_rank_a1 \
+    --krona_unet_o_rank_a2=$krona_unet_o_rank_a2 \
+    --krona_unet_ffn_rank_a1=$krona_unet_ffn_rank_a1 \
+    --krona_unet_ffn_rank_a2=$krona_unet_ffn_rank_a2 \
+    # --unet_tune_mlp \
     # --attn_update_text=$attn_update_text \
     # --train_text_encoder \
     # --delete_and_upload_drive

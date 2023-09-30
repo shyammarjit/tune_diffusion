@@ -67,8 +67,8 @@ accelerate launch train_dreambooth_lora.py \
     --krona_text_v_rank_a2=$krona_text_v_rank_a2 \
     --krona_text_o_rank_a1=$krona_text_o_rank_a1 \
     --krona_text_o_rank_a2=$krona_text_o_rank_a2 \
-    --unet_tune_mlp \
     --train_text_encoder \
+    --unet_tune_mlp \
     # --attn_update_text=$attn_update_text \
     
 
@@ -111,6 +111,6 @@ python3 generator_test.py \
     --krona_text_v_rank_a2=$krona_text_v_rank_a2 \
     --krona_text_o_rank_a1=$krona_text_o_rank_a1 \
     --krona_text_o_rank_a2=$krona_text_o_rank_a2 \
-    --unet_tune_mlp \
     --train_text_encoder \
+    --unet_tune_mlp \
     # --delete_and_upload_drive
