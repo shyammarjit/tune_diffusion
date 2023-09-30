@@ -1526,13 +1526,17 @@ class LoraLoaderMixin:
                             ] = text_encoder_lora_state_dict.pop(f"{name}.to_out_lora.down.weight")
 
                 if("o" in attn_update_text):
-                    rank_out = text_encoder_lora_state_dict[
-                        "text_model.encoder.layers.0.self_attn.out_proj.lora_linear_layer.up.weight"
-                    ].shape[1]
-                    print(text_encoder_lora_state_dict[
-                        "text_model.encoder.layers.0.self_attn.out_proj.lora_linear_layer.up.weight"
-                    ])
-                    # exit()
+                    if adapter_type=="lora":
+                        rank_out = text_encoder_lora_state_dict[
+                            "text_model.encoder.layers.0.self_attn.out_proj.lora_linear_layer.up.weight"
+                        ].shape[1]
+                    elif adapter_type=="krona":
+                        rank_out = text_encoder_lora_state_dict[
+                            "text_model.encoder.layers.0.self_attn.out_proj.lora_linear_layer.up.weight"
+                        ].shape[1]
+                    else:
+                        raise AttributeError("Currently only LoRA and KronA are supported.")
+                        
                 
                 if("k" in attn_update_text):
                     rank_k = text_encoder_lora_state_dict[

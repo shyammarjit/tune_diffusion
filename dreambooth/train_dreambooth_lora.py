@@ -1266,16 +1266,26 @@ def main(args):
     # The text encoder comes from 🤗 transformers, so we cannot directly modify it.
     # So, instead, we monkey-patch the forward calls of its attention-blocks.
     if args.train_text_encoder:
-        # ensure that dtype is float32, even if rest of the model that isn't trained is loaded in fp16        
-        text_lora_parameters = LoraLoaderMixin._modify_text_encoder(
-            text_encoder_one, dtype=torch.float32, adapter_type=args.adapter_type, attn_update_text=args.attn_update_text,
-            rank_k=args.text_lora_rank_k if "k" in args.attn_update_text else None, # added 
-            rank_q=args.text_lora_rank_q if "q" in args.attn_update_text else None, # added
-            rank_v=args.text_lora_rank_v if "v" in args.attn_update_text else None, # added 
-            rank_o=args.text_lora_rank_out if "o" in args.attn_update_text else None, # added
-            rank_mlp=args.text_lora_rank_mlp if args.text_tune_mlp else None, # added
-            patch_mlp=args.text_tune_mlp,
-        )
+        # ensure that dtype is float32, even if rest of the model that isn't trained is loaded in fp16    
+        if args.adapter_type=="lora":
+            text_lora_parameters = LoraLoaderMixin._modify_text_encoder(
+                text_encoder, dtype=torch.float32, adapter_type=args.adapter_type, attn_update_text=args.attn_update_text,
+                rank_k=args.text_lora_rank_k if "k" in args.attn_update_text else None, # added 
+                rank_q=args.text_lora_rank_q if "q" in args.attn_update_text else None, # added
+                rank_v=args.text_lora_rank_v if "v" in args.attn_update_text else None, # added 
+                rank_o=args.text_lora_rank_out if "o" in args.attn_update_text else None, # added
+                rank_mlp=args.text_lora_rank_mlp if args.text_tune_mlp else None, # added
+                patch_mlp=args.text_tune_mlp,
+            )
+        elif args.adapter_type=="krona":
+            # ToDo: Text encoder ffn/mlp updates are not added.
+            text_lora_parameters = LoraLoaderMixin._modify_text_encoder(
+                text_encoder, dtype=torch.float32, adapter_type=args.adapter_type, attn_update_text=args.attn_update_text,
+                rank_k=(args.krona_text_k_rank_a1, args.krona_text_k_rank_a1) if "k" in args.attn_update_text else None, # added 
+                rank_q=(args.krona_text_q_rank_a1, args.krona_text_q_rank_a1) if "q" in args.attn_update_text else None, # added
+                rank_v=(args.krona_text_v_rank_a1, args.krona_text_v_rank_a1) if "v" in args.attn_update_text else None, # added 
+                rank_o=(args.krona_text_o_rank_a1, args.krona_text_o_rank_a1) if "o" in args.attn_update_text else None, # added
+            )
 
     # create custom saving & loading hooks so that `accelerator.save_state(...)` serializes in a nice format
     def save_model_hook(models, weights, output_dir):
@@ -1480,9 +1490,7 @@ def main(args):
     # count numbr of parameters
     num_params = sum(p.numel() for p in unet.parameters() if p.requires_grad)
     if(args.train_text_encoder):
-        num_params_t1 = sum(p.numel() for p in text_encoder_one.parameters() if p.requires_grad)
-        num_params_t2 = sum(p.numel() for p in text_encoder_two.parameters() if p.requires_grad)
-        num_params_text = num_params_t1 + num_params_t2
+        num_params_text = sum(p.numel() for p in text_encoder.parameters() if p.requires_grad)
     else: num_params_text = 0
 
     logger.info(f"  Total learnable parameters: {num_params + num_params_text}\n") # number of parameters
@@ -1521,7 +1529,7 @@ def main(args):
         if args.train_text_encoder:
             text_encoder.train()
             # set top parameter requires_grad = True for gradient checkpointing works
-            text_encoder_one.text_model.embeddings.requires_grad_(True)
+            text_encoder.text_model.embeddings.requires_grad_(True)
             
         for step, batch in enumerate(train_dataloader):
             # Skip steps until we reach the resumed step

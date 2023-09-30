@@ -1,5 +1,6 @@
 subjects="teapot"
 attn_update_unet="kqvo"
+attn_update_text="kqvo"
 # unet parameters
 krona_unet_k_rank_a1=32 # k 
 krona_unet_k_rank_a2=16 # k
@@ -47,6 +48,7 @@ accelerate launch train_dreambooth_lora.py \
     --gradient_checkpointing \
     --enable_xformers_memory_efficient_attention \
     --attn_update_unet=$attn_update_unet \
+    --attn_update_text=$attn_update_text \
     --krona_unet_k_rank_a1=$krona_unet_k_rank_a1 \
     --krona_unet_k_rank_a2=$krona_unet_k_rank_a1 \
     --krona_unet_q_rank_a1=$krona_unet_q_rank_a1 \
@@ -90,6 +92,7 @@ python3 generator_test.py \
     --gradient_checkpointing \
     --enable_xformers_memory_efficient_attention \
     --attn_update_unet=$attn_update_unet \
+    --attn_update_text=$attn_update_text \
     --krona_unet_k_rank_a1=32 \
     --krona_unet_k_rank_a2=16 \
     --krona_unet_q_rank_a1=32 \
@@ -110,6 +113,4 @@ python3 generator_test.py \
     --krona_text_o_rank_a1=$krona_text_o_rank_a1 \
     --krona_text_o_rank_a2=$krona_text_o_rank_a2 \
     --train_text_encoder \
-    # --attn_update_text=$attn_update_text \
-    # --train_text_encoder \
     # --delete_and_upload_drive
