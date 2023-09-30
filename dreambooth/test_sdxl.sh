@@ -52,7 +52,7 @@ accelerate launch train_dreambooth_lora_sdxl.py \
     # --attn_update_text=$attn_update_text \
     # --train_text_encoder \
 
-python3 generator_test.py \
+python3 generator.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
     --instance_data_dir=$INSTANCE_DIR \
     --output_dir=$OUTPUT_DIR \

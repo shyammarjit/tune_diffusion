@@ -52,37 +52,37 @@ accelerate launch train_dreambooth_lora.py \
     # --attn_update_text=$attn_update_text \
     # --train_text_encoder \
 
-# python3 generator_test.py \
-#     --pretrained_model_name_or_path=$MODEL_NAME \
-#     --instance_data_dir=$INSTANCE_DIR \
-#     --output_dir=$OUTPUT_DIR \
-#     --mixed_precision="fp16" \
-#     --instance_prompt="a photo of sks${subjects}" \
-#     --resolution=1024 \
-#     --train_batch_size=1 \
-#     --gradient_accumulation_steps=4 \
-#     --learning_rate=$lr \
-#     --lr_scheduler="constant" \
-#     --lr_warmup_steps=0 \
-#     --max_train_steps=$steps \
-#     --adapter_type="krona" \
-#     --seed="0" \
-#     --diffusion_model="base" \
-#     --use_8bit_adam \
-#     --gradient_checkpointing \
-#     --enable_xformers_memory_efficient_attention \
-#     --attn_update_unet=$attn_update_unet \
-#     --krona_unet_k_rank_a1=32 \
-#     --krona_unet_k_rank_a2=16 \
-#     --krona_unet_q_rank_a1=32 \
-#     --krona_unet_q_rank_a2=16 \
-#     --krona_unet_v_rank_a1=32 \
-#     --krona_unet_v_rank_a2=16 \
-#     --krona_unet_o_rank_a1=32 \
-#     --krona_unet_o_rank_a2=16 \
-#     --krona_unet_ffn_rank_a1=32 \
-#     --krona_unet_ffn_rank_a2=16 \
-#     # --unet_tune_mlp \
-#     # --attn_update_text=$attn_update_text \
-#     # --train_text_encoder \
-#     # --delete_and_upload_drive
+python3 generator_test.py \
+    --pretrained_model_name_or_path=$MODEL_NAME \
+    --instance_data_dir=$INSTANCE_DIR \
+    --output_dir=$OUTPUT_DIR \
+    --mixed_precision="fp16" \
+    --instance_prompt="a photo of sks${subjects}" \
+    --resolution=1024 \
+    --train_batch_size=1 \
+    --gradient_accumulation_steps=4 \
+    --learning_rate=$lr \
+    --lr_scheduler="constant" \
+    --lr_warmup_steps=0 \
+    --max_train_steps=$steps \
+    --adapter_type="krona" \
+    --seed="0" \
+    --diffusion_model="base" \
+    --use_8bit_adam \
+    --gradient_checkpointing \
+    --enable_xformers_memory_efficient_attention \
+    --attn_update_unet=$attn_update_unet \
+    --krona_unet_k_rank_a1=32 \
+    --krona_unet_k_rank_a2=16 \
+    --krona_unet_q_rank_a1=32 \
+    --krona_unet_q_rank_a2=16 \
+    --krona_unet_v_rank_a1=32 \
+    --krona_unet_v_rank_a2=16 \
+    --krona_unet_o_rank_a1=32 \
+    --krona_unet_o_rank_a2=16 \
+    --krona_unet_ffn_rank_a1=32 \
+    --krona_unet_ffn_rank_a2=16 \
+    --unet_tune_mlp \
+    # --attn_update_text=$attn_update_text \
+    # --train_text_encoder \
+    # --delete_and_upload_drive

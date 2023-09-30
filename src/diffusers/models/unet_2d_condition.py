@@ -673,7 +673,7 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                     elif adapter_type == "krona":
                         from .lora import KronALinearLayer
                         # lora_mlp_rank is a tuple here 
-                        print(lora_mlp_rank)
+                        # print(lora_mlp_rank)
                         module.set_lora_layer(lora_layer=KronALinearLayer(args[0], args[1], rank = lora_mlp_rank)) 
                     else:
                         raise AttributeError("Wrong adapter type")

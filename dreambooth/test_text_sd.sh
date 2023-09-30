@@ -1,24 +1,30 @@
 subjects="teapot"
 attn_update_unet="kqvo"
-attn_update_text="kvqo"
 # unet parameters
-unet_lora_rank_k=4
-unet_lora_rank_q=4
-unet_lora_rank_v=4
-unet_lora_rank_o=4
-unet_lora_rank_mlp=4
+krona_unet_k_rank_a1=32 # k 
+krona_unet_k_rank_a2=16 # k
+krona_unet_q_rank_a1=32 # q
+krona_unet_q_rank_a2=16 # q
+krona_unet_v_rank_a1=32 # v
+krona_unet_v_rank_a2=16 # v
+krona_unet_o_rank_a1=32 # out
+krona_unet_o_rank_a2=16 # out
+krona_unet_ffn_rank_a1=32 # out
+krona_unet_ffn_rank_a2=16 # out
 
-# text encoder parameters
-text_lora_rank_k=4
-text_lora_rank_q=4
-text_lora_rank_v=4
-text_lora_rank_o=4
-text_lora_rank_mlp=4
+krona_text_k_rank_a1=32 # k 
+krona_text_k_rank_a2=16 # k
+krona_text_q_rank_a1=32 # q
+krona_text_q_rank_a2=16 # q
+krona_text_v_rank_a1=32 # v
+krona_text_v_rank_a2=16 # v
+krona_text_o_rank_a1=32 # out
+krona_text_o_rank_a2=16 # out
 
-lr=1e-4
-steps=5
+lr=1e-3
+steps=2
 export MODEL_NAME="stabilityai/stable-diffusion-2-1"
-export OUTPUT_DIR="/home/nmathur/test_text"
+export OUTPUT_DIR="/home/nmathur/test"
 export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
 
 accelerate launch train_dreambooth_lora.py \
@@ -34,54 +40,76 @@ accelerate launch train_dreambooth_lora.py \
     --lr_scheduler="constant" \
     --lr_warmup_steps=0 \
     --max_train_steps=$steps \
-    --adapter_type="lora" \
+    --adapter_type="krona" \
     --seed="0" \
-    --diffusion_model="sdxl" \
+    --diffusion_model="base" \
     --use_8bit_adam \
     --gradient_checkpointing \
-    --attn_update_unet=$attn_update_unet \
     --enable_xformers_memory_efficient_attention \
-    --unet_lora_rank_k=$unet_lora_rank_k \
-    --unet_lora_rank_q=$unet_lora_rank_q \
-    --unet_lora_rank_v=$unet_lora_rank_v \
-    --unet_lora_rank_out=$unet_lora_rank_o \
-    --attn_update_text=$attn_update_text \
+    --attn_update_unet=$attn_update_unet \
+    --krona_unet_k_rank_a1=$krona_unet_k_rank_a1 \
+    --krona_unet_k_rank_a2=$krona_unet_k_rank_a1 \
+    --krona_unet_q_rank_a1=$krona_unet_q_rank_a1 \
+    --krona_unet_q_rank_a2=$krona_unet_q_rank_a2 \
+    --krona_unet_v_rank_a1=$krona_unet_v_rank_a1 \
+    --krona_unet_v_rank_a2=$krona_unet_v_rank_a2 \
+    --krona_unet_o_rank_a1=$krona_unet_o_rank_a1 \
+    --krona_unet_o_rank_a2=$krona_unet_o_rank_a2 \
+    --krona_unet_ffn_rank_a1=$krona_unet_ffn_rank_a1 \
+    --krona_unet_ffn_rank_a2=$krona_unet_ffn_rank_a2 \
+    --krona_text_k_rank_a1=$krona_text_k_rank_a1 \
+    --krona_text_k_rank_a2=$krona_text_k_rank_a2 \
+    --krona_text_q_rank_a1=$krona_text_q_rank_a1 \
+    --krona_text_q_rank_a2=$krona_text_q_rank_a2 \
+    --krona_text_v_rank_a1=$krona_text_v_rank_a1 \
+    --krona_text_v_rank_a2=$krona_text_v_rank_a2 \
+    --krona_text_o_rank_a1=$krona_text_o_rank_a1 \
+    --krona_text_o_rank_a2=$krona_text_o_rank_a2 \
+    --unet_tune_mlp \
     --train_text_encoder \
-    --unet_lora_rank_k=$unet_lora_rank_k \
-    --unet_lora_rank_q=$unet_lora_rank_q \
-    --unet_lora_rank_v=$unet_lora_rank_v \
-    --unet_lora_rank_out=$unet_lora_rank_o \
-    --text_lora_rank_mlp=$text_lora_rank_mlp \
-    # --text_tune_mlp \
-    # --unet_tune_mlp \
+    # --attn_update_text=$attn_update_text \
     
 
-# python3 generator.py \
-#     --pretrained_model_name_or_path=$MODEL_NAME \
-#     --instance_data_dir=$INSTANCE_DIR \
-#     --output_dir=$OUTPUT_DIR \
-#     --mixed_precision="fp16" \
-#     --instance_prompt="a photo of sks${subjects}" \
-#     --resolution=1024 \
-#     --train_batch_size=1 \
-#     --gradient_accumulation_steps=4 \
-#     --learning_rate=$lr \
-#     --lr_scheduler="constant" \
-#     --lr_warmup_steps=0 \
-#     --max_train_steps=$steps \
-#     --adapter_type="lora" \
-#     --seed="0" \
-#     --diffusion_model="sdxl" \
-#     --use_8bit_adam \
-#     --gradient_checkpointing \
-#     --attn_update_unet=$attn_update_unet \
-#     --enable_xformers_memory_efficient_attention \
-#     --unet_lora_rank_k=$unet_lora_rank_k \
-#     --unet_lora_rank_q=$unet_lora_rank_q \
-#     --unet_lora_rank_v=$unet_lora_rank_v \
-#     --unet_lora_rank_out=$unet_lora_rank_o \
-#     # --unet_lora_rank_mlp=$unet_lora_rank_mlp \
-#     # --unet_tune_mlp \
-# #     # --attn_update_text=$attn_update_text \
-# #     # --train_text_encoder \
-# #     # --delete_and_upload_drive
+python3 generator_test.py \
+    --pretrained_model_name_or_path=$MODEL_NAME \
+    --instance_data_dir=$INSTANCE_DIR \
+    --output_dir=$OUTPUT_DIR \
+    --mixed_precision="fp16" \
+    --instance_prompt="a photo of sks${subjects}" \
+    --resolution=1024 \
+    --train_batch_size=1 \
+    --gradient_accumulation_steps=4 \
+    --learning_rate=$lr \
+    --lr_scheduler="constant" \
+    --lr_warmup_steps=0 \
+    --max_train_steps=$steps \
+    --adapter_type="krona" \
+    --seed="0" \
+    --diffusion_model="base" \
+    --use_8bit_adam \
+    --gradient_checkpointing \
+    --enable_xformers_memory_efficient_attention \
+    --attn_update_unet=$attn_update_unet \
+    --krona_unet_k_rank_a1=32 \
+    --krona_unet_k_rank_a2=16 \
+    --krona_unet_q_rank_a1=32 \
+    --krona_unet_q_rank_a2=16 \
+    --krona_unet_v_rank_a1=32 \
+    --krona_unet_v_rank_a2=16 \
+    --krona_unet_o_rank_a1=32 \
+    --krona_unet_o_rank_a2=16 \
+    --krona_unet_ffn_rank_a1=32 \
+    --krona_unet_ffn_rank_a2=16 \
+    --unet_tune_mlp \
+    --krona_text_k_rank_a1=$krona_text_k_rank_a1 \
+    --krona_text_k_rank_a2=$krona_text_k_rank_a2 \
+    --krona_text_q_rank_a1=$krona_text_q_rank_a1 \
+    --krona_text_q_rank_a2=$krona_text_q_rank_a2 \
+    --krona_text_v_rank_a1=$krona_text_v_rank_a1 \
+    --krona_text_v_rank_a2=$krona_text_v_rank_a2 \
+    --krona_text_o_rank_a1=$krona_text_o_rank_a1 \
+    --krona_text_o_rank_a2=$krona_text_o_rank_a2 \
+    --train_text_encoder \
+    # --attn_update_text=$attn_update_text \
+    # --train_text_encoder \
+    # --delete_and_upload_drive

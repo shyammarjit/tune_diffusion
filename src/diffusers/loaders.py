@@ -66,8 +66,7 @@ CUSTOM_DIFFUSION_WEIGHT_NAME_SAFE = "pytorch_custom_diffusion_weights.safetensor
 class PatchedLoraProjection(nn.Module):
     def __init__(self, regular_linear_layer, lora_scale=1, network_alpha=None, rank=4, dtype=None, adapter_type=None):
         super().__init__()
-        from .models.lora import LoRALinearLayer
-        from .models.krona import KronALinearLayer
+        from .models.lora import LoRALinearLayer, KronALinearLayer
 
         self.regular_linear_layer = regular_linear_layer
 
@@ -294,7 +293,7 @@ class UNet2DConditionLoadersMixin:
             SlicedAttnAddedKVProcessor,
             XFormersAttnProcessor,
         )
-        from .models.lora import LoRACompatibleConv, LoRACompatibleLinear, LoRAConv2dLayer, LoRALinearLayer
+        from .models.lora import LoRACompatibleConv, LoRACompatibleLinear, LoRAConv2dLayer, LoRALinearLayer, KronALinearLayer
         cache_dir = kwargs.pop("cache_dir", DIFFUSERS_CACHE)
         force_download = kwargs.pop("force_download", False)
         resume_download = kwargs.pop("resume_download", False)
@@ -389,6 +388,7 @@ class UNet2DConditionLoadersMixin:
             mapped_network_alphas = {}
 
             all_keys = list(state_dict.keys())
+            
             for key in all_keys:
                 value = state_dict.pop(key)
                 attn_processor_key, sub_key = ".".join(key.split(".")[:-3]), ".".join(key.split(".")[-3:])
@@ -411,7 +411,10 @@ class UNet2DConditionLoadersMixin:
                 raise ValueError(
                     f"The `state_dict` has to be empty at this point but has the following keys \n\n {', '.join(state_dict.keys())}"
                 )
-
+            
+            # print(lora_grouped_dict.keys())
+            # exit()
+            
             for key, value_dict in lora_grouped_dict.items():
                 attn_processor = self
                 for sub_key in key.split("."):
@@ -454,9 +457,18 @@ class UNet2DConditionLoadersMixin:
 
                 elif "lora_layer.down.weight" in value_dict:
                     if(adapter_type=="lora"): rank = value_dict["lora_layer.down.weight"].shape[0]
-                    elif(adapter_type=="krona"): raise ValueError("Currently not supported.")
+                    elif(adapter_type=="krona"):
+                        # raise ValueError("Currently not supported.")
+                        rank_a2, rank_a1 = value_dict["lora_layer.down.weight"].shape # A
+                        rank_b1, rank_b2 = value_dict[f"lora_layer.up.weight"].shape # B
+                        # print(rank_a1, rank_a2, rank_b1, rank_b2)
+                        rank = (rank_a1, rank_a2)
+                        hidden_size = rank_a1 * rank_b1 # in_features
+                            
                     else: raise ValueError("Only LoRA and KronA supported.")
 
+                    # print("2nd", key, value_dict.keys())
+                    # exit()
                     if isinstance(attn_processor, LoRACompatibleConv):
                         in_features = attn_processor.in_channels
                         out_features = attn_processor.out_channels
@@ -471,19 +483,35 @@ class UNet2DConditionLoadersMixin:
                             padding=attn_processor.padding,
                             network_alpha=mapped_network_alphas.get(key),
                         )
+                        # ToDo: need to add krona here as well in future.
                     elif isinstance(attn_processor, LoRACompatibleLinear):
-                        lora = LoRALinearLayer(
-                            attn_processor.in_features,
-                            attn_processor.out_features,
-                            rank,
-                            mapped_network_alphas.get(key),
-                        )
+                        if adapter_type =="lora":
+                            lora = LoRALinearLayer(
+                                attn_processor.in_features,
+                                attn_processor.out_features,
+                                rank,
+                                mapped_network_alphas.get(key),
+                                device=self.device, 
+                                dtype=self.dtype,
+                            )
+                        elif adapter_type == "krona":
+                            lora = KronALinearLayer(
+                                attn_processor.in_features,
+                                attn_processor.out_features,
+                                rank,
+                                mapped_network_alphas.get(key),
+                                device=self.device, 
+                                dtype=self.dtype,
+                            )
+                        else:
+                            raise AttributeError(f"Currently only LoRA and KronA are supported.")
                     else:
                         raise ValueError(f"Module {key} is not a LoRACompatibleConv or LoRACompatibleLinear module.")
 
                     value_dict = {k.replace("lora_layer.", ""): v for k, v in value_dict.items()}
                     lora.load_state_dict(value_dict)
                     non_attn_lora_layers.append((attn_processor, lora))
+                
                 else: 
                     # To handle SDXL.
                     
