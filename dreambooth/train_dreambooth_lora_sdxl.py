@@ -1215,12 +1215,12 @@ def main(args):
             elif isinstance(model, type(accelerator.unwrap_model(text_encoder_one))):
                 text_encoder_one_lora_layers_to_save = text_encoder_lora_state_dict(model,
                     attn_update_text=args.attn_update_text,
-                    text_tune_mlp=args.text_tune_mlp,
+                    # text_tune_mlp=args.text_tune_mlp,
                 )
             elif isinstance(model, type(accelerator.unwrap_model(text_encoder_two))):
                 text_encoder_two_lora_layers_to_save = text_encoder_lora_state_dict(model,
                     attn_update_text=args.attn_update_text,
-                    text_tune_mlp=args.text_tune_mlp,
+                    # text_tune_mlp=args.text_tune_mlp,
                 )
             else:
                 raise ValueError(f"unexpected save model: {model.__class__}")
@@ -1874,5 +1874,4 @@ def main(args):
 
 if __name__ == "__main__":
     args = parse_args()
-    setup_logger(output=args.output_dir, name_of_file="log") # set up our own logger
     main(args)

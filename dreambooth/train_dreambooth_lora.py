@@ -1765,7 +1765,7 @@ def main(args):
         if text_encoder is not None and args.train_text_encoder:
             text_encoder = accelerator.unwrap_model(text_encoder)
             text_encoder = text_encoder.to(torch.float32)
-            text_encoder_lora_layers = text_encoder_lora_state_dict(text_encoder)
+            text_encoder_lora_layers = text_encoder_lora_state_dict(text_encoder, attn_update_text=args.attn_update_text)
         else:
             text_encoder_lora_layers = None
 
@@ -1855,5 +1855,4 @@ def main(args):
 
 if __name__ == "__main__":
     args = parse_args()
-    setup_logger(output=args.output_dir, name_of_file="log") # set up our own logger
     main(args)
