@@ -1627,16 +1627,13 @@ def main(args):
                 lr_scheduler.step()
                 optimizer.zero_grad()
                 
-                # print("shyam")
+                # Check if all grad are ok or not? ANS: ALL OK.
                 # for i in range(len(unet_lora_parameters)):
                 #     if unet_lora_parameters[i].grad is None:
                 #         print("unet",i)
                 # for i in range(len(text_lora_parameters)):
                 #     if text_lora_parameters[i].grad is None:
                 #         print("t1", i)
-                # # print(text_lora_parameters[-1].grad)
-                # exit()
-                # print(len(unet_lora_parameters))
 
             # Checks if the accelerator has performed an optimization step behind the scenes
             if accelerator.sync_gradients:

@@ -12,14 +12,14 @@ krona_unet_k_rank_a2=$a2 # k
 krona_unet_q_rank_a1=$a1 # q
 krona_unet_q_rank_a2=$a2 # q
 krona_unet_v_rank_a1=$a1 # v
-krona_unet_v_rank_a2=16 # v
-krona_unet_o_rank_a1=32 # out
+krona_unet_v_rank_a2=$a2 # v
+krona_unet_o_rank_a1=$a1 # out
 krona_unet_o_rank_a2=$a2 # out
 krona_unet_ffn_rank_a1=$a1 # out
 krona_unet_ffn_rank_a2=$a2 # out
 
 lr=1e-3
-steps=2
+steps=1000
 
 
 accelerate launch train_dreambooth_lora_sdxl.py \
@@ -52,9 +52,7 @@ accelerate launch train_dreambooth_lora_sdxl.py \
     --krona_unet_o_rank_a2=$krona_unet_o_rank_a2 \
     --krona_unet_ffn_rank_a1=$krona_unet_ffn_rank_a1 \
     --krona_unet_ffn_rank_a2=$krona_unet_ffn_rank_a2 \
-    # --unet_tune_mlp \
-    # --attn_update_text=$attn_update_text \
-    # --train_text_encoder \
+    --unet_tune_mlp \
 
 python3 generator.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
@@ -87,6 +85,4 @@ python3 generator.py \
     --krona_unet_ffn_rank_a1=$krona_unet_ffn_rank_a1 \
     --krona_unet_ffn_rank_a2=$krona_unet_ffn_rank_a2 \
     # --unet_tune_mlp \
-    # --attn_update_text=$attn_update_text \
-    # --train_text_encoder \
     # --delete_and_upload_drive
