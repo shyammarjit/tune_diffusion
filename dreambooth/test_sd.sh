@@ -1,8 +1,8 @@
 subjects="teapot"
-attn_update_unet="kqvo"
+attn_update_unet="kqv"
 # unet parameters
-a1=2
-a2=2
+a1=16
+a2=32
 krona_unet_k_rank_a1=$a1 # k 
 krona_unet_k_rank_a2=$a2 # k
 krona_unet_q_rank_a1=$a1 # q

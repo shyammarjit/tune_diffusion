@@ -1,32 +1,37 @@
 subjects="teapot"
-attn_update_unet="kqvo"
-attn_update_text="kqvo"
-# unet parameters
-krona_unet_k_rank_a1=32 # k 
-krona_unet_k_rank_a2=16 # k
-krona_unet_q_rank_a1=32 # q
-krona_unet_q_rank_a2=16 # q
-krona_unet_v_rank_a1=32 # v
-krona_unet_v_rank_a2=16 # v
-krona_unet_o_rank_a1=32 # out
-krona_unet_o_rank_a2=16 # out
-krona_unet_ffn_rank_a1=32 # out
-krona_unet_ffn_rank_a2=16 # out
-
-krona_text_k_rank_a1=32 # k 
-krona_text_k_rank_a2=16 # k
-krona_text_q_rank_a1=32 # q
-krona_text_q_rank_a2=16 # q
-krona_text_v_rank_a1=32 # v
-krona_text_v_rank_a2=16 # v
-krona_text_o_rank_a1=32 # out
-krona_text_o_rank_a2=16 # out
-
-lr=1e-3
-steps=2
 export MODEL_NAME="stabilityai/stable-diffusion-2-1"
 export OUTPUT_DIR="/home/nmathur/test_text_sd"
 export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
+
+attn_update_unet="kqvo"
+attn_update_text="kqvo"
+# unet parameters
+a1=16
+a2=32
+krona_unet_k_rank_a1=$a1 # k 
+krona_unet_k_rank_a2=$a2 # k
+krona_unet_q_rank_a1=$a1 # q
+krona_unet_q_rank_a2=$a2 # q
+krona_unet_v_rank_a1=$a1 # v
+krona_unet_v_rank_a2=$a2 # v
+krona_unet_o_rank_a1=$a1 # out
+krona_unet_o_rank_a2=$a2 # out
+krona_unet_ffn_rank_a1=$a1 # out
+krona_unet_ffn_rank_a2=$a2 # out
+
+# text encoder parameters
+krona_text_k_rank_a1=$a1 # k 
+krona_text_k_rank_a2=$a2 # k
+krona_text_q_rank_a1=$a1 # q
+krona_text_q_rank_a2=$a2 # q
+krona_text_v_rank_a1=$a1 # v
+krona_text_v_rank_a2=$a2 # v
+krona_text_o_rank_a1=$a1 # out
+krona_text_o_rank_a2=$a2 # out
+
+lr=1e-3
+steps=2
+
 
 accelerate launch train_dreambooth_lora.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
@@ -73,7 +78,7 @@ accelerate launch train_dreambooth_lora.py \
     
 
 python3 generator_test.py \
-        --pretrained_model_name_or_path=$MODEL_NAME \
+    --pretrained_model_name_or_path=$MODEL_NAME \
     --instance_data_dir=$INSTANCE_DIR \
     --output_dir=$OUTPUT_DIR \
     --mixed_precision="fp16" \
