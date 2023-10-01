@@ -1,7 +1,7 @@
 # WARNING: Currently having issue! Don't Run!
 subjects="teapot"
 export MODEL_NAME="stabilityai/stable-diffusion-2-1"
-export OUTPUT_DIR="/home/nmathur/test_text_sd"
+export OUTPUT_DIR="/home/nmathur/test"
 export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
 
 attn_update_unet="kqvo"
@@ -78,7 +78,7 @@ accelerate launch train_dreambooth_lora.py \
     # --attn_update_text=$attn_update_text \
     
 
-python3 generator_test.py \
+python3 generator.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
     --instance_data_dir=$INSTANCE_DIR \
     --output_dir=$OUTPUT_DIR \

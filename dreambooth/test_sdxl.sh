@@ -19,7 +19,7 @@ krona_unet_ffn_rank_a1=$a1 # out
 krona_unet_ffn_rank_a2=$a2 # out
 
 lr=1e-3
-steps=1000
+steps=2
 
 
 accelerate launch train_dreambooth_lora_sdxl.py \

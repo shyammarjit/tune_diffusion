@@ -1,6 +1,6 @@
 subjects="teapot"
 export MODEL_NAME="stabilityai/stable-diffusion-2-1"
-export OUTPUT_DIR="/home/nmathur/test_text_sd"
+export OUTPUT_DIR="/home/nmathur/test"
 export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
 
 attn_update_unet="kqvo"
@@ -55,7 +55,7 @@ accelerate launch train_dreambooth_lora.py \
     --attn_update_unet=$attn_update_unet \
     --attn_update_text=$attn_update_text \
     --krona_unet_k_rank_a1=$krona_unet_k_rank_a1 \
-    --krona_unet_k_rank_a2=$krona_unet_k_rank_a1 \
+    --krona_unet_k_rank_a2=$krona_unet_k_rank_a2 \
     --krona_unet_q_rank_a1=$krona_unet_q_rank_a1 \
     --krona_unet_q_rank_a2=$krona_unet_q_rank_a2 \
     --krona_unet_v_rank_a1=$krona_unet_v_rank_a1 \
@@ -73,7 +73,7 @@ accelerate launch train_dreambooth_lora.py \
     --krona_text_o_rank_a1=$krona_text_o_rank_a1 \
     --krona_text_o_rank_a2=$krona_text_o_rank_a2 \
     --train_text_encoder \
-    --unet_tune_mlp \
+    # --unet_tune_mlp \
     # --attn_update_text=$attn_update_text \
     
 
@@ -99,7 +99,7 @@ python3 generator_test.py \
     --attn_update_unet=$attn_update_unet \
     --attn_update_text=$attn_update_text \
     --krona_unet_k_rank_a1=$krona_unet_k_rank_a1 \
-    --krona_unet_k_rank_a2=$krona_unet_k_rank_a1 \
+    --krona_unet_k_rank_a2=$krona_unet_k_rank_a2 \
     --krona_unet_q_rank_a1=$krona_unet_q_rank_a1 \
     --krona_unet_q_rank_a2=$krona_unet_q_rank_a2 \
     --krona_unet_v_rank_a1=$krona_unet_v_rank_a1 \
@@ -117,5 +117,5 @@ python3 generator_test.py \
     --krona_text_o_rank_a1=$krona_text_o_rank_a1 \
     --krona_text_o_rank_a2=$krona_text_o_rank_a2 \
     --train_text_encoder \
-    --unet_tune_mlp \
+    # --unet_tune_mlp \
     # --delete_and_upload_drive
