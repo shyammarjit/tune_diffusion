@@ -1088,14 +1088,20 @@ def main(args):
 
         lora_state_dict, network_alphas = LoraLoaderMixin.lora_state_dict(input_dir)
         LoraLoaderMixin.load_lora_into_unet(lora_state_dict, network_alphas=network_alphas, unet=unet_,
+            adapter_type=args.adapter_type, # Added
+            attn_update_unet=args.attn_update_unet, # Added
         )
         text_encoder_state_dict = {k: v for k, v in lora_state_dict.items() if "text_encoder." in k}
         LoraLoaderMixin.load_lora_into_text_encoder(
-            text_encoder_state_dict, network_alphas=network_alphas, text_encoder=text_encoder_one_
+            text_encoder_state_dict, network_alphas=network_alphas, text_encoder=text_encoder_one_,
+            adapter_type=args.adapter_type, # Added
+            attn_update_text=args.attn_update_text, # Added
         )
         text_encoder_2_state_dict = {k: v for k, v in lora_state_dict.items() if "text_encoder_2." in k}
         LoraLoaderMixin.load_lora_into_text_encoder(
-            text_encoder_2_state_dict, network_alphas=network_alphas, text_encoder=text_encoder_two_
+            text_encoder_2_state_dict, network_alphas=network_alphas, text_encoder=text_encoder_two_,
+            adapter_type=args.adapter_type, # Added
+            attn_update_text=args.attn_update_text, # Added
         )
 
     accelerator.register_save_state_pre_hook(save_model_hook)
