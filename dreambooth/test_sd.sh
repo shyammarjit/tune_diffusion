@@ -1,5 +1,5 @@
 subjects="teapot"
-attn_update_unet="kqv"
+attn_update_unet="kqvo"
 # unet parameters
 a1=16
 a2=32
@@ -15,7 +15,7 @@ krona_unet_ffn_rank_a1=$a1 # out
 krona_unet_ffn_rank_a2=$a2 # out
 
 lr=1e-3
-steps=1000
+steps=2
 export MODEL_NAME="stabilityai/stable-diffusion-2-1"
 export OUTPUT_DIR="/home/nmathur/test"
 export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
@@ -50,11 +50,11 @@ accelerate launch train_dreambooth_lora.py \
     --krona_unet_o_rank_a2=$krona_unet_o_rank_a2 \
     --krona_unet_ffn_rank_a1=$krona_unet_ffn_rank_a1 \
     --krona_unet_ffn_rank_a2=$krona_unet_ffn_rank_a2 \
-    --unet_tune_mlp \
+    # --unet_tune_mlp \
     # --attn_update_text=$attn_update_text \
     # --train_text_encoder \
 
-python3 generator.py \
+python3 generator_test.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
     --instance_data_dir=$INSTANCE_DIR \
     --output_dir=$OUTPUT_DIR \
@@ -84,7 +84,7 @@ python3 generator.py \
     --krona_unet_o_rank_a2=$krona_unet_o_rank_a2 \
     --krona_unet_ffn_rank_a1=$krona_unet_ffn_rank_a1 \
     --krona_unet_ffn_rank_a2=$krona_unet_ffn_rank_a2 \
-    --unet_tune_mlp \
+    # --unet_tune_mlp \
     # --attn_update_text=$attn_update_text \
     # --train_text_encoder \
     # --delete_and_upload_drive

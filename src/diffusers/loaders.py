@@ -1151,6 +1151,7 @@ class LoraLoaderMixin:
                 network_alphas=network_alphas,
                 text_encoder=self.text_encoder,
                 lora_scale=self.lora_scale,
+                adapter_type=adapter_type,
                 attn_update_text=attn_update_text,
                 text_tune_mlp=text_tune_mlp,
             )
@@ -1531,27 +1532,72 @@ class LoraLoaderMixin:
                             "text_model.encoder.layers.0.self_attn.out_proj.lora_linear_layer.up.weight"
                         ].shape[1]
                     elif adapter_type=="krona":
-                        rank_out = text_encoder_lora_state_dict[
+                        rank_b1, rank_b2 = text_encoder_lora_state_dict[
                             "text_model.encoder.layers.0.self_attn.out_proj.lora_linear_layer.up.weight"
-                        ].shape[1]
+                        ].shape # B
+                        
+                        rank_a2, rank_a1 = text_encoder_lora_state_dict[
+                            "text_model.encoder.layers.0.self_attn.out_proj.lora_linear_layer.down.weight"
+                        ].shape # A
+                        rank_out = (rank_a1, rank_a2)
+                        
                     else:
                         raise AttributeError("Currently only LoRA and KronA are supported.")
                         
                 
                 if("k" in attn_update_text):
-                    rank_k = text_encoder_lora_state_dict[
-                        "text_model.encoder.layers.0.self_attn.k_proj.lora_linear_layer.up.weight"
-                    ].shape[1]
+                    if adapter_type=="lora":
+                        rank_k = text_encoder_lora_state_dict[
+                            "text_model.encoder.layers.0.self_attn.k_proj.lora_linear_layer.up.weight"
+                        ].shape[1]
+                    
+                    elif adapter_type=="krona":
+                        rank_b1, rank_b2 = text_encoder_lora_state_dict[
+                            "text_model.encoder.layers.0.self_attn.k_proj.lora_linear_layer.up.weight"
+                        ].shape # B
+                        
+                        rank_a2, rank_a1 = text_encoder_lora_state_dict[
+                            "text_model.encoder.layers.0.self_attn.k_proj.lora_linear_layer.down.weight"
+                        ].shape # A
+                        rank_k = (rank_a1, rank_a2)
+                    
+                    else:
+                        raise AttributeError("Currently only LoRA and KronA are supported.")
                 
                 if("q" in attn_update_text):
-                    rank_q = text_encoder_lora_state_dict[
-                        "text_model.encoder.layers.0.self_attn.q_proj.lora_linear_layer.up.weight"
-                    ].shape[1]
+                    if adapter_type=="lora":
+                        rank_q = text_encoder_lora_state_dict[
+                            "text_model.encoder.layers.0.self_attn.q_proj.lora_linear_layer.up.weight"
+                        ].shape[1]
+                    elif adapter_type=="krona":
+                        rank_b1, rank_b2 = text_encoder_lora_state_dict[
+                            "text_model.encoder.layers.0.self_attn.q_proj.lora_linear_layer.up.weight"
+                        ].shape # B
+                        
+                        rank_a2, rank_a1 = text_encoder_lora_state_dict[
+                            "text_model.encoder.layers.0.self_attn.q_proj.lora_linear_layer.down.weight"
+                        ].shape # A
+                        rank_q = (rank_a1, rank_a2)
+                    
+                    else:
+                        raise AttributeError("Currently only LoRA and KronA are supported.")
                 
                 if("v" in attn_update_text):
-                    rank_v = text_encoder_lora_state_dict[
-                        "text_model.encoder.layers.0.self_attn.v_proj.lora_linear_layer.up.weight"
-                    ].shape[1]
+                    if adapter_type=="lora":
+                        rank_v = text_encoder_lora_state_dict[
+                            "text_model.encoder.layers.0.self_attn.v_proj.lora_linear_layer.up.weight"
+                        ].shape[1]
+                    elif adapter_type=="krona":
+                        rank_b1, rank_b2 = text_encoder_lora_state_dict[
+                            "text_model.encoder.layers.0.self_attn.v_proj.lora_linear_layer.up.weight"
+                        ].shape # B
+                        
+                        rank_a2, rank_a1 = text_encoder_lora_state_dict[
+                            "text_model.encoder.layers.0.self_attn.v_proj.lora_linear_layer.down.weight"
+                        ].shape # A
+                        rank_v = (rank_a1, rank_a2)
+                    else:
+                        raise AttributeError("Currently only LoRA and KronA are supported.")
                     
                 patch_mlp = any(".mlp." in key for key in text_encoder_lora_state_dict.keys())
 
