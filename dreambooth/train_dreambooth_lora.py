@@ -67,7 +67,8 @@ from diffusers.models.attention_processor import (
 from diffusers.optimization import get_scheduler
 from diffusers.utils import check_min_version, is_wandb_available
 from diffusers.utils.import_utils import is_xformers_available
-
+from prompts import instance_prompt # Added 
+from diffusers.models.lora import LoRALinearLayer # Added
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
 check_min_version("0.21.0.dev0")
@@ -137,8 +138,6 @@ def import_model_class_from_model_name_or_path(pretrained_model_name_or_path: st
         return T5EncoderModel
     else:
         raise ValueError(f"{model_class} is not supported.")
-
-
 
 
 def struct_output(args):
@@ -620,7 +619,7 @@ def parse_args(input_args=None):
     parser.add_argument(
         "--diffusion_model",
         type=str,
-        default="sdxl",
+        default="base",
         help="Define the type of diffusion model to be used",
         choices=["sdxl", "base"],
     )
@@ -1157,8 +1156,26 @@ def main(args):
     # The text encoder comes from 🤗 transformers, so we cannot directly modify it.
     # So, instead, we monkey-patch the forward calls of its attention-blocks.
     if args.train_text_encoder:
-        # ensure that dtype is float32, even if rest of the model that isn't trained is loaded in fp16
-        text_lora_parameters = LoraLoaderMixin._modify_text_encoder(text_encoder, dtype=torch.float32, rank=args.rank)
+        # ensure that dtype is float32, even if rest of the model that isn't trained is loaded in fp16    
+        if args.adapter_type=="lora":
+            text_lora_parameters = LoraLoaderMixin._modify_text_encoder(
+                text_encoder, dtype=torch.float32, adapter_type=args.adapter_type, attn_update_text=args.attn_update_text,
+                rank_k=args.text_lora_rank_k if "k" in args.attn_update_text else None, # added 
+                rank_q=args.text_lora_rank_q if "q" in args.attn_update_text else None, # added
+                rank_v=args.text_lora_rank_v if "v" in args.attn_update_text else None, # added 
+                rank_o=args.text_lora_rank_out if "o" in args.attn_update_text else None, # added
+                rank_mlp=args.text_lora_rank_mlp if args.text_tune_mlp else None, # added
+                patch_mlp=args.text_tune_mlp,
+            )
+        elif args.adapter_type=="krona":
+            # ToDo: Text encoder ffn/mlp updates are not added.
+            text_lora_parameters = LoraLoaderMixin._modify_text_encoder(
+                text_encoder, dtype=torch.float32, adapter_type=args.adapter_type, attn_update_text=args.attn_update_text,
+                rank_k=(args.krona_text_k_rank_a1, args.krona_text_k_rank_a1) if "k" in args.attn_update_text else None, # added 
+                rank_q=(args.krona_text_q_rank_a1, args.krona_text_q_rank_a1) if "q" in args.attn_update_text else None, # added
+                rank_v=(args.krona_text_v_rank_a1, args.krona_text_v_rank_a1) if "v" in args.attn_update_text else None, # added 
+                rank_o=(args.krona_text_o_rank_a1, args.krona_text_o_rank_a1) if "o" in args.attn_update_text else None, # added
+            )
 
     # create custom saving & loading hooks so that `accelerator.save_state(...)` serializes in a nice format
     def save_model_hook(models, weights, output_dir):
@@ -1170,6 +1187,9 @@ def main(args):
         for model in models:
             if isinstance(model, type(accelerator.unwrap_model(unet))):
                 unet_lora_layers_to_save = unet_attn_processors_state_dict(model)
+                if(args.unet_tune_mlp):
+                    unet_lora_layers_to_save_ffn = unet_ffn_within_attn_processors_state_dict(unet)
+                    unet_lora_layers_to_save.update(unet_lora_layers_to_save_ffn) # added 
             elif isinstance(model, type(accelerator.unwrap_model(text_encoder))):
                 text_encoder_lora_layers_to_save = text_encoder_lora_state_dict(model)
             else:
@@ -1358,6 +1378,14 @@ def main(args):
     logger.info(f"  Total optimization steps = {args.max_train_steps}")
     global_step = 0
     first_epoch = 0
+    
+    # count numbr of parameters
+    num_params = sum(p.numel() for p in unet.parameters() if p.requires_grad)
+    if(args.train_text_encoder):
+        num_params_text = sum(p.numel() for p in text_encoder.parameters() if p.requires_grad)
+    else: num_params_text = 0
+
+    logger.info(f"  Total learnable parameters: {num_params + num_params_text}\n") # number of parameters
 
     # Potentially load in the weights and states from a previous save
     if args.resume_from_checkpoint:
@@ -1392,6 +1420,9 @@ def main(args):
         unet.train()
         if args.train_text_encoder:
             text_encoder.train()
+            # set top parameter requires_grad = True for gradient checkpointing works
+            text_encoder.text_model.embeddings.requires_grad_(True)
+            
         for step, batch in enumerate(train_dataloader):
             # Skip steps until we reach the resumed step
             if args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
@@ -1606,6 +1637,11 @@ def main(args):
         unet = accelerator.unwrap_model(unet)
         unet = unet.to(torch.float32)
         unet_lora_layers = unet_attn_processors_state_dict(unet)
+        
+        if(args.unet_tune_mlp): 
+            unet_lora_layers_ffn = unet_ffn_within_attn_processors_state_dict(unet)
+            # print(unet_lora_layers_ffn[list(unet_lora_layers_ffn.keys())[0]])
+            unet_lora_layers.update(unet_lora_layers_ffn)
 
         if text_encoder is not None and args.train_text_encoder:
             text_encoder = accelerator.unwrap_model(text_encoder)
@@ -1642,7 +1678,14 @@ def main(args):
         pipeline = pipeline.to(accelerator.device)
 
         # load attention processors
-        pipeline.load_lora_weights(args.output_dir, weight_name="pytorch_lora_weights.safetensors")
+        pipeline.load_lora_weights(args.output_dir,
+            adapter_type=args.adapter_type, 
+            attn_update_unet=args.attn_update_unet,
+            attn_update_text=args.attn_update_text,
+            text_tune_mlp=args.text_tune_mlp,
+            train_text_encoder=args.train_text_encoder,         
+            weight_name="pytorch_lora_weights.safetensors",
+        )
 
         # run inference
         images = []
@@ -1685,6 +1728,11 @@ def main(args):
             )
 
     accelerator.end_training()
+    
+    # delete the log folder completely
+    log_folder = os.path.join(args.output_dir, "logs")
+    if os.path.exists(log_folder):
+        shutil.rmtree(log_folder)
 
 
 if __name__ == "__main__":
