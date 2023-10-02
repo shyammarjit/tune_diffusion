@@ -19,7 +19,7 @@ krona_unet_ffn_rank_a1=$a1 # out
 krona_unet_ffn_rank_a2=$a2 # out
 
 lr=1e-3
-steps=2
+steps=1000
 
 accelerate launch train_dreambooth_lora.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
@@ -55,7 +55,7 @@ accelerate launch train_dreambooth_lora.py \
     # --attn_update_text=$attn_update_text \
     # --train_text_encoder \
 
-python3 generator_test.py \
+python3 generator.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
     --instance_data_dir=$INSTANCE_DIR \
     --output_dir=$OUTPUT_DIR \
