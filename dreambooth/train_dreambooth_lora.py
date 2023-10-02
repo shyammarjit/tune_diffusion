@@ -1297,7 +1297,9 @@ def main(args):
         for model in models:
             if isinstance(model, type(accelerator.unwrap_model(unet))):
                 unet_lora_layers_to_save = unet_attn_processors_state_dict(model)
-                unet_lora_layers_to_save.update(unet_lora_layers_to_save_ffn) # added 
+                if(args.unet_tune_mlp): # added 
+                    unet_lora_layers_to_save_ffn = unet_ffn_within_attn_processors_state_dict(unet)
+                    unet_lora_layers_to_save.update(unet_lora_layers_to_save_ffn) # added 
             elif isinstance(model, type(accelerator.unwrap_model(text_encoder))):
                 text_encoder_lora_layers_to_save = text_encoder_lora_state_dict(model)
             else:
