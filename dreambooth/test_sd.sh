@@ -1,4 +1,8 @@
 subjects="teapot"
+export MODEL_NAME="stabilityai/stable-diffusion-2-1"
+export OUTPUT_DIR="/home/nmathur/test"
+export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
+
 attn_update_unet="kqvo"
 # unet parameters
 a1=16
@@ -16,9 +20,6 @@ krona_unet_ffn_rank_a2=$a2 # out
 
 lr=1e-3
 steps=2
-export MODEL_NAME="stabilityai/stable-diffusion-2-1"
-export OUTPUT_DIR="/home/nmathur/test"
-export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
 
 accelerate launch train_dreambooth_lora.py \
     --pretrained_model_name_or_path=$MODEL_NAME \

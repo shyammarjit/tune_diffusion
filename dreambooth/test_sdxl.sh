@@ -5,8 +5,8 @@ export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
 
 attn_update_unet="kqvo"
 # unet parameters
-a1=2
-a2=2
+a1=16
+a2=32
 krona_unet_k_rank_a1=$a1 # k 
 krona_unet_k_rank_a2=$a2 # k
 krona_unet_q_rank_a1=$a1 # q
@@ -19,7 +19,7 @@ krona_unet_ffn_rank_a1=$a1 # out
 krona_unet_ffn_rank_a2=$a2 # out
 
 lr=1e-3
-steps=1000
+steps=2
 
 
 accelerate launch train_dreambooth_lora_sdxl.py \
@@ -52,9 +52,9 @@ accelerate launch train_dreambooth_lora_sdxl.py \
     --krona_unet_o_rank_a2=$krona_unet_o_rank_a2 \
     --krona_unet_ffn_rank_a1=$krona_unet_ffn_rank_a1 \
     --krona_unet_ffn_rank_a2=$krona_unet_ffn_rank_a2 \
-    --unet_tune_mlp \
+    # --unet_tune_mlp \
 
-python3 generator.py \
+python3 generator_test.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
     --instance_data_dir=$INSTANCE_DIR \
     --output_dir=$OUTPUT_DIR \

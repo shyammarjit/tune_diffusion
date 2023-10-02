@@ -1108,11 +1108,11 @@ class LoraLoaderMixin:
     unet_name = UNET_NAME
 
     def load_lora_weights(self, pretrained_model_name_or_path_or_dict: Union[str, Dict[str, torch.Tensor]], 
-            adapter_type=None,
-            train_text_encoder=None,
-            attn_update_unet=None,
-            attn_update_text=None,
-            text_tune_mlp=None,
+            adapter_type=None, # Added 
+            train_text_encoder=None, # Added
+            attn_update_unet=None, # Added
+            attn_update_text=None, # Added 
+            text_tune_mlp=None, # Added
             **kwargs,
         ):
         """
@@ -1142,8 +1142,8 @@ class LoraLoaderMixin:
         # print(state_dict, network_alphas); exit()
         self.load_lora_into_unet(state_dict, network_alphas=network_alphas, 
             unet=self.unet, 
-            adapter_type=adapter_type, 
-            attn_update_unet=attn_update_unet,
+            adapter_type=adapter_type, # Added
+            attn_update_unet=attn_update_unet, # Added
         )
         if train_text_encoder:
             self.load_lora_into_text_encoder(
@@ -1151,9 +1151,9 @@ class LoraLoaderMixin:
                 network_alphas=network_alphas,
                 text_encoder=self.text_encoder,
                 lora_scale=self.lora_scale,
-                adapter_type=adapter_type,
-                attn_update_text=attn_update_text,
-                text_tune_mlp=text_tune_mlp,
+                adapter_type=adapter_type, # Added
+                attn_update_text=attn_update_text, # Added
+                # text_tune_mlp=text_tune_mlp,
             )
         
 

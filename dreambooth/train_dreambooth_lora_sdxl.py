@@ -157,9 +157,7 @@ def struct_output(args):
     else: os.mkdir(dataset_)
     
     
-        
     if(args.adapter_type=="lora"):
-        
         # Now create folder for experiments
         attn_config = ''
         if "k" in args.attn_update_unet: attn_config = attn_config + "k" + str(args.unet_lora_rank_k)
@@ -178,8 +176,8 @@ def struct_output(args):
             attn_config = attn_config + "_" + text_attn_config
         
         exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
-    elif(args.adapter_type=="krona"): 
-        
+    
+    elif(args.adapter_type=="krona"):
         # Now create folder for experiments
         attn_config = ""
         if "k" in args.attn_update_unet: 
@@ -187,9 +185,9 @@ def struct_output(args):
         if "q" in args.attn_update_unet: 
             attn_config = attn_config + "q" + str(args.krona_unet_q_rank_a1) + ":" + str(args.krona_unet_q_rank_a2)
         if "v" in args.attn_update_unet: 
-            attn_config = attn_config + "v" + str(args.krona_unet_v_rank_a1) + ":" + str(args.krona_unet_q_rank_a2)
+            attn_config = attn_config + "v" + str(args.krona_unet_v_rank_a1) + ":" + str(args.krona_unet_v_rank_a2)
         if "o" in args.attn_update_unet: 
-            attn_config = attn_config + "o" + str(args.krona_unet_o_rank_a1) + ":" + str(args.krona_unet_q_rank_a2)
+            attn_config = attn_config + "o" + str(args.krona_unet_o_rank_a1) + ":" + str(args.krona_unet_o_rank_a2)
         if(args.unet_tune_mlp): 
             attn_config = attn_config + "f" + str(args.krona_unet_ffn_rank_a1) + ":" + str(args.krona_unet_ffn_rank_a2)
         
@@ -200,9 +198,9 @@ def struct_output(args):
             if "q" in args.attn_update_text: 
                 text_attn_config = text_attn_config + "q" + str(args.krona_text_q_rank_a1) + ":" + str(args.krona_text_q_rank_a2)
             if "v" in args.attn_update_text: 
-                text_attn_config = text_attn_config + "v" + str(args.krona_text_v_rank_a1) + ":" + str(args.krona_text_q_rank_a2)
+                text_attn_config = text_attn_config + "v" + str(args.krona_text_v_rank_a1) + ":" + str(args.krona_text_v_rank_a2)
             if "o" in args.attn_update_text: 
-                text_attn_config = text_attn_config + "o" + str(args.krona_text_o_rank_a1) + ":" + str(args.krona_text_q_rank_a2)
+                text_attn_config = text_attn_config + "o" + str(args.krona_text_o_rank_a1) + ":" + str(args.krona_text_o_rank_a2)
             if(args.text_tune_mlp): 
                 text_attn_config = text_attn_config + "f" + str(args.krona_text_ffn_rank_a1) + ":" + str(args.krona_text_ffn_rank_a2)    
             attn_config = attn_config + "_" + text_attn_config
@@ -215,6 +213,7 @@ def struct_output(args):
     if(os.path.exists(exp_)): pass
     else: os.mkdir(exp_)
     return exp_
+
 
 def parse_args(input_args=None):
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
@@ -928,9 +927,7 @@ def unet_attn_processors_state_dict(unet) -> Dict[str, torch.tensor]:
 
 
 def main(args):
-    
     logging_dir = Path(args.output_dir, args.logging_dir)
-
     accelerator_project_config = ProjectConfiguration(project_dir=args.output_dir, logging_dir=logging_dir)
 
     accelerator = Accelerator(
@@ -1170,21 +1167,21 @@ def main(args):
         # exit()
         text_lora_parameters_one = LoraLoaderMixin._modify_text_encoder(
             text_encoder_one, dtype=torch.float32, adapter_type=args.adapter_type, attn_update_text=args.attn_update_text,
-            rank_k=args.text_lora_rank_k if "k" in args.attn_update_text else None, # added 
-            rank_q=args.text_lora_rank_q if "q" in args.attn_update_text else None, # added
-            rank_v=args.text_lora_rank_v if "v" in args.attn_update_text else None, # added 
-            rank_o=args.text_lora_rank_out if "o" in args.attn_update_text else None, # added
-            rank_mlp=args.text_lora_rank_mlp if args.text_tune_mlp else None, # added
-            patch_mlp=args.text_tune_mlp,
+            rank_k=(args.krona_text_k_rank_a1, args.krona_text_k_rank_a2) if "k" in args.attn_update_text else None, # added 
+            rank_q=(args.krona_text_q_rank_a1, args.krona_text_q_rank_a2) if "q" in args.attn_update_text else None, # added
+            rank_v=(args.krona_text_v_rank_a1, args.krona_text_v_rank_a2) if "v" in args.attn_update_text else None, # added 
+            rank_o=(args.krona_text_o_rank_a1, args.krona_text_o_rank_a2) if "o" in args.attn_update_text else None, # added
+            # rank_mlp=args.text_lora_rank_mlp if args.text_tune_mlp else None, # added
+            # patch_mlp=args.text_tune_mlp,
         )
         text_lora_parameters_two = LoraLoaderMixin._modify_text_encoder(
             text_encoder_two, dtype=torch.float32, adapter_type=args.adapter_type, attn_update_text=args.attn_update_text,
-            rank_k=args.text_lora_rank_k if "k" in args.attn_update_text else None, # added 
-            rank_q=args.text_lora_rank_q if "q" in args.attn_update_text else None, # added
-            rank_v=args.text_lora_rank_v if "v" in args.attn_update_text else None, # added 
-            rank_o=args.text_lora_rank_out if "o" in args.attn_update_text else None, # added
-            rank_mlp=args.text_lora_rank_mlp if args.text_tune_mlp else None, # added
-            patch_mlp=args.text_tune_mlp,
+            rank_k=(args.krona_text_k_rank_a1, args.krona_text_k_rank_a2) if "k" in args.attn_update_text else None, # added 
+            rank_q=(args.krona_text_q_rank_a1, args.krona_text_q_rank_a2) if "q" in args.attn_update_text else None, # added
+            rank_v=(args.krona_text_v_rank_a1, args.krona_text_v_rank_a2) if "v" in args.attn_update_text else None, # added 
+            rank_o=(args.krona_text_o_rank_a1, args.krona_text_o_rank_a2) if "o" in args.attn_update_text else None, # added
+            # rank_mlp=args.text_lora_rank_mlp if args.text_tune_mlp else None, # added
+            # patch_mlp=args.text_tune_mlp,
         )
         
         # print(text_lora_parameters_one)
@@ -1253,14 +1250,21 @@ def main(args):
                 raise ValueError(f"unexpected save model: {model.__class__}")
 
         lora_state_dict, network_alphas = LoraLoaderMixin.lora_state_dict(input_dir)
-        LoraLoaderMixin.load_lora_into_unet(lora_state_dict, network_alphas=network_alphas, unet=unet_)
+        LoraLoaderMixin.load_lora_into_unet(lora_state_dict, network_alphas=network_alphas, unet=unet_,
+            adapter_type=args.adapter_type, # Added
+            attn_update_unet=args.attn_update_unet, # Added
+        )
         text_encoder_state_dict = {k: v for k, v in lora_state_dict.items() if "text_encoder." in k}
         LoraLoaderMixin.load_lora_into_text_encoder(
-            text_encoder_state_dict, network_alphas=network_alphas, text_encoder=text_encoder_one_
+            text_encoder_state_dict, network_alphas=network_alphas, text_encoder=text_encoder_one_,
+            adapter_type=args.adapter_type, # Added
+            attn_update_text=args.attn_update_text, # Added
         )
         text_encoder_2_state_dict = {k: v for k, v in lora_state_dict.items() if "text_encoder_2." in k}
         LoraLoaderMixin.load_lora_into_text_encoder(
-            text_encoder_2_state_dict, network_alphas=network_alphas, text_encoder=text_encoder_two_
+            text_encoder_2_state_dict, network_alphas=network_alphas, text_encoder=text_encoder_two_,
+            adapter_type=args.adapter_type, # Added
+            attn_update_text=args.attn_update_text, # Added
         )
 
     accelerator.register_save_state_pre_hook(save_model_hook)
@@ -1290,6 +1294,7 @@ def main(args):
         optimizer_class = torch.optim.AdamW
 
     # Optimizer creation
+    # To Do: different leanring rate for text encoder as well as unet
     params_to_optimize = (
         itertools.chain(unet_lora_parameters, text_lora_parameters_one, text_lora_parameters_two)
         if args.train_text_encoder
@@ -1440,12 +1445,12 @@ def main(args):
     first_epoch = 0
     
     # count numbr of parameters
-    num_params = sum(p.numel() for p in unet.parameters() if p.requires_grad)
-    if(args.train_text_encoder):
-        num_params_t1 = sum(p.numel() for p in text_encoder_one.parameters() if p.requires_grad)
-        num_params_t2 = sum(p.numel() for p in text_encoder_two.parameters() if p.requires_grad)
-        num_params_text = num_params_t1 + num_params_t2
-    else: num_params_text = 0
+    num_params = sum(p.numel() for p in unet.parameters() if p.requires_grad) # Added
+    if(args.train_text_encoder): # Added
+        num_params_t1 = sum(p.numel() for p in text_encoder_one.parameters() if p.requires_grad) # Added
+        num_params_t2 = sum(p.numel() for p in text_encoder_two.parameters() if p.requires_grad) # Added
+        num_params_text = num_params_t1 + num_params_t2 # Added
+    else: num_params_text = 0 # Added
 
     logger.info(f"  Total learnable parameters: {num_params + num_params_text}\n") # number of parameters
 
@@ -1499,8 +1504,8 @@ def main(args):
             text_encoder_two.train()
             
             # set top parameter requires_grad = True for gradient checkpointing works
-            text_encoder_one.text_model.embeddings.requires_grad_(True)
-            text_encoder_two.text_model.embeddings.requires_grad_(True)
+            text_encoder_one.text_model.embeddings.requires_grad_(True) # Added
+            text_encoder_two.text_model.embeddings.requires_grad_(True) # Added
             
         for step, batch in enumerate(train_dataloader):
             # Skip steps until we reach the resumed step
@@ -1742,14 +1747,10 @@ def main(args):
         unet = accelerator.unwrap_model(unet)
         unet = unet.to(torch.float32)
         unet_lora_layers = unet_attn_processors_state_dict(unet)
-        # print("shyam")
-        # print(unet_lora_layers[list(unet_lora_layers.keys())[0]])
-        # print(unet_lora_layers[list(unet_lora_layers.keys())[0]][0])
-        # exit()
-        if(args.unet_tune_mlp): 
-            unet_lora_layers_ffn = unet_ffn_within_attn_processors_state_dict(unet)
+        if(args.unet_tune_mlp): # Added
+            unet_lora_layers_ffn = unet_ffn_within_attn_processors_state_dict(unet) # Added
             # print(unet_lora_layers_ffn[list(unet_lora_layers_ffn.keys())[0]])
-            unet_lora_layers.update(unet_lora_layers_ffn)
+            unet_lora_layers.update(unet_lora_layers_ffn) # Added
             # print(unet_lora_layers.keys())
         
 
@@ -1815,11 +1816,12 @@ def main(args):
         pipeline.scheduler = DPMSolverMultistepScheduler.from_config(pipeline.scheduler.config, **scheduler_args)
 
         # load attention processors (need to pass adapter Type as well)
-        pipeline.load_lora_weights(args.output_dir, adapter_type=args.adapter_type, 
-            attn_update_unet=args.attn_update_unet,
-            attn_update_text=args.attn_update_text,
-            text_tune_mlp=args.text_tune_mlp,
-            train_text_encoder=args.train_text_encoder,
+        pipeline.load_lora_weights(args.output_dir, 
+            adapter_type=args.adapter_type, # Added
+            attn_update_unet=args.attn_update_unet, # Added
+            attn_update_text=args.attn_update_text, # Added
+            # text_tune_mlp=args.text_tune_mlp, # No need for this one # Added
+            train_text_encoder=args.train_text_encoder, # Added
         )
 
         # run inference

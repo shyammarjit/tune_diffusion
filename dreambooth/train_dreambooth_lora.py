@@ -205,9 +205,9 @@ def struct_output(args):
         if "q" in args.attn_update_unet: 
             attn_config = attn_config + "q" + str(args.krona_unet_q_rank_a1) + ":" + str(args.krona_unet_q_rank_a2)
         if "v" in args.attn_update_unet: 
-            attn_config = attn_config + "v" + str(args.krona_unet_v_rank_a1) + ":" + str(args.krona_unet_q_rank_a2)
+            attn_config = attn_config + "v" + str(args.krona_unet_v_rank_a1) + ":" + str(args.krona_unet_v_rank_a2)
         if "o" in args.attn_update_unet: 
-            attn_config = attn_config + "o" + str(args.krona_unet_o_rank_a1) + ":" + str(args.krona_unet_q_rank_a2)
+            attn_config = attn_config + "o" + str(args.krona_unet_o_rank_a1) + ":" + str(args.krona_unet_o_rank_a2)
         if(args.unet_tune_mlp): 
             attn_config = attn_config + "f" + str(args.krona_unet_ffn_rank_a1) + ":" + str(args.krona_unet_ffn_rank_a2)
         
@@ -218,9 +218,9 @@ def struct_output(args):
             if "q" in args.attn_update_text: 
                 text_attn_config = text_attn_config + "q" + str(args.krona_text_q_rank_a1) + ":" + str(args.krona_text_q_rank_a2)
             if "v" in args.attn_update_text: 
-                text_attn_config = text_attn_config + "v" + str(args.krona_text_v_rank_a1) + ":" + str(args.krona_text_q_rank_a2)
+                text_attn_config = text_attn_config + "v" + str(args.krona_text_v_rank_a1) + ":" + str(args.krona_text_v_rank_a2)
             if "o" in args.attn_update_text: 
-                text_attn_config = text_attn_config + "o" + str(args.krona_text_o_rank_a1) + ":" + str(args.krona_text_q_rank_a2)
+                text_attn_config = text_attn_config + "o" + str(args.krona_text_o_rank_a1) + ":" + str(args.krona_text_o_rank_a2)
             if(args.text_tune_mlp): 
                 text_attn_config = text_attn_config + "f" + str(args.krona_text_ffn_rank_a1) + ":" + str(args.krona_text_ffn_rank_a2)    
             attn_config = attn_config + "_" + text_attn_config
@@ -233,6 +233,7 @@ def struct_output(args):
     if(os.path.exists(exp_)): pass
     else: os.mkdir(exp_)
     return exp_
+
 
 def parse_args(input_args=None):
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
@@ -1002,6 +1003,7 @@ def unet_ffn_within_attn_processors_state_dict(unet):
             ffn_processors_state_dict[f"{ffn_processor_key}.{parameter_key}"] = parameter
     return ffn_processors_state_dict
 
+
 def unet_attn_processors_state_dict(unet) -> Dict[str, torch.tensor]:
     r"""
     Returns:
@@ -1281,10 +1283,10 @@ def main(args):
             # ToDo: Text encoder ffn/mlp updates are not added.
             text_lora_parameters = LoraLoaderMixin._modify_text_encoder(
                 text_encoder, dtype=torch.float32, adapter_type=args.adapter_type, attn_update_text=args.attn_update_text,
-                rank_k=(args.krona_text_k_rank_a1, args.krona_text_k_rank_a1) if "k" in args.attn_update_text else None, # added 
-                rank_q=(args.krona_text_q_rank_a1, args.krona_text_q_rank_a1) if "q" in args.attn_update_text else None, # added
-                rank_v=(args.krona_text_v_rank_a1, args.krona_text_v_rank_a1) if "v" in args.attn_update_text else None, # added 
-                rank_o=(args.krona_text_o_rank_a1, args.krona_text_o_rank_a1) if "o" in args.attn_update_text else None, # added
+                rank_k=(args.krona_text_k_rank_a1, args.krona_text_k_rank_a2) if "k" in args.attn_update_text else None, # added 
+                rank_q=(args.krona_text_q_rank_a1, args.krona_text_q_rank_a2) if "q" in args.attn_update_text else None, # added
+                rank_v=(args.krona_text_v_rank_a1, args.krona_text_v_rank_a2) if "v" in args.attn_update_text else None, # added 
+                rank_o=(args.krona_text_o_rank_a1, args.krona_text_o_rank_a2) if "o" in args.attn_update_text else None, # added
             )
 
     # create custom saving & loading hooks so that `accelerator.save_state(...)` serializes in a nice format
@@ -1329,9 +1331,14 @@ def main(args):
                 raise ValueError(f"unexpected save model: {model.__class__}")
 
         lora_state_dict, network_alphas = LoraLoaderMixin.lora_state_dict(input_dir)
-        LoraLoaderMixin.load_lora_into_unet(lora_state_dict, network_alphas=network_alphas, unet=unet_)
+        LoraLoaderMixin.load_lora_into_unet(lora_state_dict, network_alphas=network_alphas, unet=unet_,
+            adapter_type=args.adapter_type, # Added
+            attn_update_unet=args.attn_update_unet, # Added
+        )
         LoraLoaderMixin.load_lora_into_text_encoder(
-            lora_state_dict, network_alphas=network_alphas, text_encoder=text_encoder_
+            lora_state_dict, network_alphas=network_alphas, text_encoder=text_encoder_,
+            adapter_type=args.adapter_type, # Added
+            attn_update_text=args.attn_update_text, # Added
         )
 
     accelerator.register_save_state_pre_hook(save_model_hook)

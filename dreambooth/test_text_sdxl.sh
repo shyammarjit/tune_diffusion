@@ -1,6 +1,6 @@
 # WARNING: Currently having issue! Don't Run!
 subjects="teapot"
-export MODEL_NAME="stabilityai/stable-diffusion-2-1"
+export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
 export OUTPUT_DIR="/home/nmathur/test"
 export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
 
@@ -34,7 +34,7 @@ lr=1e-3
 steps=2
 
 
-accelerate launch train_dreambooth_lora.py \
+accelerate launch train_dreambooth_lora_sdxl.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
     --instance_data_dir=$INSTANCE_DIR \
     --output_dir=$OUTPUT_DIR \
@@ -56,7 +56,7 @@ accelerate launch train_dreambooth_lora.py \
     --attn_update_unet=$attn_update_unet \
     --attn_update_text=$attn_update_text \
     --krona_unet_k_rank_a1=$krona_unet_k_rank_a1 \
-    --krona_unet_k_rank_a2=$krona_unet_k_rank_a1 \
+    --krona_unet_k_rank_a2=$krona_unet_k_rank_a2 \
     --krona_unet_q_rank_a1=$krona_unet_q_rank_a1 \
     --krona_unet_q_rank_a2=$krona_unet_q_rank_a2 \
     --krona_unet_v_rank_a1=$krona_unet_v_rank_a1 \
@@ -74,11 +74,10 @@ accelerate launch train_dreambooth_lora.py \
     --krona_text_o_rank_a1=$krona_text_o_rank_a1 \
     --krona_text_o_rank_a2=$krona_text_o_rank_a2 \
     --train_text_encoder \
-    --unet_tune_mlp \
-    # --attn_update_text=$attn_update_text \
+    # --unet_tune_mlp \
     
 
-python3 generator.py \
+python3 generator_test.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
     --instance_data_dir=$INSTANCE_DIR \
     --output_dir=$OUTPUT_DIR \
@@ -100,7 +99,7 @@ python3 generator.py \
     --attn_update_unet=$attn_update_unet \
     --attn_update_text=$attn_update_text \
     --krona_unet_k_rank_a1=$krona_unet_k_rank_a1 \
-    --krona_unet_k_rank_a2=$krona_unet_k_rank_a1 \
+    --krona_unet_k_rank_a2=$krona_unet_k_rank_a2 \
     --krona_unet_q_rank_a1=$krona_unet_q_rank_a1 \
     --krona_unet_q_rank_a2=$krona_unet_q_rank_a2 \
     --krona_unet_v_rank_a1=$krona_unet_v_rank_a1 \
@@ -118,5 +117,5 @@ python3 generator.py \
     --krona_text_o_rank_a1=$krona_text_o_rank_a1 \
     --krona_text_o_rank_a2=$krona_text_o_rank_a2 \
     --train_text_encoder \
-    --unet_tune_mlp \
+    # --unet_tune_mlp \
     # --delete_and_upload_drive

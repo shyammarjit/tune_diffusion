@@ -93,9 +93,11 @@ def generator(args, prompts, from_checkpoint):
         # load the SDXL model
         model_id = "stabilityai/stable-diffusion-xl-base-1.0"
         pipe = DiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16, 
-            adapter_type = args.adapter_type,
-            adapter_low_rank = args.adapter_low_rank,
-            unet_tune_mlp=args.unet_tune_mlp
+            adapter_type=args.adapter_type, # Added
+            attn_update_unet=args.attn_update_unet, # Added
+            attn_update_text=args.attn_update_text, # Added
+            # text_tune_mlp=args.text_tune_mlp, # No need for this one # Added
+            train_text_encoder=args.train_text_encoder, # Added
         )
         pipe = pipe.to("cuda")
         pipe.load_lora_weights(os.path.join(args.output_dir, from_checkpoint), 
@@ -119,6 +121,7 @@ def generator(args, prompts, from_checkpoint):
             adapter_type=args.adapter_type, 
             attn_update_unet=args.attn_update_unet,
             attn_update_text=args.attn_update_text,
+            train_text_encoder=args.train_text_encoder,
             weight_name="pytorch_lora_weights.safetensors",
         )
     else:
@@ -249,10 +252,6 @@ if __name__ == "__main__":
     prompts = get_promts(os.path.basename(args.instance_data_dir))
     
     # find the availabel checkpoint list name
-    run_generator = []
-    # if os.path.join(args.output_dir, 'checkpoint-500'): run_generator.append('checkpoint-500') 
-    # if os.path.join(args.output_dir, 'checkpoint-1000'): run_generator.append('checkpoint-1000')
-    
     from_checkpoint = ""
     # generate images based on given prompts
     generator(args, prompts, from_checkpoint)
