@@ -1,25 +1,28 @@
+# WARNING: Currently having issue! Don't Run!
 subjects="teapot"
+export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
+export OUTPUT_DIR="/home/nmathur/test_text"
+export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
+
 attn_update_unet="kqvo"
 attn_update_text="kvqo"
 # unet parameters
 unet_lora_rank_k=4
 unet_lora_rank_q=4
 unet_lora_rank_v=4
-unet_lora_rank_o=4
+unet_lora_rank_out=4
 unet_lora_rank_mlp=4
 
 # text encoder parameters
 text_lora_rank_k=4
 text_lora_rank_q=4
 text_lora_rank_v=4
-text_lora_rank_o=4
+text_lora_rank_out=4
 text_lora_rank_mlp=4
 
 lr=1e-4
 steps=5
-export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
-export OUTPUT_DIR="/home/nmathur/test_text"
-export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
+
 
 accelerate launch train_dreambooth_lora_sdxl.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
@@ -39,12 +42,12 @@ accelerate launch train_dreambooth_lora_sdxl.py \
     --diffusion_model="sdxl" \
     --use_8bit_adam \
     --gradient_checkpointing \
-    --attn_update_unet=$attn_update_unet \
     --enable_xformers_memory_efficient_attention \
+    --attn_update_unet=$attn_update_unet \
     --unet_lora_rank_k=$unet_lora_rank_k \
     --unet_lora_rank_q=$unet_lora_rank_q \
     --unet_lora_rank_v=$unet_lora_rank_v \
-    --unet_lora_rank_out=$unet_lora_rank_o \
+    --unet_lora_rank_out=$unet_lora_rank_out \
     --attn_update_text=$attn_update_text \
     --train_text_encoder \
     --unet_lora_rank_k=$unet_lora_rank_k \

@@ -124,7 +124,7 @@ def generator(args, prompts, from_checkpoint):
     if(os.path.exists(image_dir)): pass
     else: os.mkdir(image_dir)
     
-    for i in trange(len(prompts), desc = "generating images"):
+    for i in trange(1, desc = "generating images"):
         if(args.diffusion_model == "sdxl"):
             image = pipe(prompt=prompts[i], output_type="latent", generator=generator).images[0]
             image = refiner(prompt=prompts[i], image=image[None, :], generator=generator).images[0]
@@ -254,16 +254,10 @@ if __name__ == "__main__":
     # generate the prompts
     prompts = get_promts(os.path.basename(args.instance_data_dir))
     
-    # find the available checkpoint list name
-    run_generator = []
-    if os.path.join(args.output_dir, 'checkpoint-500'): run_generator.append('checkpoint-500') 
-    if os.path.join(args.output_dir, 'checkpoint-1000'): run_generator.append('checkpoint-1000')
-    
-    for from_checkpoint in run_generator:
-        print(f"For {from_checkpoint}")
-        # generate images based on given prompts
-        generator(args, prompts, from_checkpoint)
-        # compute the quantiative results (CLIP-I, CLIP-T)
-        clipi, clipt = evaluator(args, prompts, from_checkpoint)
-        save_metrics(args, clipi, clipt, from_checkpoint)
+    # generate images based on given prompts
+    from_checkpoint=""
+    generator(args, prompts, from_checkpoint)
+    # compute the quantiative results (CLIP-I, CLIP-T)
+    clipi, clipt = evaluator(args, prompts, from_checkpoint)
+    save_metrics(args, clipi, clipt, from_checkpoint)
 

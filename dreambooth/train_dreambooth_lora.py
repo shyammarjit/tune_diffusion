@@ -139,6 +139,103 @@ def import_model_class_from_model_name_or_path(pretrained_model_name_or_path: st
         raise ValueError(f"{model_class} is not supported.")
 
 
+
+
+def struct_output(args):
+    """
+    output:
+	|- backpack
+		|- lora_{r}_{learning_rate}_{learning_rate_text}
+			|- *.savetensors
+			|- images
+				|- *.png
+		|- krona_{r}_{learning_rate}_{learning_rate_text}
+			|- *.savetensors
+			|- images
+				|- *.png
+	
+    |- backpack_dog
+        |- lora_{r}_{learning_rate}_{learning_rate_text}
+                |- *.savetensors
+                |- images
+                    |- *.png
+        |- krona_{r}_{learning_rate}_{learning_rate_text}
+            |- *.savetensors
+            |- images
+                |- *.png
+    """
+    print("output folder formatting done.")
+    # Check whether output folder exists or not. If not then create
+    if(os.path.exists(args.output_dir)): pass
+    else: os.mkdir(args.output_dir)
+    
+    # Now create another folder by the name of the dataset
+    dataset_name = os.path.basename(args.instance_data_dir)
+    dataset_ = os.path.join(args.output_dir, dataset_name)
+    if(os.path.exists(dataset_)): pass
+    else: os.mkdir(dataset_)
+    
+    
+        
+    if(args.adapter_type=="lora"):
+        
+        # Now create folder for experiments
+        attn_config = ''
+        if "k" in args.attn_update_unet: attn_config = attn_config + "k" + str(args.unet_lora_rank_k)
+        if "q" in args.attn_update_unet: attn_config = attn_config + "q" + str(args.unet_lora_rank_q)
+        if "v" in args.attn_update_unet: attn_config = attn_config + "v" + str(args.unet_lora_rank_v)
+        if "o" in args.attn_update_unet: attn_config = attn_config + "o" + str(args.unet_lora_rank_out)
+        if(args.unet_tune_mlp): attn_config = attn_config + "f" + str(args.unet_lora_rank_mlp)
+        
+        if(args.train_text_encoder):
+            text_attn_config = ''
+            if "k" in args.attn_update_text: text_attn_config = text_attn_config + "k" + str(args.text_lora_rank_k)
+            if "q" in args.attn_update_text: text_attn_config = text_attn_config + "q" + str(args.text_lora_rank_q)
+            if "v" in args.attn_update_text: text_attn_config = text_attn_config + "v" + str(args.text_lora_rank_v)
+            if "o" in args.attn_update_text: text_attn_config = text_attn_config + "o" + str(args.text_lora_rank_out)
+            if(args.text_tune_mlp): text_attn_config = text_attn_config + "f" + str(args.text_lora_rank_mlp)
+            attn_config = attn_config + "_" + text_attn_config
+        
+        exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
+    elif(args.adapter_type=="krona"): 
+        
+        # Now create folder for experiments
+        attn_config = ""
+        if "k" in args.attn_update_unet: 
+            attn_config = attn_config + "k" + str(args.krona_unet_k_rank_a1) + ":" + str(args.krona_unet_k_rank_a2)
+        if "q" in args.attn_update_unet: 
+            attn_config = attn_config + "q" + str(args.krona_unet_q_rank_a1) + ":" + str(args.krona_unet_q_rank_a2)
+        if "v" in args.attn_update_unet: 
+            attn_config = attn_config + "v" + str(args.krona_unet_v_rank_a1) + ":" + str(args.krona_unet_q_rank_a2)
+        if "o" in args.attn_update_unet: 
+            attn_config = attn_config + "o" + str(args.krona_unet_o_rank_a1) + ":" + str(args.krona_unet_q_rank_a2)
+        if(args.unet_tune_mlp): 
+            attn_config = attn_config + "f" + str(args.krona_unet_ffn_rank_a1) + ":" + str(args.krona_unet_ffn_rank_a2)
+        
+        if(args.train_text_encoder):
+            text_attn_config = ''
+            if "k" in args.attn_update_text: 
+                text_attn_config = text_attn_config + "k" + str(args.krona_text_k_rank_a1) + ":" + str(args.krona_text_k_rank_a2)
+            if "q" in args.attn_update_text: 
+                text_attn_config = text_attn_config + "q" + str(args.krona_text_q_rank_a1) + ":" + str(args.krona_text_q_rank_a2)
+            if "v" in args.attn_update_text: 
+                text_attn_config = text_attn_config + "v" + str(args.krona_text_v_rank_a1) + ":" + str(args.krona_text_q_rank_a2)
+            if "o" in args.attn_update_text: 
+                text_attn_config = text_attn_config + "o" + str(args.krona_text_o_rank_a1) + ":" + str(args.krona_text_q_rank_a2)
+            if(args.text_tune_mlp): 
+                text_attn_config = text_attn_config + "f" + str(args.krona_text_ffn_rank_a1) + ":" + str(args.krona_text_ffn_rank_a2)    
+            attn_config = attn_config + "_" + text_attn_config
+            
+        exp = f"krona_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
+        # raise ValueError("currently not supported.")
+    else: raise AttributeError(f"{args.adapter_type} wrong adapter format.")
+    
+    exp_ = os.path.join(dataset_, exp)
+    if(os.path.exists(exp_)): pass
+    else: os.mkdir(exp_)
+    return exp_
+
+
 def parse_args(input_args=None):
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
     parser.add_argument(
@@ -448,10 +545,134 @@ def parse_args(input_args=None):
         help=("The dimension of the LoRA update matrices."),
     )
 
-    if input_args is not None:
-        args = parser.parse_args(input_args)
-    else:
-        args = parser.parse_args()
+    # our parsers
+    parser.add_argument(
+        "--unet_lora_rank_k",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => k matrix",
+    )
+    parser.add_argument(
+        "--unet_lora_rank_q",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => q matrix",
+    )
+    parser.add_argument(
+        "--unet_lora_rank_v",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => v matrix",
+    )
+    parser.add_argument(
+        "--unet_lora_rank_out",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => out matrix",
+    )
+    parser.add_argument("--unet_lora_rank_mlp",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => ffn matrix",
+    )
+    parser.add_argument(
+        "--text_lora_rank_k",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => k matrix",
+    )
+    parser.add_argument(
+        "--text_lora_rank_q",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => q matrix",
+    )
+    parser.add_argument(
+        "--text_lora_rank_v",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => v matrix",
+    )
+    parser.add_argument(
+        "--text_lora_rank_out",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => out matrix",
+    )
+    parser.add_argument("--text_lora_rank_mlp",
+        type=int,
+        default=4,
+        help="Lora Rank size for matrix decomposition => ffn matrix",
+    )
+    
+    # parser.add_argument(
+    #     "--krona_rank_a1",
+    #     type=int,
+    #     default=16,
+    #     help="KornA Rank size for matrix decomposition",
+    # )
+    # parser.add_argument(
+    #     "--krona_rank_a2",
+    #     type=int,
+    #     default=4,
+    #     help="KornA Rank size for matrix decomposition",
+    # )
+    parser.add_argument(
+        "--diffusion_model",
+        type=str,
+        default="sdxl",
+        help="Define the type of diffusion model to be used",
+        choices=["sdxl", "base"],
+    )
+    parser.add_argument(
+        "--adapter_type",
+        type=str,
+        default="lora",
+        help="Adapter type.",
+        choices=["lora", "krona"],
+    )
+
+    parser.add_argument(
+        "--attn_update_unet",
+        type=str,
+        default=None,
+        help="Details about attention matrix (k, q, v, o)",
+    )
+
+    parser.add_argument(
+        "--attn_update_text",
+        type=str,
+        default=None,
+        help="Details about attention matrix (k, q, v, o)",
+    )
+
+    parser.add_argument("--delete_and_upload_drive", 
+        action="store_true", 
+        help="Whether or not to push the model to the GDrive.",
+    )
+    
+    parser.add_argument("--adapter_low_rank", 
+        action="store_true",
+        help="Whether low rank parameterized format is there or not.",
+    )
+
+    parser.add_argument("--unet_tune_mlp",
+        action="store_true",
+        help="Whether we are finetuning MLP layers as well.",
+    )
+    parser.add_argument("--text_tune_mlp",
+        action="store_true",
+        help="Whether we are finetuning MLP layers as well.",
+    )
+
+    if input_args is not None: args = parser.parse_args(input_args)
+    else: args = parser.parse_args()
+    
+    # our edit
+    args.instance_prompt = instance_prompt(os.path.basename(args.instance_data_dir))
+    if args.with_prior_preservation:
+        args.class_prompt = 'a '+ args.instance_prompt.split(',')[1]
+    args.output_dir = struct_output(args) # structure the output folder
 
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
@@ -656,6 +877,20 @@ def encode_prompt(text_encoder, input_ids, attention_mask, text_encoder_use_atte
     prompt_embeds = prompt_embeds[0]
 
     return prompt_embeds
+
+
+def unet_ffn_within_attn_processors_state_dict(unet):
+    """
+    Returns:
+        a state dict containing just the ffn processor parameters.
+    """
+    ffn_processors = unet.ffn_processors 
+    ffn_processors_state_dict = {}
+
+    for ffn_processor_key, ffn_processor in ffn_processors.items():
+        for parameter_key, parameter in ffn_processor.state_dict().items():
+            ffn_processors_state_dict[f"{ffn_processor_key}.{parameter_key}"] = parameter
+    return ffn_processors_state_dict
 
 
 def unet_attn_processors_state_dict(unet) -> Dict[str, torch.tensor]:
@@ -877,14 +1112,47 @@ def main(args):
             lora_attn_processor_class = (
                 LoRAAttnProcessor2_0 if hasattr(F, "scaled_dot_product_attention") else LoRAAttnProcessor
             )
-
-        module = lora_attn_processor_class(
-            hidden_size=hidden_size, cross_attention_dim=cross_attention_dim, rank=args.rank
-        )
+        
+        # To DO: May need to modify the rank of K, Q, V and Out (Future Experiments) # Done
+        if(args.adapter_type=="lora"):
+            module = lora_attn_processor_class(
+                hidden_size=hidden_size, 
+                cross_attention_dim=cross_attention_dim, 
+                adapter_type=args.adapter_type, # added 
+                attn_update_unet=args.attn_update_unet, # added 
+                k_rank=args.unet_lora_rank_k if "k" in args.attn_update_unet else None, # k rank
+                q_rank=args.unet_lora_rank_q if "q" in args.attn_update_unet else None, # added 
+                v_rank=args.unet_lora_rank_v if "v" in args.attn_update_unet else None, # added 
+                out_rank=args.unet_lora_rank_out if "o" in args.attn_update_unet else None, # added 
+            )
+        elif(args.adapter_type=="krona"):
+            # not supported here
+            module = lora_attn_processor_class(
+                hidden_size=hidden_size, 
+                cross_attention_dim=cross_attention_dim, 
+                adapter_type=args.adapter_type, # added 
+                attn_update_unet=args.attn_update_unet, # added 
+                k_rank=(args.krona_unet_k_rank_a1, args.krona_unet_k_rank_a2) if "k" in args.attn_update_unet else None, # k rank
+                q_rank=(args.krona_unet_q_rank_a1, args.krona_unet_q_rank_a2) if "q" in args.attn_update_unet else None, # added 
+                v_rank=(args.krona_unet_v_rank_a1, args.krona_unet_v_rank_a2) if "v" in args.attn_update_unet else None, # added 
+                out_rank=(args.krona_unet_o_rank_a1, args.krona_unet_o_rank_a2) if "o" in args.attn_update_unet else None, # added 
+            )
+        else:
+            raise AttributeError(f"{args.adapter_type} is not supported.")
+        
         unet_lora_attn_procs[name] = module
         unet_lora_parameters.extend(module.parameters())
 
     unet.set_attn_processor(unet_lora_attn_procs)
+    if(args.unet_tune_mlp): 
+        # ToDo: fix krona ffn layer 
+        if args.adapter_type=="lora": lora_mlp_rank=args.unet_lora_rank_mlp
+        elif args.adapter_type=="krona": lora_mlp_rank=(args.krona_unet_ffn_rank_a1, args.krona_unet_ffn_rank_a2)
+        else: raise AttributeError("wrong adapter type")
+        ffn_info, unet_lora_extended_parameters = unet.set_ffn_processors(adapter_type=args.adapter_type,
+            lora_mlp_rank=lora_mlp_rank,
+        )
+        unet_lora_parameters.extend(unet_lora_extended_parameters)
 
     # The text encoder comes from 🤗 transformers, so we cannot directly modify it.
     # So, instead, we monkey-patch the forward calls of its attention-blocks.
