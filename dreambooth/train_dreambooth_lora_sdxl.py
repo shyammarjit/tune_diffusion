@@ -1603,7 +1603,7 @@ def main(args):
             )
             # print("shyam")
             # print(text_encoder_lora_layers)
-            exit()
+            # exit()
         else:
             text_encoder_lora_layers = None
             text_encoder_2_lora_layers = None
@@ -1696,6 +1696,10 @@ def main(args):
             )
     accelerator.end_training()
 
+    # delete the log folder completely
+    log_folder = os.path.join(args.output_dir, "logs")
+    if os.path.exists(log_folder):
+        shutil.rmtree(log_folder)
 
 if __name__ == "__main__":
     args = parse_args()

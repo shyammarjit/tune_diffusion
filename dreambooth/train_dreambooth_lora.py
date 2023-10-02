@@ -1224,7 +1224,9 @@ def main(args):
             attn_update_unet=attn_update_unet,
         )
         LoraLoaderMixin.load_lora_into_text_encoder(
-            lora_state_dict, network_alphas=network_alphas, text_encoder=text_encoder_
+            lora_state_dict, network_alphas=network_alphas, text_encoder=text_encoder_,
+            adapter_type=adapter_type, 
+            attn_update_text=attn_update_text,
         )
 
     accelerator.register_save_state_pre_hook(save_model_hook)
@@ -1649,7 +1651,10 @@ def main(args):
         if text_encoder is not None and args.train_text_encoder:
             text_encoder = accelerator.unwrap_model(text_encoder)
             text_encoder = text_encoder.to(torch.float32)
-            text_encoder_lora_layers = text_encoder_lora_state_dict(text_encoder)
+            text_encoder_lora_layers = text_encoder_lora_state_dict(text_encoder,
+                attn_update_text=args.attn_update_text,
+                text_tune_mlp=args.text_tune_mlp,
+            )
         else:
             text_encoder_lora_layers = None
 

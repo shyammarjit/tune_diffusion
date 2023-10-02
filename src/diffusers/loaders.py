@@ -1090,6 +1090,7 @@ class LoraLoaderMixin:
                 lora_scale=self.lora_scale,
                 attn_update_text=attn_update_text,
                 # text_tune_mlp=text_tune_mlp,
+                adapter_type=adapter_type,
             )
         
 
@@ -1509,7 +1510,7 @@ class LoraLoaderMixin:
                     rank_k=rank_k if "k" in attn_update_text else None,
                     rank_v=rank_v if "v" in attn_update_text else None,
                     rank_q=rank_q if "q" in attn_update_text else None,
-                    rank_o=rank_out if "q" in attn_update_text else None,
+                    rank_o=rank_out if "o" in attn_update_text else None,
                     rank_mlp=rank_mlp if text_tune_mlp else None,
                     patch_mlp=patch_mlp,
                     adapter_type=adapter_type,
