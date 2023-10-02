@@ -1049,6 +1049,7 @@ class LoraLoaderMixin:
             attn_update_unet=None,
             attn_update_text=None,
             text_tune_mlp=None,
+            train_text_encoder=None,
             **kwargs,
         ):
         """
@@ -1081,14 +1082,15 @@ class LoraLoaderMixin:
             adapter_type=adapter_type, 
             attn_update_unet=attn_update_unet,
         )
-        self.load_lora_into_text_encoder(
-            state_dict,
-            network_alphas=network_alphas,
-            text_encoder=self.text_encoder,
-            lora_scale=self.lora_scale,
-            attn_update_text=attn_update_text,
-            text_tune_mlp=text_tune_mlp,
-        )
+        if train_text_encoder:
+            self.load_lora_into_text_encoder(
+                state_dict,
+                network_alphas=network_alphas,
+                text_encoder=self.text_encoder,
+                lora_scale=self.lora_scale,
+                attn_update_text=attn_update_text,
+                text_tune_mlp=text_tune_mlp,
+            )
         
 
     @classmethod
