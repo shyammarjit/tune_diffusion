@@ -1164,8 +1164,8 @@ def main(args):
                 rank_q=args.text_lora_rank_q if "q" in args.attn_update_text else None, # added
                 rank_v=args.text_lora_rank_v if "v" in args.attn_update_text else None, # added 
                 rank_o=args.text_lora_rank_out if "o" in args.attn_update_text else None, # added
-                rank_mlp=args.text_lora_rank_mlp if args.text_tune_mlp else None, # added
-                patch_mlp=args.text_tune_mlp,
+                # rank_mlp=args.text_lora_rank_mlp if args.text_tune_mlp else None, # added
+                # patch_mlp=args.text_tune_mlp,
             )
         elif args.adapter_type=="krona":
             # ToDo: Text encoder ffn/mlp updates are not added.
@@ -1219,7 +1219,10 @@ def main(args):
                 raise ValueError(f"unexpected save model: {model.__class__}")
 
         lora_state_dict, network_alphas = LoraLoaderMixin.lora_state_dict(input_dir)
-        LoraLoaderMixin.load_lora_into_unet(lora_state_dict, network_alphas=network_alphas, unet=unet_)
+        LoraLoaderMixin.load_lora_into_unet(lora_state_dict, network_alphas=network_alphas, unet=unet_, 
+            adapter_type=adapter_type, 
+            attn_update_unet=attn_update_unet,
+        )
         LoraLoaderMixin.load_lora_into_text_encoder(
             lora_state_dict, network_alphas=network_alphas, text_encoder=text_encoder_
         )

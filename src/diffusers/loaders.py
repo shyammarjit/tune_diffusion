@@ -1089,7 +1089,7 @@ class LoraLoaderMixin:
                 text_encoder=self.text_encoder,
                 lora_scale=self.lora_scale,
                 attn_update_text=attn_update_text,
-                text_tune_mlp=text_tune_mlp,
+                # text_tune_mlp=text_tune_mlp,
             )
         
 
@@ -1466,9 +1466,9 @@ class LoraLoaderMixin:
                     rank_out = text_encoder_lora_state_dict[
                         "text_model.encoder.layers.0.self_attn.out_proj.lora_linear_layer.up.weight"
                     ].shape[1]
-                    print(text_encoder_lora_state_dict[
-                        "text_model.encoder.layers.0.self_attn.out_proj.lora_linear_layer.up.weight"
-                    ])
+                    # print(text_encoder_lora_state_dict[
+                    #     "text_model.encoder.layers.0.self_attn.out_proj.lora_linear_layer.up.weight"
+                    # ])
                     # exit()
                 
                 if("k" in attn_update_text):

@@ -29,7 +29,6 @@ class DatasetWrapper(Dataset):
         img = preprocess(Image.open(self.images_path[idx]))
         return img
     
-    
 
 def CLIP_I(org_folder_path = None, gen_folder_path = None):
     org_image_files = sorted([os.path.join(org_folder_path, f) for f in os.listdir(org_folder_path)])
@@ -52,7 +51,6 @@ def CLIP_I(org_folder_path = None, gen_folder_path = None):
     clipi = torch.mean(torch.FloatTensor(clipi))
     print(f"cosine cimilarity Image-2-Image {clipi}")
     return clipi.item()
-    
 
 
 def CLIP_T(gen_folder_path = None, prompts = None):
@@ -78,7 +76,6 @@ def CLIP_T(gen_folder_path = None, prompts = None):
     average_similarity = total_similarity / num_images
     print(f'Cosine similarity CLIP-T {average_similarity}')
     return average_similarity
-
 
 
 def evaluator(args, prompts, from_checkpoint):
@@ -115,7 +112,13 @@ def generator(args, prompts, from_checkpoint):
         model_id = "stabilityai/stable-diffusion-2-1-base"
         pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
         pipe = pipe.to("cuda")
-        pipe.load_lora_weights(os.path.join(args.output_dir, from_checkpoint), adapter_type=args.adapter_type)
+        pipe.load_lora_weights(args.output_dir,
+            adapter_type=args.adapter_type, 
+            attn_update_unet=args.attn_update_unet,
+            attn_update_text=args.attn_update_text,
+            train_text_encoder=args.train_text_encoder,
+            weight_name="pytorch_lora_weights.safetensors",
+        )
     else:
         raise AttributeError("only supported base and sdxl model")
 
@@ -242,9 +245,6 @@ def save_metrics(args, clipi, clipt, from_checkpoint):
         print("zip folder uploaded on GDrive and deleted from local.")
 
 
-
-
-
 if __name__ == "__main__":
     # load the clip model
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -260,4 +260,3 @@ if __name__ == "__main__":
     # compute the quantiative results (CLIP-I, CLIP-T)
     clipi, clipt = evaluator(args, prompts, from_checkpoint)
     save_metrics(args, clipi, clipt, from_checkpoint)
-
