@@ -116,8 +116,8 @@ def generator(args, prompts, from_checkpoint):
             adapter_type=args.adapter_type, 
             attn_update_unet=args.attn_update_unet,
             attn_update_text=args.attn_update_text,
-            train_text_encoder=args.train_text_encoder,
             weight_name="pytorch_lora_weights.safetensors",
+            train_text_encoder=args.train_text_encoder,
         )
     else:
         raise AttributeError("only supported base and sdxl model")

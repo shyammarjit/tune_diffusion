@@ -102,6 +102,8 @@ def generator(args, prompts, from_checkpoint):
             adapter_type=args.adapter_type, 
             attn_update_unet=args.attn_update_unet,
             attn_update_text=args.attn_update_text,
+            # text_tune_mlp=args.text_tune_mlp, # No need for this one # Added
+            train_text_encoder=args.train_text_encoder, # Added
         )
         refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-refiner-1.0", torch_dtype=torch.float16, use_safetensors=True, variant="fp16",
@@ -115,7 +117,13 @@ def generator(args, prompts, from_checkpoint):
         model_id = "stabilityai/stable-diffusion-2-1-base"
         pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
         pipe = pipe.to("cuda")
-        pipe.load_lora_weights(os.path.join(args.output_dir, from_checkpoint), adapter_type=args.adapter_type)
+        pipe.load_lora_weights(os.path.join(args.output_dir, from_checkpoint),
+            adapter_type=args.adapter_type, 
+            attn_update_unet=args.attn_update_unet,
+            attn_update_text=args.attn_update_text,
+            weight_name="pytorch_lora_weights.safetensors",
+            train_text_encoder=args.train_text_encoder,
+        )
     else:
         raise AttributeError("only supported base and sdxl model")
 
