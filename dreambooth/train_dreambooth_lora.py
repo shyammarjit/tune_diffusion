@@ -1797,10 +1797,11 @@ def main(args):
 
         # load attention processors
         pipeline.load_lora_weights(args.output_dir,
-            adapter_type=args.adapter_type, 
+            adapter_type=args.adapter_type,
+            train_text_encoder=args.train_text_encoder,
             attn_update_unet=args.attn_update_unet,
             attn_update_text=args.attn_update_text,
-            text_tune_mlp=args.text_tune_mlp,         
+            text_tune_mlp=args.text_tune_mlp,    
             weight_name="pytorch_lora_weights.safetensors"
         )
 
