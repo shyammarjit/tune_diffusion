@@ -3,8 +3,8 @@ export MODEL_NAME="stabilityai/stable-diffusion-2-1"
 export OUTPUT_DIR="/home/nmathur/test"
 export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
 
-attn_update_unet="kqvo"
-attn_update_text="kqvo"
+attn_update_unet="kqv"
+attn_update_text="kqv"
 # unet parameters
 a1=16
 a2=32
