@@ -195,7 +195,7 @@ def struct_output(args):
             if(args.text_tune_mlp): text_attn_config = text_attn_config + "f" + str(args.text_lora_rank_mlp)
             attn_config = attn_config + "_" + text_attn_config
         
-        exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
+        exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}_{args.learning_rate_text}"
     elif(args.adapter_type=="krona"): 
         
         # Now create folder for experiments
@@ -225,7 +225,7 @@ def struct_output(args):
                 text_attn_config = text_attn_config + "f" + str(args.krona_text_ffn_rank_a1) + ":" + str(args.krona_text_ffn_rank_a2)    
             attn_config = attn_config + "_" + text_attn_config
             
-        exp = f"krona_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
+        exp = f"krona_{attn_config}_{args.diffusion_model}_{args.learning_rate}_{args.learning_rate_text}"
         # raise ValueError("currently not supported.")
     else: raise AttributeError(f"{args.adapter_type} wrong adapter format.")
     
@@ -402,6 +402,12 @@ def parse_args(input_args=None):
     )
     parser.add_argument(
         "--learning_rate",
+        type=float,
+        default=5e-4,
+        help="Initial learning rate (after the potential warmup period) to use.",
+    )
+    parser.add_argument(
+        "--learning_rate_text",
         type=float,
         default=5e-4,
         help="Initial learning rate (after the potential warmup period) to use.",
@@ -1256,14 +1262,36 @@ def main(args):
         optimizer_class = torch.optim.AdamW
 
     # Optimizer creation
-    params_to_optimize = (
-        itertools.chain(unet_lora_parameters, text_lora_parameters)
-        if args.train_text_encoder
-        else unet_lora_parameters
+    # params_to_optimize = (
+    #     itertools.chain(unet_lora_parameters, text_lora_parameters)
+    #     if args.train_text_encoder
+    #     else unet_lora_parameters
+    # )
+    
+    text_lr = (
+        args.learning_rate
+        if args.learning_rate_text is None
+        else args.learning_rate_text
     )
+
+    params_to_optimize = (
+        [
+            {
+                "params": itertools.chain(unet_lora_parameters), 
+                "lr": args.learning_rate
+            },
+            {
+                "params": itertools.chain(text_lora_parameters),
+                "lr": text_lr,
+            },
+        ]
+        if args.train_text_encoder
+        else itertools.chain(unet_lora_parameters)
+    )
+    
     optimizer = optimizer_class(
         params_to_optimize,
-        lr=args.learning_rate,
+        # lr=args.learning_rate,
         betas=(args.adam_beta1, args.adam_beta2),
         weight_decay=args.adam_weight_decay,
         eps=args.adam_epsilon,

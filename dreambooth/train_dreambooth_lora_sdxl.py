@@ -174,7 +174,7 @@ def struct_output(args):
         attn_config = attn_config + "_" + text_attn_config
         
     if(args.adapter_type=="lora"):
-        exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
+        exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}_{args.learning_rate_text}"
     elif(args.adapter_type=="krona"): raise ValueError("currently not supported.")
     else: raise AttributeError("Wrong adapter format.") 
     
@@ -366,6 +366,14 @@ def parse_args(input_args=None):
         default=5e-4,
         help="Initial learning rate (after the potential warmup period) to use.",
     )
+    
+    parser.add_argument(
+        "--learning_rate_text",
+        type=float,
+        default=5e-4,
+        help="Initial learning rate (after the potential warmup period) to use.",
+    )
+    
     parser.add_argument(
         "--scale_lr",
         action="store_true",
@@ -1130,16 +1138,55 @@ def main(args):
     else:
         optimizer_class = torch.optim.AdamW
 
+    # When we have same learning rate
+    # params_to_optimize = (
+    #     itertools.chain(unet_lora_parameters, text_lora_parameters_one, text_lora_parameters_two)
+    #     if args.train_text_encoder
+    #     else unet_lora_parameters
+    # )
+    
+    
+    # different learning rate for text encoders
+    text_lr = (
+        args.learning_rate
+        if args.learning_rate_text is None
+        else args.learning_rate_text
+    )
+    
+    # unet_lora_params_with_lr = [{'params': unet_lora_parameters, 'lr': args.learning_rate}]
+    # text_lora_params_with_lr_one = [{'params': text_lora_parameters_one, 'lr': text_lr}]
+    # text_lora_params_with_lr_two = [{'params': text_lora_parameters_one, 'lr': text_lr}]
+    
+    
+    # params_to_optimize = (
+    #     itertools.chain(unet_lora_params_with_lr, text_lora_params_with_lr_one, text_lora_params_with_lr_two)
+    #     if args.train_text_encoder
+    #     else unet_lora_parameters
+    # )
     # Optimizer creation
     params_to_optimize = (
-        itertools.chain(unet_lora_parameters, text_lora_parameters_one, text_lora_parameters_two)
+        [
+            {
+                "params": itertools.chain(unet_lora_parameters), 
+                "lr": args.learning_rate
+            },
+            {
+                "params": itertools.chain(text_lora_parameters_one),
+                "lr": text_lr,
+            },
+            {
+                "params": itertools.chain(text_lora_parameters_two),
+                "lr": text_lr,
+            },
+            
+        ]
         if args.train_text_encoder
-        else unet_lora_parameters
+        else itertools.chain(unet_lora_parameters)
     )
-
+    
     optimizer = optimizer_class(
         params_to_optimize,
-        lr=args.learning_rate,
+        # lr=args.learning_rate,
         betas=(args.adam_beta1, args.adam_beta2),
         weight_decay=args.adam_weight_decay,
         eps=args.adam_epsilon,

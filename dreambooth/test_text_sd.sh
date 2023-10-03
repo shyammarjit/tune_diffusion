@@ -4,7 +4,7 @@ export OUTPUT_DIR="/home/nmathur/test"
 export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
 
 attn_update_unet="kqvo"
-attn_update_text="kqv0"
+attn_update_text="kqvo"
 # unet parameters
 unet_lora_rank_k=4
 unet_lora_rank_q=4
