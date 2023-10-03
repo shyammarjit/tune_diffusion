@@ -18,7 +18,8 @@ text_lora_rank_q=4
 text_lora_rank_v=4
 text_lora_rank_out=4
 
-lr=1e-3
+lr_unet=1e-4
+lr_text=5e-5
 steps=2
 
 
@@ -31,7 +32,8 @@ accelerate launch train_dreambooth_lora.py \
     --resolution=1024 \
     --train_batch_size=1 \
     --gradient_accumulation_steps=4 \
-    --learning_rate=$lr \
+    --learning_rate=$lr_unet \
+    --learning_rate_text=$lr_text \
     --lr_scheduler="constant" \
     --lr_warmup_steps=0 \
     --max_train_steps=$steps \
@@ -64,7 +66,8 @@ python3 generator_test.py \
     --resolution=1024 \
     --train_batch_size=1 \
     --gradient_accumulation_steps=4 \
-    --learning_rate=$lr \
+    --learning_rate=$lr_unet \
+    --learning_rate_text=$lr_text \
     --lr_scheduler="constant" \
     --lr_warmup_steps=0 \
     --max_train_steps=$steps \
