@@ -30,7 +30,8 @@ krona_text_v_rank_a2=$a2 # v
 krona_text_o_rank_a1=$a1 # out
 krona_text_o_rank_a2=$a2 # out
 
-lr=1e-3
+lr_unet=1e-3
+lr_text=1e-3
 steps=1000
 
 
@@ -43,7 +44,8 @@ accelerate launch train_dreambooth_lora_sdxl.py \
     --resolution=1024 \
     --train_batch_size=1 \
     --gradient_accumulation_steps=4 \
-    --learning_rate=$lr \
+    --learning_rate=$lr_unet \
+    --learning_rate_text=$lr_text \
     --lr_scheduler="constant" \
     --lr_warmup_steps=0 \
     --max_train_steps=$steps \
@@ -86,7 +88,8 @@ python3 generator.py \
     --resolution=1024 \
     --train_batch_size=1 \
     --gradient_accumulation_steps=4 \
-    --learning_rate=$lr \
+    --learning_rate=$lr_unet \
+    --learning_rate_text=$lr_text \
     --lr_scheduler="constant" \
     --lr_warmup_steps=0 \
     --max_train_steps=$steps \
