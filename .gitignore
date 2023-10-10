@@ -15,6 +15,7 @@ tests/fixtures/cached_*_text.txt
 logs/
 lightning_logs/
 lang_code_data/
+tune_diffusion/dreambooth/run_*.sh
 
 # Distribution / packaging
 .Python

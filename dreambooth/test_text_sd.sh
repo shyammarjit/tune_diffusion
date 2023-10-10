@@ -1,7 +1,7 @@
 subjects="teapot"
 export MODEL_NAME="stabilityai/stable-diffusion-2-1"
-export OUTPUT_DIR="/home/nmathur/test"
-export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
+export OUTPUT_DIR="/home2/shyammarjit/test"
+export INSTANCE_DIR="/home2/shyammarjit/dataset/${subjects}"
 
 attn_update_unet="kqvo"
 attn_update_text="kqvo"

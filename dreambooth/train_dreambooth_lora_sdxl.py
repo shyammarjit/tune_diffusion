@@ -174,7 +174,9 @@ def struct_output(args):
         attn_config = attn_config + "_" + text_attn_config
         
     if(args.adapter_type=="lora"):
-        exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}_{args.learning_rate_text}"
+        exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
+        if args.train_text_encoder:
+            exp = exp + f"_{args.learning_rate_text}"
     elif(args.adapter_type=="krona"): raise ValueError("currently not supported.")
     else: raise AttributeError("Wrong adapter format.") 
     

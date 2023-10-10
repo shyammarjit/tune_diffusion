@@ -12,7 +12,7 @@ unet_lora_rank_out=4
 unet_lora_rank_mlp=4
 
 lr=1e-4
-steps=2
+steps=1000
 
 
 accelerate launch train_dreambooth_lora.py \
@@ -42,7 +42,7 @@ accelerate launch train_dreambooth_lora.py \
     --unet_lora_rank_mlp=$unet_lora_rank_mlp \
     # --unet_tune_mlp \
 
-python3 generator.py \
+python3 generator_test.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
     --instance_data_dir=$INSTANCE_DIR \
     --output_dir=$OUTPUT_DIR \
@@ -67,5 +67,5 @@ python3 generator.py \
     --unet_lora_rank_v=$unet_lora_rank_v \
     --unet_lora_rank_out=$unet_lora_rank_out \
     --unet_lora_rank_mlp=$unet_lora_rank_mlp \
-#    # --unet_tune_mlp \
-#    # --delete_and_upload_drive
+    # --unet_tune_mlp \
+    # --delete_and_upload_drive
