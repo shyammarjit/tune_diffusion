@@ -12,7 +12,7 @@ unet_lora_rank_out=4
 unet_lora_rank_mlp=4
 
 lr=1e-4
-steps=2
+steps=1000
 
 
 accelerate launch train_dreambooth_lora.py \

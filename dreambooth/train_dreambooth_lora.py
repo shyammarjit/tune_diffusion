@@ -193,7 +193,7 @@ def struct_output(args):
             if "o" in args.attn_update_text: text_attn_config = text_attn_config + "o" + str(args.text_lora_rank_out)
             if(args.text_tune_mlp): text_attn_config = text_attn_config + "f" + str(args.text_lora_rank_mlp)
             attn_config = attn_config + "_" + text_attn_config
-            exp = exp + f"_{args.learning_rate_text}"
+            exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}_{args.learning_rate_text}"
 
     elif(args.adapter_type=="krona"):
         # Now create folder for experiments

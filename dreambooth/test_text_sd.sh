@@ -89,5 +89,5 @@ python3 generator_test.py \
     --unet_lora_rank_v=$unet_lora_rank_v \
     --unet_lora_rank_out=$unet_lora_rank_out \
     --train_text_encoder \
-    # --unet_tune_mlp \
-    # --delete_and_upload_drive
+#    # --unet_tune_mlp \
+#    # --delete_and_upload_drive
