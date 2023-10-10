@@ -165,7 +165,8 @@ def struct_output(args):
         if "v" in args.attn_update_unet: attn_config = attn_config + "v" + str(args.unet_lora_rank_v)
         if "o" in args.attn_update_unet: attn_config = attn_config + "o" + str(args.unet_lora_rank_out)
         if(args.unet_tune_mlp): attn_config = attn_config + "f" + str(args.unet_lora_rank_mlp)
-        
+        exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
+
         if(args.train_text_encoder):
             text_attn_config = ''
             if "k" in args.attn_update_text: text_attn_config = text_attn_config + "k" + str(args.text_lora_rank_k)
@@ -174,8 +175,7 @@ def struct_output(args):
             if "o" in args.attn_update_text: text_attn_config = text_attn_config + "o" + str(args.text_lora_rank_out)
             if(args.text_tune_mlp): text_attn_config = text_attn_config + "f" + str(args.text_lora_rank_mlp)
             attn_config = attn_config + "_" + text_attn_config
-        
-        exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}_{args.learning_rate_text}"
+            exp = f"lora_{attn_config}_{args.diffusion_model}_{args.learning_rate}_{args.learning_rate_text}"
     
     elif(args.adapter_type=="krona"):
         # Now create folder for experiments
@@ -190,6 +190,7 @@ def struct_output(args):
             attn_config = attn_config + "o" + str(args.krona_unet_o_rank_a1) + ":" + str(args.krona_unet_o_rank_a2)
         if(args.unet_tune_mlp): 
             attn_config = attn_config + "f" + str(args.krona_unet_ffn_rank_a1) + ":" + str(args.krona_unet_ffn_rank_a2)
+        exp = f"krona_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
         
         if(args.train_text_encoder):
             text_attn_config = ''
@@ -205,7 +206,7 @@ def struct_output(args):
                 text_attn_config = text_attn_config + "f" + str(args.krona_text_ffn_rank_a1) + ":" + str(args.krona_text_ffn_rank_a2)    
             attn_config = attn_config + "_" + text_attn_config
             
-        exp = f"krona_{attn_config}_{args.diffusion_model}_{args.learning_rate}_{args.learning_rate_text}"
+            exp = f"krona_{attn_config}_{args.diffusion_model}_{args.learning_rate}_{args.learning_rate_text}"
         # raise ValueError("currently not supported.")
     else: raise AttributeError(f"{args.adapter_type} wrong adapter format.")
     
