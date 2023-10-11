@@ -54,3 +54,17 @@ To run with text encoder config please hit this inside ```dreambooth``` folder
 ```
 bash test_text.sh
 ```
+
+
+## How to edit the code?
+
+Following are the files where we need to look into in order to change the things:
+* All the files inside ```dreambooth``` folder.
+* Inside ```src``` folder, in ```loaders.py``` script we need to revisit of all the functions.
+* Inside ```src/tune_diffusion/models``` folder.
+    * ```attention_processor.py``` ➡️ In ```LoRAAttnProcessor2_0``` class, add ```adapter_type``` and ```attn_update_unet```
+    * ```lora.py``` ➡️ Need to visit all the functions.
+    * ```unet_2d_condition.py``` ➡️ There was ```attn_processors``` as a @property of the prior class, here we have added ```ffn_processors``` as an another @property for ffn layers.
+    Here, we also added ```set_ffn_processors``` another function within the parent class for ffn layers.
+* Inside ```src/pipelines/stable_diffusion_xl``` folder.
+    * In ```pipeline_stable_diffusion.py``` script, within ```load_lora_weights``` function need to add ```adapter_type```, ```attn_update_unet```, and ```attn_update_text``` as an extra arguments. This bypass call is getting only when we are using *SDXL* models. 
