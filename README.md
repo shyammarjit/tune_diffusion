@@ -2,19 +2,27 @@
 
 Conda env Create
 ```
-conda create -n diffusers
+conda create -y -n diffusers python=3.11
+conda activate diffusers
 ```
 
-Install acclerator
+Install acclerator and wandb
 ```
-pip install accelerator
+pip install accelerator wandb
+```
+Install diffuser from Our Space
+```
+pip install git+https://github.com/huggingface/diffusers
+git clone git@github.com:shyammarjit/tune_diffusion.git
+cd tune_diffusion 
+pip install -e ".[torch]"
 ```
 
-Install diffuser
+Install diffuser from HuggingFace
 ```
 pip install git+https://github.com/huggingface/diffusers
 git clone https://github.com/huggingface/diffusers.git
-cd diffusers
+cd diffusers 
 pip install -e ".[torch]"
 ```
 
