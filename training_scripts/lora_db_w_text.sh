@@ -1,20 +1,20 @@
 #!/bin/bash
 
-subjects=("dog6")
+# subjects=("dog6")
 # subjects=("clock")
-# subjects=("teapot")
+subjects=("teapot")
 
-lora_rank=("8" "4" "16" "2")
-LEARNING_RATE=("5e-6" "2e-6" "1e-6" "5e-5" "2e-5" "1e-5" "5e-4" "1e-4")
-LEARNING_RATE_TEXT=("5e-6" "2e-6" "1e-6" "5e-5" "2e-5" "1e-5" "5e-4" "1e-4")
-steps=("400" "800" "1000" "1200")
+# lora_rank=("8" "4" "16" "2")
+lora_rank=("8")
+LEARNING_RATE=("5e-6")
+LEARNING_RATE_TEXT=("5e-6")
+steps=("1200")
 
-export OUTPUT_DIR="/home/smarjit/outputs"
+export OUTPUT_DIR="/home/nmathur/outputs"
 export MODEL_NAME="stabilityai/stable-diffusion-2-1-base"
 
 for dataset in "${subjects[@]}"; do
-    export INSTANCE_DIR="/home/smarjit/dataset/${dataset}"
-    export CLASS_DIR="/home/smarjit/class_data/${dataset}"
+    export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${dataset}"
 
     for rank in "${lora_rank[@]}"; do
         for lr in "${LEARNING_RATE[@]}"; do
@@ -24,7 +24,6 @@ for dataset in "${subjects[@]}"; do
                         --pretrained_model_name_or_path="$MODEL_NAME"  \
                         --instance_data_dir="$INSTANCE_DIR" \
                         --output_dir="$OUTPUT_DIR" \
-                        --class_data_dir=$CLASS_DIR \
                         --train_text_encoder \
                         --resolution=512 \
                         --train_batch_size=1 \
@@ -36,10 +35,7 @@ for dataset in "${subjects[@]}"; do
                         --lr_warmup_steps=0 \
                         --max_train_steps="$s" \
                         --lora_or_krona=0 \
-                        --lora_rank="$rank" \
-                        --with_prior_preservation \
-                        --prior_loss_weight=1.0 \
-                        --num_class_images=250 
+                        --lora_rank="$rank"
                 done
             done
         done

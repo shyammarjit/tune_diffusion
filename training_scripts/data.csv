@@ -1,2 +1,3 @@
-Dataset_Name,Adaptor,lora_rank,clipi,clipt,num_train_epochs,no_of_images,learning_rate,learning_rate_text,alpha_text,alpha_unet,output_path
-dog2,0,16,0.68896484375,0.22468610491071428,1,252,0.0001,0.0001,1.0,1.0,/home/smarjit/outputs/dog2/lora_16_0.0001_0.0001_1.0_1.0/images
+Dataset_Name,Adaptor,lora_rank,clipi,clipt,num_train_epochs,no_of_images,learning_rate,learning_rate_text,alpha_text,alpha_unet,output_path,with_prior_preservation
+dog2,0,16,0.68896484375,0.2246861049107142,1,252,0.0001,0.0001,1.0,1.0,/home/smarjit/outputs/dog2/lora_16_0.0001_0.0001_1.0_1.0/images,
+teapot,0,8,0.7919921875,0.2751708984375,240,5,5e-06,5e-06,1.0,1.0,/home/nmathur/outputs/teapot/lora_8_5e-06_5e-06_1200_False/images,False

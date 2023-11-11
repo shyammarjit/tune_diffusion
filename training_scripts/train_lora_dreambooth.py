@@ -10,7 +10,7 @@ import inspect
 import json
 from pathlib import Path
 from typing import Optional
-from torchviz import make_dot, make_dot_from_trace
+# from torchviz import make_dot, make_dot_from_trace
 import torch
 import torch.nn.functional as F
 import torch.utils.checkpoint
@@ -32,7 +32,7 @@ from huggingface_hub import HfFolder, Repository, whoami
 from tqdm.auto import tqdm
 from transformers import CLIPTextModel, CLIPTokenizer
 
-from krona_diffusion import (
+from lora_diffusion import (
     extract_lora_ups_down,
     inject_trainable_lora,
     inject_trainable_lora_extended,
@@ -40,7 +40,7 @@ from krona_diffusion import (
     save_lora_weight,
     save_safeloras,
 )
-from krona_diffusion.xformers_utils import set_use_memory_efficient_attention_xformers
+from lora_diffusion.xformers_utils import set_use_memory_efficient_attention_xformers
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
