@@ -4,7 +4,7 @@
 conda create -y -n <env_name>
 ```
 
-## Install requirements  
+## Install requirements
 ```
 pip install -r requirements.txt
 ```
@@ -20,7 +20,7 @@ pip install -e.
 
 ## Install CLIP
 ```
-pip install ftfy regex tqdm scipy pandas
+pip install ftfy regex tqdm scipy pandas accelerator
 pip install git+https://github.com/openai/CLIP.git
 ```
 

@@ -5,9 +5,9 @@
 subjects=("teapot")
 
 # lora_rank=("8" "4" "16" "2")
-lora_rank=("8")
-LEARNING_RATE=("5e-6")
-LEARNING_RATE_TEXT=("5e-6")
+lora_rank=("8" "4" "16" "2")
+LEARNING_RATE=("1e-5", "5e-5", "1e-4", "5e-4", "1e-3")
+LEARNING_RATE_TEXT=("1e-5", "5e-5", "1e-4", "5e-4", "1e-3")
 steps=("1200")
 
 export OUTPUT_DIR="/home/nmathur/outputs"
