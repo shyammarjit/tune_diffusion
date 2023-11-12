@@ -18,6 +18,8 @@ cd diffusers-0.17.1
 pip install -e.
 ```
 
+⚠️ Doing ```pip install diffusers==0.17.1``` may take much higher time to train.
+
 ## Install CLIP
 ```
 pip install ftfy regex tqdm scipy pandas accelerator
