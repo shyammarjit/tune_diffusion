@@ -1,17 +1,16 @@
 #!/bin/bash
-
-# subjects=("dog6")
-# subjects=("clock")
+export OUTPUT_DIR="/home/nmathur/runwayml_outputs"
+export MODEL_NAME="runwayml/stable-diffusion-v1-5"
 subjects=("teapot")
 
 # lora_rank=("8" "4" "16" "2")
-lora_rank=("8" "4" "16")
-LEARNING_RATE=("1e-5" "5e-5" "1e-4" "5e-4" "1e-3")
-LEARNING_RATE_TEXT=("1e-5" "5e-5" "1e-4" "5e-4" "1e-3")
-steps=("800" "1000" "1200" "1500")
+lora_rank=("8" "4")
+# LEARNING_RATE=("5e-6" "2e-6" "1e-6" "5e-5" "2e-5" "1e-5" "5e-4" "1e-4")
+LEARNING_RATE=("1e-5" "1e-4" "5e-4" "8e-4" "1e-3" "3e-3" "5e-3")
+LEARNING_RATE_TEXT=("1e-5" "3e-5" "5e-5" "8e-5" "1e-4")
+steps=("1200")
 
-export OUTPUT_DIR="/home/nmathur/outputs"
-export MODEL_NAME="stabilityai/stable-diffusion-2-1-base"
+
 
 for dataset in "${subjects[@]}"; do
     export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${dataset}"
@@ -25,7 +24,7 @@ for dataset in "${subjects[@]}"; do
                         --instance_data_dir="$INSTANCE_DIR" \
                         --output_dir="$OUTPUT_DIR" \
                         --train_text_encoder \
-                        --resolution=768 \
+                        --resolution=512 \
                         --train_batch_size=1 \
                         --gradient_accumulation_steps=1 \
                         --learning_rate="$lr" \
@@ -35,7 +34,9 @@ for dataset in "${subjects[@]}"; do
                         --lr_warmup_steps=0 \
                         --max_train_steps="$s" \
                         --lora_or_krona=0 \
-                        --lora_rank="$rank"
+                        --lora_rank="$rank" \
+                        --save_steps=500 \
+
                 done
             done
         done
