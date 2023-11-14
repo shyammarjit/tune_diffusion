@@ -9,7 +9,7 @@ conda create -y -n <env_name>
 pip install -r requirements.txt
 ```
 
-# Install diffusers version 0.17.1 from [here](https://github.com/huggingface/diffusers/releases/tag/v0.17.1)
+## Install diffusers version 0.17.1 from [here](https://github.com/huggingface/diffusers/releases/tag/v0.17.1)
 ```
 # Download at root
 wget https://github.com/huggingface/diffusers/archive/refs/tags/v0.17.1.zip
