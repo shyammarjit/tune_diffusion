@@ -67,6 +67,7 @@ def get_promts(dataset):
 
     elif unique_token=="dog6":
         add_ones = [
+            'a {0} dog in a swimming pool'.format(unique_token),
             'a {0} dog in the Acropolis'.format(unique_token),
             'a {0} dog in a doghouse'.format(unique_token),
             'a {0} dog in a bucket'.format(unique_token),

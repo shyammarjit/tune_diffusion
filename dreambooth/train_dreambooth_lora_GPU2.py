@@ -70,6 +70,8 @@ from diffusers.utils.import_utils import is_xformers_available
 from logger import setup_logger
 from diffusers.models.lora import LoRALinearLayer
 from prompts import instance_prompt
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = "1"
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
 check_min_version("0.21.0.dev0")
 
