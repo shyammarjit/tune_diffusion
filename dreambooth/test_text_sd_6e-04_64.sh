@@ -12,7 +12,7 @@ a2_range=("4" "8" "2")
 
 
 lr_unet=6e-04
-lr_text_range=("1e-06" "5e-06" "1e-05" "5e-05" "5e-04" "8e-04" "1e-03" "5e-03")
+lr_text_range=("5e-06" "1e-05" "5e-05" "5e-04" "8e-04" "1e-03" "5e-03") # "1e-06" 
 steps=1200
 
 for a2 in "${a2_range[@]}"; do

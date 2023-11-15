@@ -6,10 +6,7 @@ conda create -y -n diffusers python=3.11
 conda activate diffusers
 ```
 
-Install acclerator and wandb
-```
-pip install accelerator wandb
-```
+
 Install diffuser from Our Space
 ```
 pip install git+https://github.com/huggingface/diffusers
@@ -32,6 +29,11 @@ pip install -r requirements.txt
 pip install -r requirements_sdxl.txt
 pip install bitsandbytes>=0.40.0
 pip install xformers>=0.0.20
+```
+
+Install acclerator and wandb
+```
+pip install accelerator wandb
 ```
 
 Install CLIP
