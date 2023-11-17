@@ -1089,35 +1089,38 @@ def main(args):
             )
 
     accelerator.end_training()
-    save_path = args.output_dir
-    generator(args)
-    clipi, clipt = evaluator(args)
+    
+    # save_path = args.output_dir
+    # generator(args)
+    # clipi, clipt = evaluator(args)
 
-    print(clipi)
-    print(clipt)
+    # print(clipi)
+    # print(clipt)
     
-    # save all the info in the form of *.json file
-    exp_info = {"Dataset_Name": os.path.basename(args.instance_data_dir), "Adaptor": args.lora_or_krona,
-                "lora_rank": args.lora_rank, "clipi": clipi, "clipt": clipt, "num_train_epochs": args.num_train_epochs, 
-                "no_of_images": len(train_dataset), "learning_rate": args.learning_rate, 
-                "learning_rate_text": args.learning_rate_text, "alpha_text": args.alpha_text, 
-                "alpha_unet": args.alpha_unet, "output_path": args.output_dir, "with_prior_preservation": args.with_prior_preservation}
-    exp_name = f'{save_path}/log_{args.lora_or_krona}_{args.lora_rank}_{args.num_train_epochs}_{len(train_dataset)}_\
-        {args.learning_rate}_{args.learning_rate_text}_{args.with_prior_preservation}.json'
+    # # save all the info in the form of *.json file
+    # exp_info = {"Dataset_Name": os.path.basename(args.instance_data_dir), "Adaptor": args.lora_or_krona,
+    #             "lora_rank": args.lora_rank, "clipi": clipi, "clipt": clipt, "num_train_epochs": args.num_train_epochs, 
+    #             "no_of_images": len(train_dataset), "learning_rate": args.learning_rate, 
+    #             "learning_rate_text": args.learning_rate_text, "alpha_text": args.alpha_text, 
+    #             "alpha_unet": args.alpha_unet, "output_path": args.output_dir, "with_prior_preservation": args.with_prior_preservation}
+    # exp_name = f'{save_path}/log_{args.lora_or_krona}_{args.lora_rank}_{args.num_train_epochs}_{len(train_dataset)}_\
+    #     {args.learning_rate}_{args.learning_rate_text}_{args.with_prior_preservation}.json'
     
-    with open(exp_name, 'w') as f:
-        f.write(json.dumps(exp_info, indent=4))
+    # with open(exp_name, 'w') as f:
+    #     f.write(json.dumps(exp_info, indent=4))
     
-    filename = 'data.csv'
-    if not os.path.exists(filename):
-        df = pd.DataFrame(columns=exp_info.keys())
-        df.to_csv(filename, index=False)
+    # filename = 'data.csv'
+    # if not os.path.exists(filename):
+    #     df = pd.DataFrame(columns=exp_info.keys())
+    #     df.to_csv(filename, index=False)
 
-    df = pd.read_csv(filename)
-    df = pd.concat([df, pd.DataFrame(exp_info, index=[0])], ignore_index=True)
-    df.to_csv('data.csv', index=False)
+    # df = pd.read_csv(filename)
+    # df = pd.concat([df, pd.DataFrame(exp_info, index=[0])], ignore_index=True)
+    # df.to_csv('data.csv', index=False)
 
 if __name__ == "__main__":
+    import time
+    start_time = time.time()
     args = parse_args()
     if(args.lora_or_krona==1):
         from krona_diffusion import (extract_lora_ups_down,
@@ -1142,3 +1145,4 @@ if __name__ == "__main__":
     else:
         raise ValueError(f"lora krona argument either 0 or 1, but given {args.lora_or_krona}")
     main(args)
+    print("--- %s seconds ---" % (time.time() - start_time))

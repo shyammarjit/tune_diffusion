@@ -1,0 +1,183 @@
+Metadata-Version: 2.1
+Name: diffusers
+Version: 0.21.0.dev0
+Summary: Diffusers
+Home-page: https://github.com/huggingface/diffusers
+Author: The HuggingFace team
+Author-email: patrick@huggingface.co
+License: Apache
+Keywords: deep learning
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.7.0
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: importlib_metadata
+Requires-Dist: filelock
+Requires-Dist: huggingface-hub>=0.13.2
+Requires-Dist: numpy
+Requires-Dist: regex!=2019.12.17
+Requires-Dist: requests
+Requires-Dist: safetensors>=0.3.1
+Requires-Dist: Pillow
+Provides-Extra: quality
+Requires-Dist: urllib3<=2.0.0; extra == "quality"
+Requires-Dist: black~=23.1; extra == "quality"
+Requires-Dist: isort>=5.5.4; extra == "quality"
+Requires-Dist: ruff==0.0.280; extra == "quality"
+Requires-Dist: hf-doc-builder>=0.3.0; extra == "quality"
+Provides-Extra: docs
+Requires-Dist: hf-doc-builder>=0.3.0; extra == "docs"
+Provides-Extra: training
+Requires-Dist: accelerate>=0.11.0; extra == "training"
+Requires-Dist: datasets; extra == "training"
+Requires-Dist: protobuf<4,>=3.20.3; extra == "training"
+Requires-Dist: tensorboard; extra == "training"
+Requires-Dist: Jinja2; extra == "training"
+Provides-Extra: test
+Requires-Dist: compel==0.1.8; extra == "test"
+Requires-Dist: datasets; extra == "test"
+Requires-Dist: Jinja2; extra == "test"
+Requires-Dist: invisible-watermark>=0.2.0; extra == "test"
+Requires-Dist: k-diffusion>=0.0.12; extra == "test"
+Requires-Dist: librosa; extra == "test"
+Requires-Dist: omegaconf; extra == "test"
+Requires-Dist: parameterized; extra == "test"
+Requires-Dist: pytest; extra == "test"
+Requires-Dist: pytest-timeout; extra == "test"
+Requires-Dist: pytest-xdist; extra == "test"
+Requires-Dist: requests-mock==1.10.0; extra == "test"
+Requires-Dist: safetensors>=0.3.1; extra == "test"
+Requires-Dist: sentencepiece!=0.1.92,>=0.1.91; extra == "test"
+Requires-Dist: scipy; extra == "test"
+Requires-Dist: torchvision; extra == "test"
+Requires-Dist: transformers>=4.25.1; extra == "test"
+Provides-Extra: torch
+Requires-Dist: torch>=1.4; extra == "torch"
+Requires-Dist: accelerate>=0.11.0; extra == "torch"
+Provides-Extra: flax
+Requires-Dist: jax!=0.3.2,>=0.2.8; extra == "flax"
+Requires-Dist: jaxlib>=0.1.65; extra == "flax"
+Requires-Dist: flax>=0.4.1; extra == "flax"
+Provides-Extra: dev
+Requires-Dist: urllib3<=2.0.0; extra == "dev"
+Requires-Dist: black~=23.1; extra == "dev"
+Requires-Dist: isort>=5.5.4; extra == "dev"
+Requires-Dist: ruff==0.0.280; extra == "dev"
+Requires-Dist: hf-doc-builder>=0.3.0; extra == "dev"
+Requires-Dist: compel==0.1.8; extra == "dev"
+Requires-Dist: datasets; extra == "dev"
+Requires-Dist: Jinja2; extra == "dev"
+Requires-Dist: invisible-watermark>=0.2.0; extra == "dev"
+Requires-Dist: k-diffusion>=0.0.12; extra == "dev"
+Requires-Dist: librosa; extra == "dev"
+Requires-Dist: omegaconf; extra == "dev"
+Requires-Dist: parameterized; extra == "dev"
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-timeout; extra == "dev"
+Requires-Dist: pytest-xdist; extra == "dev"
+Requires-Dist: requests-mock==1.10.0; extra == "dev"
+Requires-Dist: safetensors>=0.3.1; extra == "dev"
+Requires-Dist: sentencepiece!=0.1.92,>=0.1.91; extra == "dev"
+Requires-Dist: scipy; extra == "dev"
+Requires-Dist: torchvision; extra == "dev"
+Requires-Dist: transformers>=4.25.1; extra == "dev"
+Requires-Dist: accelerate>=0.11.0; extra == "dev"
+Requires-Dist: datasets; extra == "dev"
+Requires-Dist: protobuf<4,>=3.20.3; extra == "dev"
+Requires-Dist: tensorboard; extra == "dev"
+Requires-Dist: Jinja2; extra == "dev"
+Requires-Dist: hf-doc-builder>=0.3.0; extra == "dev"
+Requires-Dist: torch>=1.4; extra == "dev"
+Requires-Dist: accelerate>=0.11.0; extra == "dev"
+Requires-Dist: jax!=0.3.2,>=0.2.8; extra == "dev"
+Requires-Dist: jaxlib>=0.1.65; extra == "dev"
+Requires-Dist: flax>=0.4.1; extra == "dev"
+
+## Installation Steps
+
+Conda env Create
+```
+conda create -y -n diffusers python=3.11
+conda activate diffusers
+```
+
+Install acclerator and wandb
+```
+pip install accelerator wandb
+```
+Install diffuser from Our Space
+```
+pip install git+https://github.com/huggingface/diffusers
+git clone git@github.com:shyammarjit/tune_diffusion.git
+cd tune_diffusion 
+pip install -e ".[torch]"
+```
+
+Install diffuser from HuggingFace
+```
+pip install git+https://github.com/huggingface/diffusers
+git clone https://github.com/huggingface/diffusers.git
+cd diffusers 
+pip install -e ".[torch]"
+```
+
+Install requirements 
+```
+pip install -r requirements.txt 
+pip install -r requirements_sdxl.txt
+pip install bitsandbytes>=0.40.0
+pip install xformers>=0.0.20
+```
+
+Install CLIP
+```
+# conda install --yes -c pytorch pytorch=1.7.1 torchvision cudatoolkit=11.0
+pip install ftfy regex tqdm scipy pandas
+pip install git+https://github.com/openai/CLIP.git
+```
+
+Train dreambooth_sdxl using script file
+```
+bash run_lora_sdxl.sh
+```
+
+Generate images from the finetuned weights 
+```
+python generator.py
+```
+
+## What to run?
+To run without text encoder config please hit this inside ```dreambooth``` folder
+```
+bash dreambooth/test.sh
+```
+
+
+To run with text encoder config please hit this inside ```dreambooth``` folder
+```
+bash test_text.sh
+```
+
+
+## How to edit the code?
+
+Following are the files where we need to look into in order to change the things:
+* All the files inside ```dreambooth``` folder.
+* Inside ```src``` folder, in ```loaders.py``` script we need to revisit of all the functions.
+* Inside ```src/tune_diffusion/models``` folder.
+    * ```attention_processor.py``` ➡️ In ```LoRAAttnProcessor2_0``` class, add ```adapter_type``` and ```attn_update_unet```
+    * ```lora.py``` ➡️ Need to visit all the functions.
+    * ```unet_2d_condition.py``` ➡️ There was ```attn_processors``` as a @property of the prior class, here we have added ```ffn_processors``` as an another @property for ffn layers.
+    Here, we also added ```set_ffn_processors``` another function within the parent class for ffn layers.
+* Inside ```src/pipelines/stable_diffusion_xl``` folder.
+    * In ```pipeline_stable_diffusion.py``` script, within ```load_lora_weights``` function need to add ```adapter_type```, ```attn_update_unet```, and ```attn_update_text``` as an extra arguments. This bypass call is getting only when we are using *SDXL* models. 

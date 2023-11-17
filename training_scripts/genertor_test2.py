@@ -11,9 +11,9 @@ import torch.nn.functional as F
 import wandb
 
 model_id = "stabilityai/stable-diffusion-2-1-base"
-pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16).to("cuda")
+pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16).to("cuda:1")
 pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
 model, preprocess = clip.load('ViT-B/32', device=device, jit=False)
 # torch.manual_seed(0)
 
@@ -87,49 +87,60 @@ def CLIP_T(gen_folder_path = None, prompts = None):
 
 
 
-def evaluator(args):
-    clipi = CLIP_I(org_folder_path = args.instance_data_dir, gen_folder_path = args.output_dir)
-    clipt = CLIP_T(gen_folder_path = args.output_dir, prompts = get_promts(os.path.basename(args.instance_data_dir)))
+def evaluator(instance_data_dir, output_dir):
+    clipi = CLIP_I(org_folder_path = instance_data_dir, gen_folder_path = output_dir)
+    clipt = CLIP_T(gen_folder_path = output_dir, prompts = get_promts(os.path.basename(instance_data_dir)))
     return clipi, clipt
 
 
-def generator(args):
-    if(args.lora_or_krona==1):
-        from krona_diffusion import tune_lora_scale, patch_pipe
-        wandb.init(project='krona-exp',name=f"krona_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.alpha_text}_{args.alpha_unet}")
-
-    elif(args.lora_or_krona==0):
-        from lora_diffusion import tune_lora_scale, patch_pipe
-        wandb.init(project='krona-exp',name=f"lora_{args.lora_rank}_{args.learning_rate}_{args.learning_rate_text}_{args.alpha_text}_{args.alpha_unet}")
-
-    else:
-        raise AttributeError(f"wrong ataptor type {args.adaptor}")
+def generator(instance_data_dir, output_dir):
+    from lora_diffusion import tune_lora_scale, patch_pipe
     
-    
-    prompts = get_promts(os.path.basename(args.instance_data_dir))
-    lora_weight_path = os.path.join(args.output_dir, "lora_weight.safetensors")
+    prompts = get_promts(os.path.basename(instance_data_dir))
+    lora_weight_path = os.path.join(output_dir, "lora_weight.safetensors")
     # Patch the pipe with the updated lora_weight_path
     patch_pipe(pipe, lora_weight_path, patch_text=True, patch_ti=True, patch_unet=True)
     
     # Tune lora_scale for unet and text_encoder
-    tune_lora_scale(pipe.unet, args.alpha_unet)
-    tune_lora_scale(pipe.text_encoder, args.alpha_text)
+    tune_lora_scale(pipe.unet, 1.0)
+    tune_lora_scale(pipe.text_encoder, 1.0)
     
-    args.output_dir = os.path.join(args.output_dir, 'images') # create the image folder
-    if(os.path.exists(args.output_dir)): pass
-    else: os.mkdir(args.output_dir)
+    output_dir = os.path.join(output_dir, 'images') # create the image folder
+    if(os.path.exists(output_dir)): pass
+    else: os.mkdir(output_dir)
     
-    for i in trange(len(prompts), desc = "generating images"):
-        image = pipe(prompts[i], num_inference_steps=50, guidance_scale=7).images[0]
-        image_save_path = os.path.join(args.output_dir, "image_{}.jpg".format(i+1))
-        wandb.log({'Final Images': wandb.Image(image)})
+    for i in trange(1000, desc = "generating images"):
+        image = pipe(prompts[0], num_inference_steps=50, guidance_scale=7).images[0]
+        image_save_path = os.path.join(output_dir, 'seed_images', "image_seed{}.jpg".format(i+1))
+        # wandb.log({'Final Images': wandb.Image(image)})
         # # wandb.log({'subject': wandb.weights(args.learning_rate_text)})
         # wandb.log({'rank(r)': wandb.weights(args.lora_rank)})
         # wandb.log({'learning rate': wandb.weights(args.learning_rate)})
         # wandb.log({'learning rate text': wandb.weights(args.learning_rate_text)})
         # wandb.log({'alpha text': wandb.weights(args.alpha_text)})
         # wandb.log({'alpha unet': wandb.weights(args.alpha_unet)})
-
-        
         image.save(image_save_path)
     print(f"Image generation completed.")
+
+
+# instance_data_dir = "/home/nmathur/dataset/tune_diffusion/dog6"
+# output_dir = "/home/nmathur/output_lora/dog6/lora_8_0.0001_5e-05_1000_False"
+
+
+# generator(instance_data_dir, output_dir)
+
+# instance_data_dir = "/home/nmathur/dataset/tune_diffusion/plushy"
+# output_dir = '/home/nmathur/output_lora/plushy/lora_8_0.0001_0.0001_1000_False'
+# generator(instance_data_dir, output_dir)
+
+# instance_data_dir = "/home/nmathur/dataset/tune_diffusion/glass_sculpture"
+# output_dir = '/home/nmathur/output_lora/glass_sculpture/lora_8_0.0001_0.0001_1000_False'
+# generator(instance_data_dir, output_dir)
+# evaluator(instance_data_dir, output_dir)
+
+# instance_data_dir = "/home/nmathur/dataset/tune_diffusion/dog6"
+# output_dir = "/home/nmathur/output_lora/dog6/lora_8_0.0001_0.0001_1000_False"
+
+instance_data_dir = "/home/nmathur/dataset/tune_diffusion/plushy"
+output_dir = '/home/nmathur/output_lora/plushy/lora_8_0.0001_0.0001_1000_False'
+generator(instance_data_dir, output_dir)

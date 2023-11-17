@@ -1,13 +1,12 @@
 #https://github.com/huggingface/diffusers/tree/main/examples/dreambooth
 export MODEL_NAME="stabilityai/stable-diffusion-2-1-base"
-export INSTANCE_DIR="/home/smarjit/datas"
-export OUTPUT_DIR="./home/smarjit/outputs"
+export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/dog6"
+export OUTPUT_DIR="/home/nmathur/output_lora"
 
 accelerate launch train_lora_dreambooth.py \
-  --pretrained_model_name_or_path=$MODEL_NAME  \
-  --instance_data_dir=$INSTANCE_DIR \
-  --output_dir=$OUTPUT_DIR \
-  --instance_prompt="game character bnha" \
+  --pretrained_model_name_or_path="$MODEL_NAME"  \
+  --instance_data_dir="$INSTANCE_DIR" \
+  --output_dir="$OUTPUT_DIR" \
   --train_text_encoder \
   --resolution=512 \
   --train_batch_size=1 \
@@ -17,6 +16,7 @@ accelerate launch train_lora_dreambooth.py \
   --color_jitter \
   --lr_scheduler="constant" \
   --lr_warmup_steps=0 \
-  --max_train_steps=10 \
-  --lora_or_krona=1 \
-  --lora_rank=8
+  --max_train_steps=1000 \
+  --lora_or_krona=0 \
+  --save_steps=1500 \
+  --lora_rank=4 \

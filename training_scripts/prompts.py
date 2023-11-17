@@ -38,14 +38,17 @@ def instance_prompt(dataset):
         'akemi':'takada,akemi',
         'supersaiyan':'super,saiyan',
         'pokemon':'pokemon',
-        'kiriko':'kiriko'
+        'kiriko':'kiriko',
+        'glass_sculpture':'sks_glass_sculpture,sculpture',
+        'panda_sculpture':'sks_panda_sculpture,sculpture',
+        'plushy':'sks_plushy,plushy',
     }
     return subject_class_dict[dataset]
  
 
 def get_promts(dataset):
     livig_dataset=["cat","cat2","dog","dog2","dog3","dog5","dog6","dog7","dog8"]
-    non_living_dataset= ['backpack','backpack_dog','bear_plushie','berry_bowl','can','candle' ,'clock' ,'colorful_sneaker','duck_toy','fancy_boot','grey_sloth_plushie','monster_toy','pink_sunglasses','poop_emoji','rc_car','red_cartoon','robot_toy','shiny_sneaker','teapot','vase','wolf_plushie']
+    non_living_dataset= ['glass_sculpture', 'panda_sculpture', 'backpack','backpack_dog','bear_plushie','berry_bowl','can','candle' ,'clock' ,'colorful_sneaker','duck_toy','fancy_boot','grey_sloth_plushie','monster_toy','pink_sunglasses','poop_emoji','rc_car','red_cartoon','robot_toy','shiny_sneaker','teapot','vase','wolf_plushie', 'plushy']
     unique_token = os.path.basename(dataset)
     class_token = instance_prompt(unique_token)
     add_ones=[]
@@ -59,6 +62,20 @@ def get_promts(dataset):
         ]
         add_ones = [sentence.format(V=unique_token) for sentence in add_ones]
 
+    elif unique_token=="glass_sculpture":
+        add_ones = [
+            'a {0} sculpture holding flowers'.format(unique_token),
+        ]
+
+    elif unique_token=="panda_sculpture":
+        add_ones = [
+            'a {0} sculpture made of glass'.format(unique_token),
+        ]
+
+    elif unique_token=="plushy":
+        add_ones = [
+            'a {} plushy on a skate board in times square'.format(unique_token),
+        ]
     elif unique_token=="clock":
         add_ones = [
             'a {0} clock with a cave in the background'.format(unique_token),
@@ -68,6 +85,7 @@ def get_promts(dataset):
 
     elif unique_token=="dog6":
         add_ones = [
+            'a {0} dog in a swimming pool'.format(unique_token),
             'a {0} dog in the Acropolis'.format(unique_token),
             'a {0} dog in a doghouse'.format(unique_token),
             'a {0} dog in a bucket'.format(unique_token),
