@@ -1,0 +1,5 @@
+Collecting bitsandbytes
+  Using cached bitsandbytes-0.41.2.post2-py3-none-any.whl.metadata (9.8 kB)
+Using cached bitsandbytes-0.41.2.post2-py3-none-any.whl (92.6 MB)
+Installing collected packages: bitsandbytes
+Successfully installed bitsandbytes-0.41.2.post2

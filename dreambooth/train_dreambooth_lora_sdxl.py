@@ -1908,5 +1908,8 @@ def main(args):
     
 
 if __name__ == "__main__":
+    import time
+    start_time = time.time()
     args = parse_args()
     main(args)
+    print("--- %s seconds ---" % (time.time() - start_time))
