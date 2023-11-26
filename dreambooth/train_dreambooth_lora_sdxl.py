@@ -190,7 +190,7 @@ def struct_output(args):
             attn_config = attn_config + "o" + str(args.krona_unet_o_rank_a1) + ":" + str(args.krona_unet_o_rank_a2)
         if(args.unet_tune_mlp): 
             attn_config = attn_config + "f" + str(args.krona_unet_ffn_rank_a1) + ":" + str(args.krona_unet_ffn_rank_a2)
-        exp = f"krona_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
+        exp = f"{args.init_type}_krona_{attn_config}_{args.diffusion_model}_{args.learning_rate}"
         
         if(args.train_text_encoder):
             text_attn_config = ''
