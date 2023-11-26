@@ -20,7 +20,7 @@ krona_unet_ffn_rank_a2=$a2 # out
 
 lr=6e-4
 steps=1000
-
+init_type="type_2"
 
 accelerate launch train_dreambooth_lora_sdxl.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
@@ -51,7 +51,7 @@ accelerate launch train_dreambooth_lora_sdxl.py \
     --krona_unet_v_rank_a2=$krona_unet_v_rank_a2 \
     --krona_unet_o_rank_a1=$krona_unet_o_rank_a1 \
     --krona_unet_o_rank_a2=$krona_unet_o_rank_a2 \
-    --init_type="type_2" 
+    --init_type=$init_type
 
 python3 generator.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
@@ -82,4 +82,4 @@ python3 generator.py \
     --krona_unet_v_rank_a2=$krona_unet_v_rank_a2 \
     --krona_unet_o_rank_a1=$krona_unet_o_rank_a1 \
     --krona_unet_o_rank_a2=$krona_unet_o_rank_a2 \
-    --init_type="type_2" 
+    --init_type=$init_type
