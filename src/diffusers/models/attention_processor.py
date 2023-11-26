@@ -1309,6 +1309,7 @@ class LoRAAttnProcessor2_0(nn.Module):
             q_rank=None,
             v_rank=None,
             out_rank=None,
+            init_type=None,
             **kwargs,
         ):
         super().__init__()
@@ -1341,13 +1342,13 @@ class LoRAAttnProcessor2_0(nn.Module):
             
         elif(adapter_type == "krona"):
             if("q" in attn_update_unet):
-                self.to_q_lora = KronALinearLayer(q_hidden_size, q_hidden_size, q_rank, network_alpha)
+                self.to_q_lora = KronALinearLayer(q_hidden_size, q_hidden_size, q_rank, network_alpha, device=None, dtype=None, init_type=init_type)
             if("k" in attn_update_unet):
-                self.to_k_lora = KronALinearLayer(cross_attention_dim or hidden_size, hidden_size, k_rank, network_alpha)
+                self.to_k_lora = KronALinearLayer(cross_attention_dim or hidden_size, hidden_size, k_rank, network_alpha, device=None, dtype=None, init_type=init_type)
             if("v" in attn_update_unet):
-                self.to_v_lora = KronALinearLayer(cross_attention_dim or v_hidden_size, v_hidden_size, v_rank, network_alpha)
+                self.to_v_lora = KronALinearLayer(cross_attention_dim or v_hidden_size, v_hidden_size, v_rank, network_alpha, device=None, dtype=None, init_type=init_type)
             if("o" in attn_update_unet):
-                self.to_out_lora = KronALinearLayer(out_hidden_size, out_hidden_size, out_rank, network_alpha)
+                self.to_out_lora = KronALinearLayer(out_hidden_size, out_hidden_size, out_rank, network_alpha, device=None, dtype=None, init_type=init_type)
             
         else:
             raise ValueError("Only lora & krona supported.")

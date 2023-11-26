@@ -46,11 +46,7 @@ class KronALinearLayer(nn.Module):
         # This value has the same meaning as the `--network_alpha` option in the kohya-ss trainer script.
         # See https://github.com/darkstorm2150/sd-scripts/blob/main/docs/train_network_README-en.md#execute-learning
         self.network_alpha = network_alpha
-
-        if init_type is None:
-            raise ValueError(f"please select an init_type")
-        
-        if init_type=="type_1":
+        if init_type=="type_1" or init_type is None:
             # our results are based on this
             nn.init.normal_(self.down.weight, std=1 / rank[0])
             nn.init.zeros_(self.up.weight)

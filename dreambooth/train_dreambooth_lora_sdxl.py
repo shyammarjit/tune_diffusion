@@ -735,6 +735,11 @@ def parse_args(input_args=None):
         action="store_true",
         help="Whether we are finetuning MLP layers as well.",
     )
+    parser.add_argument("--init_type",
+        default="type_1",
+        type=str,
+        help="in which type to initialize",
+    )
 
     if input_args is not None: args = parser.parse_args(input_args)
     else: args = parser.parse_args()
@@ -1142,6 +1147,7 @@ def main(args):
                 hidden_size=hidden_size, 
                 cross_attention_dim=cross_attention_dim, 
                 adapter_type=args.adapter_type, # added 
+                init_type=args.init_type, # added
                 attn_update_unet=args.attn_update_unet, # added 
                 k_rank=(args.krona_unet_k_rank_a1, args.krona_unet_k_rank_a2) if "k" in args.attn_update_unet else None, # k rank
                 q_rank=(args.krona_unet_q_rank_a1, args.krona_unet_q_rank_a2) if "q" in args.attn_update_unet else None, # added 
