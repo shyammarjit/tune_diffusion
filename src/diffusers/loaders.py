@@ -691,7 +691,7 @@ class UNet2DConditionLoadersMixin:
         # set layers
         self.set_attn_processor(attn_processors)
 
-        # set ff layers
+        # set ffn layers
         for target_module, lora_layer in non_attn_lora_layers:
             target_module.set_lora_layer(lora_layer)
 

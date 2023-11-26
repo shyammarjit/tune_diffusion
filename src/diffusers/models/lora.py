@@ -16,14 +16,14 @@ from typing import Optional
 
 import torch.nn.functional as F
 from torch import nn
-import torch
+import torch, math
 
 def kronecker(A, B):
     return torch.einsum("ab,cd->acbd", A, B).view(A.size(0)*B.size(0),  A.size(1)*B.size(1))
 
 
 class KronALinearLayer(nn.Module):
-    def __init__(self, in_features, out_features, rank=(32, 16), network_alpha=None, device=None, dtype=None):
+    def __init__(self, in_features, out_features, rank=(32, 16), network_alpha=None, device=None, dtype=None, init_type=None):
         super().__init__()
         
         self.a1 = rank[0]
@@ -47,12 +47,63 @@ class KronALinearLayer(nn.Module):
         # See https://github.com/darkstorm2150/sd-scripts/blob/main/docs/train_network_README-en.md#execute-learning
         self.network_alpha = network_alpha
 
-        nn.init.normal_(self.down.weight, std=1 / rank[0])
-        nn.init.zeros_(self.up.weight)
+        if init_type is None:
+            raise ValueError(f"please select an init_type")
+        
+        if init_type=="type_1":
+            # our results are based on this
+            nn.init.normal_(self.down.weight, std=1 / rank[0])
+            nn.init.zeros_(self.up.weight)
+        elif init_type=="type_2":
+            nn.init.zeros_(self.down.weight)
+            nn.init.normal_(self.up.weight, std=1 / rank[0])
+        elif init_type=="type_3":
+            nn.init.normal_(self.down.weight, std=1 / rank[0])
+            nn.init.normal_(self.up.weight, std=1 / rank[0])
+        
+        elif init_type=="type_4":
+            nn.init.normal_(self.down.weight, std=1 / math.sqrt(min(in_features, out_features)))
+            nn.init.zeros_(self.up.weight)
+        elif init_type=="type_5":
+            nn.init.zeros_(self.down.weight)
+            nn.init.normal_(self.up.weight, std=1 / math.sqrt(min(in_features, out_features)))
+        elif init_type=="type_6":
+            nn.init.normal_(self.down.weight, std=1 / math.sqrt(min(in_features, out_features)))
+            nn.init.normal_(self.up.weight, std=1 / math.sqrt(min(in_features, out_features)))
+        
+        elif init_type=="type_7":
+            # This initialization is being followed in VL Adapter
+            nn.init.zeros_(self.down.weight)
+            nn.init.zeros_(self.up.weight)
+        
+        elif init_type=="type_8":
+            nn.init.xavier_uniform_(self.down.weight)
+            nn.init.zeros_(self.up.weight)
+        elif init_type=="type_9":
+            nn.init.zeros_(self.down.weight)
+            nn.init.xavier_uniform_(self.up.weight)
+        elif init_type=="type_10":
+            # this initialization is used in PEVIT
+            nn.init.xavier_uniform_(self.down.weight)
+            nn.init.xavier_uniform_(self.up.weight)
+        
+        elif init_type=="type_11":
+            nn.init.kaiming_uniform_(self.down.weight, a=math.sqrt(5), mode='fan_in', nonlinearity='leaky_relu')
+            nn.init.kaiming_uniform_(self.up.weight, a=math.sqrt(5), mode='fan_in', nonlinearity='leaky_relu')
+        elif init_type=="type_12":
+            # This initialization is followed in KronA
+            nn.init.kaiming_uniform_(self.down.weight, a=math.sqrt(5), mode='fan_in', nonlinearity='leaky_relu')
+            nn.init.zeros_(self.up.weight)
+        elif init_type=="type_13":
+            nn.init.zeros_(self.down.weight)
+            nn.init.kaiming_uniform_(self.up.weight, a=math.sqrt(5), mode='fan_in', nonlinearity='leaky_relu')
+        else:
+            raise ValueError(f"wrong {init_type}")
         # nn.init.normal_(self.down, std=1 / rank[0])
         # nn.init.zeros_(self.up)
 
     def forward(self, hidden_states):
+        # print(self.up.weight)
         orig_dtype = hidden_states.dtype
         dtype = self.down.weight.dtype
         # dtype = self.down.dtype
