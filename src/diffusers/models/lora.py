@@ -47,6 +47,7 @@ class KronALinearLayer(nn.Module):
         # See https://github.com/darkstorm2150/sd-scripts/blob/main/docs/train_network_README-en.md#execute-learning
         self.network_alpha = network_alpha
         if init_type=="type_1" or init_type is None:
+            if init_type is None: print("init_type is default")
             # our results are based on this
             nn.init.normal_(self.down.weight, std=1 / rank[0])
             nn.init.zeros_(self.up.weight)
