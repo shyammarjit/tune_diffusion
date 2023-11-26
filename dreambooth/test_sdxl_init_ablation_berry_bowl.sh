@@ -36,6 +36,7 @@ accelerate launch train_dreambooth_lora_sdxl.py \
     --adapter_type="krona" \
     --seed="0" \
     --diffusion_model="sdxl" \
+    --checkpointing_steps=100 \
     --use_8bit_adam \
     --gradient_checkpointing \
     --enable_xformers_memory_efficient_attention \
@@ -60,6 +61,7 @@ python3 generator.py \
     --train_batch_size=1 \
     --gradient_accumulation_steps=4 \
     --learning_rate=$lr \
+    --checkpointing_steps=100 \
     --lr_scheduler="constant" \
     --lr_warmup_steps=0 \
     --max_train_steps=$steps \

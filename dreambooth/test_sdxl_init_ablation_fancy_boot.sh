@@ -31,6 +31,7 @@ accelerate launch train_dreambooth_lora_sdxl.py \
     --resolution=1024 \
     --train_batch_size=1 \
     --gradient_accumulation_steps=4 \
+    --checkpointing_steps=100 \
     --learning_rate=$lr \
     --lr_scheduler="constant" \
     --lr_warmup_steps=0 \
@@ -60,6 +61,7 @@ python3 generator.py \
     --instance_prompt="a photo of sks${subjects}" \
     --resolution=1024 \
     --train_batch_size=1 \
+    --checkpointing_steps=100 \
     --gradient_accumulation_steps=4 \
     --learning_rate=$lr \
     --lr_scheduler="constant" \
