@@ -42,13 +42,15 @@ def instance_prompt(dataset):
         'glass_sculpture':'sks_glass_sculpture,sculpture',
         'panda_sculpture':'sks_panda_sculpture,sculpture',
         'plushy':'sks_plushy,plushy',
+        'doggy':'sks_doggy,dog',
+        'sofa':'sks_sofa,sofa',
     }
     return subject_class_dict[dataset]
  
 
 def get_promts(dataset):
-    livig_dataset=["cat","cat2","dog","dog2","dog3","dog5","dog6","dog7","dog8"]
-    non_living_dataset= ['glass_sculpture', 'panda_sculpture', 'backpack','backpack_dog','bear_plushie','berry_bowl','can','candle' ,'clock' ,'colorful_sneaker','duck_toy','fancy_boot','grey_sloth_plushie','monster_toy','pink_sunglasses','poop_emoji','rc_car','red_cartoon','robot_toy','shiny_sneaker','teapot','vase','wolf_plushie', 'plushy']
+    livig_dataset=["cat","cat2","dog","dog2","dog3","dog5","dog6","dog7","dog8", "doggy"]
+    non_living_dataset= ['glass_sculpture', 'panda_sculpture', 'backpack','backpack_dog','bear_plushie','berry_bowl','can','candle' ,'clock' ,'colorful_sneaker','duck_toy','fancy_boot','grey_sloth_plushie','monster_toy','pink_sunglasses','poop_emoji','rc_car','red_cartoon','robot_toy','shiny_sneaker','teapot','vase','wolf_plushie', 'plushy', 'sofa']
     unique_token = os.path.basename(dataset)
     class_token = instance_prompt(unique_token)
     add_ones=[]
@@ -74,7 +76,15 @@ def get_promts(dataset):
 
     elif unique_token=="plushy":
         add_ones = [
-            'a {} plushy on a skate board in times square'.format(unique_token),
+            'A backpack in the style of {} tortoise plushy'.format(unique_token),
+            'A {} tortoise plushy swimming in pool'.format(unique_token),
+        ]
+
+    elif unique_token=="doggy":
+        add_ones = [
+            'a {} dog in times square'.format(unique_token),
+            'a {} dog in a construction outfit'.format(unique_token),
+            'Painting of a {} dog at a beach by artist claude monet'.format(unique_token),
         ]
     elif unique_token=="clock":
         add_ones = [
@@ -112,10 +122,14 @@ def get_promts(dataset):
         
     elif unique_token == "cat":
         add_ones = [
-            'a {0} cat seen from the top'.format(unique_token),
-            'a {0} cat seen from the bottom'.format(unique_token),
-            'a {0} cat seen from the side'.format(unique_token),
-            'a {0} cat seen from the back'.format(unique_token)
+            'a {} cat at a beach with a view of seashore'.format(unique_token),
+            'a photo of {} cat'.format(unique_token),
+        ]
+
+    elif unique_token == "sofa":
+        add_ones = [
+            'Floor lamp on the side of a {} chair'.format(unique_token),
+            'a {} chair near a pool'.format(unique_token),
         ]
 
     elif unique_token == "dog2":

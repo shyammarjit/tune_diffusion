@@ -11,9 +11,9 @@ import torch.nn.functional as F
 import wandb
 
 model_id = "stabilityai/stable-diffusion-2-1-base"
-pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16).to("cuda:2")
+pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16).to("cuda:0")
 pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
-device = torch.device('cuda:2' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 model, preprocess = clip.load('ViT-B/32', device=device, jit=False)
 # torch.manual_seed(0)
 
@@ -109,18 +109,22 @@ def generator(instance_data_dir, output_dir):
     if(os.path.exists(output_dir)): pass
     else: os.mkdir(output_dir)
     
-    for i in trange(1000, desc = "generating images"):
+    for i in trange(100, desc = "generating images"):
         image = pipe(prompts[0], num_inference_steps=50, guidance_scale=7).images[0]
-        image_save_path = os.path.join(output_dir, 'seed_images', "image_seed{}.jpg".format(i+1))
-        # wandb.log({'Final Images': wandb.Image(image)})
-        # # wandb.log({'subject': wandb.weights(args.learning_rate_text)})
-        # wandb.log({'rank(r)': wandb.weights(args.lora_rank)})
-        # wandb.log({'learning rate': wandb.weights(args.learning_rate)})
-        # wandb.log({'learning rate text': wandb.weights(args.learning_rate_text)})
-        # wandb.log({'alpha text': wandb.weights(args.alpha_text)})
-        # wandb.log({'alpha unet': wandb.weights(args.alpha_unet)})
+        image_save_path = os.path.join(output_dir, 'seed_images', "image0_seed{}.jpg".format(i+1))
         image.save(image_save_path)
+
+        image = pipe(prompts[1], num_inference_steps=50, guidance_scale=7).images[0]
+        image_save_path = os.path.join(output_dir, 'seed_images', "image1_seed{}.jpg".format(i+1))
+        image.save(image_save_path)
+
     print(f"Image generation completed.")
+
+
+
+instance_data_dir = "/home/nmathur/dataset/tune_diffusion/cat"
+output_dir = '/home/nmathur/output_lora_ram/cat/lora_8_0.0001_5e-05_1000_False'
+generator(instance_data_dir, output_dir)
 
 
 # instance_data_dir = "/home/nmathur/dataset/tune_diffusion/dog6"
@@ -145,6 +149,8 @@ def generator(instance_data_dir, output_dir):
 # output_dir = '/home/nmathur/output_lora/glass_sculpture/lora_8_0.0001_5e-05_1000_False'
 # generator(instance_data_dir, output_dir)
 
-instance_data_dir = "/home/nmathur/dataset/tune_diffusion/panda_sculpture"
-output_dir = '/home/nmathur/output_lora/panda_sculpture/lora_8_0.0001_0.0001_1000_False'
-generator(instance_data_dir, output_dir)
+# instance_data_dir = "/home/nmathur/dataset/tune_diffusion/panda_sculpture"
+# output_dir = '/home/nmathur/output_lora/panda_sculpture/lora_8_0.0001_0.0001_1000_False'
+# generator(instance_data_dir, output_dir)
+
+
