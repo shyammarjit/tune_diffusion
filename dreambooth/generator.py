@@ -16,7 +16,7 @@ class DatasetWrapper(Dataset):
     def __init__(self, images_path, input_size = 512):
         self.images_path = images_path; self.input_size = input_size
         # Build transform
-        self.trans = T.Compose([T.PILToTensor(), T.Resize(size=(self.input_size, self.input_size))]) 
+        self.trans = T.Compose([T.PILToTensor(), T.Resize(size=(self.input_size, self.input_size)), T.ToTensor()]) 
         # total_images = args.images
         # distribution = [i for i in range(total_images)]
         # num_selected_images = int(selection_p * total_images)
