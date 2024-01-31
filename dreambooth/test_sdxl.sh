@@ -1,12 +1,12 @@
-subjects="teapot"
+subjects="cat"
 export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
-export OUTPUT_DIR="/home/nmathur/test"
-export INSTANCE_DIR="/home/nmathur/dataset/tune_diffusion/${subjects}"
+export OUTPUT_DIR="/home/shyam/test"
+export INSTANCE_DIR="/home/shyam/dataset/${subjects}"
 
 attn_update_unet="kqvo"
 # unet parameters
-a1=16
-a2=32
+a1=64
+a2=8
 krona_unet_k_rank_a1=$a1 # k 
 krona_unet_k_rank_a2=$a2 # k
 krona_unet_q_rank_a1=$a1 # q
