@@ -23,7 +23,7 @@ def kronecker(A, B):
 
 
 class KronALinearLayer(nn.Module):
-    def __init__(self, in_features, out_features, rank=(32, 16), network_alpha=None, device=None, dtype=None):
+    def __init__(self, in_features, out_features, rank=(64, 4), network_alpha=None, device=None, dtype=None):
         super().__init__()
         
         self.a1 = rank[0]
@@ -225,6 +225,7 @@ class LoRACompatibleLinear(nn.Linear):
         return self.args, self.kwargs
 
     def set_lora_layer(self, lora_layer: Optional[LoRALinearLayer], adapter_type="lora"):
+        """ Note: here rank paramters are already set so no need to set them again. """
         if adapter_type=="lora": self.lora_layer = lora_layer
         elif adapter_type=="krona": self.lora_layer = KronALinearLayer
         else: raise AttributeError("wrong adapter type")
