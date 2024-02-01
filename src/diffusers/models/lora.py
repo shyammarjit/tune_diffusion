@@ -224,11 +224,9 @@ class LoRACompatibleLinear(nn.Linear):
     def get_config(self):
         return self.args, self.kwargs
 
-    def set_lora_layer(self, lora_layer: Optional[LoRALinearLayer], adapter_type="lora"):
+    def set_lora_layer(self, lora_layer: Optional[LoRALinearLayer]):
         """ Note: here rank paramters are already set so no need to set them again. """
-        if adapter_type=="lora": self.lora_layer = lora_layer
-        elif adapter_type=="krona": self.lora_layer = KronALinearLayer
-        else: raise AttributeError("wrong adapter type")
+        self.lora_layer = lora_layer
 
     def forward(self, x):
         if self.lora_layer is None:
